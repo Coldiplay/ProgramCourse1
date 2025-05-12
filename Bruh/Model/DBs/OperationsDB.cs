@@ -13,15 +13,15 @@ namespace Bruh.Model.DBs
 {
     public class OperationsDB : ISampleDB
     {
-        public List<IModel> GetEntries(string filter)
+        public List<IModel> GetEntries(string search, string filter)
         {
             List<IModel> operations = new();
             if (DbConnection.GetDbConnection() == null)
                 return operations;
 
-            using (var cmd = DbConnection.GetDbConnection().CreateCommand("SELECT `ID`, `Title`, `Cost`, `TransactDate`, `DateOfCreate`, `Income`, `Description`, `PeriodicityID`, `CategoryID`, `DebtID`, `AccountID` FROM `Operations` WHERE `Title` LIKE @filter OR `Cost` LIKE @filter OR `Description` LIKE @filter OR `TransactDate` LIKE @filter "))
+            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID`, `Title`, `Cost`, `TransactDate`, `DateOfCreate`, `Income`, `Description`, `PeriodicityID`, `CategoryID`, `DebtID`, `AccountID` FROM `Operations` WHERE `Title` LIKE @search OR `Cost` LIKE @search OR `Description` LIKE @search OR `TransactDate` LIKE @search {filter}"))
             {
-                cmd.Parameters.Add(new MySqlParameter("filter", $"%{filter}%"));
+                cmd.Parameters.Add(new MySqlParameter("search", $"%{search}%"));
 
                 DbConnection.GetDbConnection().OpenConnection();
                 ExeptionHandler.Try(() =>

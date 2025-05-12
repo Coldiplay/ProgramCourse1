@@ -1,5 +1,4 @@
-﻿using Bruh.VM;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,15 +15,13 @@ using System.Windows.Shapes;
 namespace Bruh.View
 {
     /// <summary>
-    /// Логика взаимодействия для EditWindow.xaml
+    /// Логика взаимодействия для FilterWindow.xaml
     /// </summary>
-    public partial class EditWindow : Window
+    public partial class FilterWindow : Window
     {
-        public EditWindow()
+        public FilterWindow()
         {
             InitializeComponent();
-            //if (DataContext is EditWindowVM)
-                //((EditWindowVM)DataContext).Set();
         }
     }
 }

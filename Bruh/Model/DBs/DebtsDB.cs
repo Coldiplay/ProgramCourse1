@@ -8,15 +8,15 @@ namespace Bruh.Model.DBs
 {
     public class DebtsDB : ISampleDB
     {
-        public List<IModel> GetEntries(string filter)
+        public List<IModel> GetEntries(string search, string filter)
         {
             List<IModel> debts = new();
             if (DbConnection.GetDbConnection() == null)
                 return debts;
 
-            using (var cmd = DbConnection.GetDbConnection().CreateCommand("SELECT `ID`, `Title`, `Summ`, `AnnualInterest`, `DateOfPick`, `DateOfReturn`, `CurrencyID` FROM `Debts` WHERE `Title` LIKE @filter OR `Summ` LIKE @filter OR `DateOfPick` LIKE @filter OR `DateOfReturn` LIKE @filter OR `AnnualInterest` LIKE @filter"))
+            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID`, `Title`, `Summ`, `AnnualInterest`, `DateOfPick`, `DateOfReturn`, `CurrencyID` FROM `Debts` WHERE `Title` LIKE @search OR `Summ` LIKE @search OR `DateOfPick` LIKE @search OR `DateOfReturn` LIKE @search OR `AnnualInterest` LIKE @search {filter}"))
             {
-                cmd.Parameters.Add(new MySqlParameter("filter", $"%{filter}%"));
+                cmd.Parameters.Add(new MySqlParameter("search", $"%{search}%"));
 
                 DbConnection.GetDbConnection().OpenConnection();
                 ExeptionHandler.Try(() =>
@@ -60,6 +60,8 @@ namespace Bruh.Model.DBs
                     });
                     DbConnection.GetDbConnection().OpenConnection();
                 }
+
+                debt.SetCode();
             });
 
             return debts;
@@ -112,9 +114,10 @@ namespace Bruh.Model.DBs
                 });
                 DbConnection.GetDbConnection().OpenConnection();
             }
+            debt.SetCode();
+
             return debt;
         }
-
 
         public bool Insert(IModel deb, bool changeCorrespondingEntries)
         {

@@ -8,7 +8,8 @@
         mc:Ignorable="d"
         DataContext="{DynamicResource vm}"
         Title="MainWindow" Height="480" Width="600"
-        SizeToContent="Width">
+        SizeToContent="Width"
+        WindowStartupLocation="CenterScreen">
     
     <Window.Resources>
         <vm:MainVM x:Key="vm"/>
@@ -100,10 +101,12 @@
             <Button Content="Долги" Style="{DynamicResource MainMenuButton}" Command="{Binding SetDebts}"/>
             <Button Content="Вклады" Style="{DynamicResource MainMenuButton}" Command="{Binding SetDeposits}"/>
             <Button Content="Счета" Style="{DynamicResource MainMenuButton}" Command="{Binding SetAccounts}"/>
+            <Button Content="Категории" Style="{DynamicResource MainMenuButton}" Command="{Binding OpenCategories}"/>
         </StackPanel>
 
         <StackPanel Grid.Column="1">
             <TextBlock Text="{Binding TitleOfList}" FontSize="20" FontWeight="SemiBold"/>
+            <TextBox Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}" MaxLength="255"/>
             <StackPanel Orientation="Horizontal">
                 <Button Content="+ Добавить" Style="{DynamicResource Operations}" Command="{Binding AddEntry}"/>
                 <Button Content="Изменить" Style="{DynamicResource Operations}" Command="{Binding EditEntry}"/>

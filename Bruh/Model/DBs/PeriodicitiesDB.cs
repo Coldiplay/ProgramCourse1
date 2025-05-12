@@ -13,7 +13,7 @@ namespace Bruh.Model.DBs
 {
     public class PeriodicitiesDB : ISampleDB
     {
-        public List<IModel> GetEntries(string filter)
+        public List<IModel> GetEntries(string search, string filter)
         {
             List<IModel> periodicities = new();
             if (DbConnection.GetDbConnection() == null)
