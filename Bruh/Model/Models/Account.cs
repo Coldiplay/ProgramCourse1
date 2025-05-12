@@ -20,7 +20,7 @@ namespace Bruh.Model.Models
 
         public string GetBalance
         {
-            get => Currency == null || Currency.Symbol == null ? $"{Balance} " : $"{Balance} {Currency.Symbol}";
+            get => Currency == null || char.IsWhiteSpace(Currency.Symbol) ? $"{Balance} " : $"{Balance} {Currency.Symbol}";
         }
     }
 }

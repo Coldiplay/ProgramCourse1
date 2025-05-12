@@ -8,7 +8,9 @@
         xmlns:model="clr-namespace:Bruh.Model.Models"
         mc:Ignorable="d"
         DataContext="{DynamicResource vm}"
-        Title="EditWindow" Height="450" Width="800">
+        Title="EditWindow" Height="450" Width="800"
+        WindowStartupLocation="CenterScreen"
+        SizeToContent="WidthAndHeight">
     <Window.Resources>
         <vm:EditWindowVM x:Key="vm"/>
         <DataTemplate DataType="{x:Type model:Account}">
@@ -48,39 +50,45 @@
         <DataTemplate DataType="{x:Type model:Bank}">
             <StackPanel>
                 <TextBlock Text="Название банка"/>
-                <TextBox Text="{Binding Title}"/>                
+                <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"/>                
             </StackPanel>
         </DataTemplate>
         <DataTemplate DataType="{x:Type model:Category}">
             <StackPanel>
                 <TextBlock Text="Название категории"/>
-                <TextBox Text="{Binding Title}"/>
+                <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"/>
             </StackPanel>
         </DataTemplate>
         <DataTemplate DataType="{x:Type model:Currency}">
             <StackPanel>
                 <TextBlock Text="Название валюты"/>
-                <TextBox Text="{Binding Title}"/>
+                <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBlock Text="Знак валюты"/>
-                <TextBox Text="{Binding Symbol}" MaxLength="1"/>
+                <TextBox Text="{Binding Symbol, UpdateSourceTrigger=PropertyChanged}" MaxLength="1"/>
                 </StackPanel>
         </DataTemplate>
         <DataTemplate DataType="{x:Type model:Debt}">
             <StackPanel>
                 <TextBlock Text="Название долга"/>
-                <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" MaxLength="255"/>
                 <TextBlock Text="Сумма долга"/>
                 <TextBox Text="{Binding Summ, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBlock Text="Годовой процент (%)"/>
-                <TextBox Text="{Binding AnnualInterest, UpdateSourceTrigger=PropertyChanged}"/>
-                <TextBlock Text="Примерная сумма всего долга"/>
-                <TextBlock Text="{Binding GetApproximateFullSumm, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding AnnualInterest, UpdateSourceTrigger=PropertyChanged}" MaxLength="8"/>
                 <TextBlock Text="Валюта"/>
                 <ComboBox ItemsSource="{Binding DataContext.Currencies, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" SelectedItem="{Binding Currency, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="GetCurrency"/>
                 <TextBlock Text="Дата взятия долга"/>
                 <DatePicker SelectedDate="{Binding DateOfPick, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Срок"/>
+                <StackPanel Orientation="Horizontal">
+                    <TextBox Text="{Binding Duration, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Content="{Binding DataContext.DurationType, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" 
+                            Command="{Binding DataContext.ChangeDurationType, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
+                </StackPanel>
                 <TextBlock Text="Дата возврата долга"/>
-                <DatePicker SelectedDate="{Binding DateOfReturn, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock Text="{Binding DateOfReturn, StringFormat=dd.MM.yyyy}"/>
+                <TextBlock Text="Примерная сумма всего долга"/>
+                <TextBlock Text="{Binding GetApproximateFullSumm, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBlock Text="Примерный ежемесячный платёж"/>
                 <TextBlock Text="{Binding GetApproximateMonthlyPayment, UpdateSourceTrigger=PropertyChanged}"/>
             </StackPanel>
@@ -89,18 +97,24 @@
         <DataTemplate DataType="{x:Type model:Deposit}">
             <StackPanel>
                 <TextBlock Text="Название вклада"/>
-                <TextBox Text="{Binding Title}"/>
+                <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" MaxLength="255"/>
                 <TextBlock Text="Сумма вклада"/>
-                <TextBox Text="{Binding InitalSumm}"/>
+                <TextBox Text="{Binding InitalSumm, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBlock Text="Процент вклада"/>
-                <TextBox Text="{Binding InterestRate}"/>
-                <CheckBox Content="Капитализация процентов" IsChecked="{Binding Capitalization}"/>
+                <TextBox Text="{Binding InterestRate, UpdateSourceTrigger=PropertyChanged}" MaxLength="8"/>
+                <CheckBox Content="Капитализация процентов" IsChecked="{Binding Capitalization, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBlock Text="Дата открытия вклада"/>
-                <DatePicker SelectedDate="{Binding OpenDate}"/>
+                <DatePicker SelectedDate="{Binding OpenDate, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBlock Text="Срок вклада"/>
                 <StackPanel Orientation="Horizontal">
-                    <TextBox Text="{Binding Duration}"/>
+                    <TextBox Text="{Binding Duration, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Content="{Binding DataContext.DurationType, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" 
+                            Command="{Binding DataContext.ChangeDurationType, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
                 </StackPanel>
+                <TextBlock Text="Дата закрытия вклада"/>
+                <TextBlock Text="{Binding CloseDate, StringFormat=dd.MM.yyyy}"/>
+                <TextBlock Text="Примерная конечная сумма"/>
+                <TextBlock Text="{Binding GetProbSumm}"/>
             </StackPanel>
         </DataTemplate>
 

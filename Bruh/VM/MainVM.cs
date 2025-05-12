@@ -28,6 +28,9 @@ namespace Bruh.VM
         private string titleOfList = "";
         private uint codeOper;
         private IModel? selectedEntry;
+        private List<string>? parametres = [];
+
+        //private object? filter;
 
         public ObservableCollection<Operation> Operations
         {
@@ -151,14 +154,31 @@ namespace Bruh.VM
             set
             {
                 codeOper = value;
+                Parametres = null;
                 UpdateLists(codeOper);
             }
         }
-
+        public List<string>? Parametres
+        {
+            get => parametres;
+            set
+            {
+                parametres = value;
+                Filter = "";
+                parametres?.ForEach(p => 
+                {
+                    Filter = $"{Filter} {p}";
+                });
+                Signal();
+                Signal(nameof(Filter));
+            }
+        }
+        public string Filter { get; set; }
 
         public ICommand AddEntry { get; set; }
         public ICommand EditEntry { get; set; }
         public ICommand RemoveEntry { get; set; }
+        public ICommand OpenCategories { get; set; }
 
         public ICommand SetIncomes { get; set; }
         public ICommand SetExpenses { get; set; }
@@ -215,6 +235,10 @@ namespace Bruh.VM
                     UpdateLists(CodeOper);
                 }
             }, () => SelectedEntry != null);
+            OpenCategories = new CommandVM(() => 
+            {
+                new CategoriesWindow().ShowDialog();
+            }, () => true);
         }
 
         public void UpdateLists(uint i)
@@ -235,42 +259,42 @@ namespace Bruh.VM
                     StackPanels.ForEach(sp => sp.Visibility = Visibility.Collapsed);
                     StackPanels.First(sp => sp.Name == "Operations").Visibility = Visibility.Visible;
                     TitleOfList = "Все операции";
-                    Operations = new(DB.GetDb(typeof(OperationsDB)).GetEntries(Search).Select(s => (Operation)s).OrderBy(oper => oper.TransactDate));
+                    Operations = new(DB.GetDb(typeof(OperationsDB)).GetEntries(Search, Filter).Select(s => (Operation)s).OrderBy(oper => oper.TransactDate));
                     break;
 
                 case 1:
                     StackPanels.ForEach(sp => sp.Visibility = Visibility.Collapsed);
                     StackPanels.First(sp => sp.Name == "Incomes").Visibility = Visibility.Visible;
                     TitleOfList = "Доходы";
-                    Operations = new(DB.GetDb(typeof(OperationsDB)).GetEntries(Search).Select(s => (Operation)s).Where(oper => oper.Income == true).OrderBy(oper => oper.TransactDate));
+                    Operations = new(DB.GetDb(typeof(OperationsDB)).GetEntries(Search, Filter).Select(s => (Operation)s).Where(oper => oper.Income == true).OrderBy(oper => oper.TransactDate));
                     break;
 
                 case 2:
                     StackPanels.ForEach(sp => sp.Visibility = Visibility.Collapsed);
                     StackPanels.First(sp => sp.Name == "Expenses").Visibility = Visibility.Visible;
                     TitleOfList = "Расходы";
-                    Operations = new(DB.GetDb(typeof(OperationsDB)).GetEntries(Search).Select(s => (Operation)s).Where(oper => oper.Income == false).OrderBy(oper => oper.TransactDate));
+                    Operations = new(DB.GetDb(typeof(OperationsDB)).GetEntries(Search, Filter).Select(s => (Operation)s).Where(oper => oper.Income == false).OrderBy(oper => oper.TransactDate));
                     break;
 
                 case 3:
                     StackPanels.ForEach(sp => sp.Visibility = Visibility.Collapsed);
                     StackPanels.First(sp => sp.Name == "Debts").Visibility = Visibility.Visible;
                     TitleOfList = "Долги";
-                    Debts = new(DB.GetDb(typeof(DebtsDB)).GetEntries(Search).Select(d => (Debt)d).OrderBy(d => d.DateOfPick));
+                    Debts = new(DB.GetDb(typeof(DebtsDB)).GetEntries(Search, Filter).Select(d => (Debt)d).OrderBy(d => d.DateOfPick));
                     break;
 
                 case 4:
                     StackPanels.ForEach(sp => sp.Visibility = Visibility.Collapsed);
                     StackPanels.First(sp => sp.Name == "Deposits").Visibility = Visibility.Visible;
                     TitleOfList = "Вклады";
-                    Deposits = new(DB.GetDb(typeof(DepositsDB)).GetEntries(Search).Select(d => (Deposit)d).OrderBy(d => d.OpenDate));
+                    Deposits = new(DB.GetDb(typeof(DepositsDB)).GetEntries(Search, Filter).Select(d => (Deposit)d).OrderBy(d => d.OpenDate));
                     break;
 
                 case 5:
                     StackPanels.ForEach(sp => sp.Visibility = Visibility.Collapsed);
                     StackPanels.First(sp => sp.Name == "Accounts").Visibility = Visibility.Visible;
                     TitleOfList = "Счета";
-                    Accounts = new(DB.GetDb(typeof(AccountsDB)).GetEntries(Search).Select(a => (Account)a).OrderBy(a => a.Title));
+                    Accounts = new(DB.GetDb(typeof(AccountsDB)).GetEntries(Search, Filter).Select(a => (Account)a).OrderBy(a => a.Title));
                     break;
             }
         }

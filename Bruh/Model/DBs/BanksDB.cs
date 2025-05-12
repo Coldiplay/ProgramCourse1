@@ -8,7 +8,7 @@ namespace Bruh.Model.DBs
 {
     public class BanksDB : ISampleDB
     {
-        public List<IModel> GetEntries(string filter)
+        public List<IModel> GetEntries(string search, string filter)
         {
             List<IModel> banks = new();
             if (DbConnection.GetDbConnection() == null)
@@ -65,7 +65,6 @@ namespace Bruh.Model.DBs
             }
             return bank;
         }
-
 
         public bool Insert(IModel ban, bool changeCorrespondingEntries)
         {

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Bruh.Model.DBs
 {
+    /*
     //public class Test
     //{
     //    public void Main()
@@ -14,16 +15,18 @@ namespace Bruh.Model.DBs
     //        DB<DbOperation>.GetDb().Insert();
     //    }
     //}
+    */
 
     public interface ISampleDB
     {
         public bool Insert(IModel obj, bool changeCorrespondingEntries);
         public bool Update(IModel obj, bool changeCorrespondingEntries);
         public bool Remove(IModel obj, bool changeCorrespondingEntries);
-        public List<IModel> GetEntries(string filter);
+        public List<IModel> GetEntries(string search, string filter);
         public IModel GetSingleEntry(int id);
     }
 
+    /*
     //public class DB<T> where T : ISampleDB, new()
     //{
     //    static List<ISampleDB> sampleDBs = new List<ISampleDB>();
@@ -39,7 +42,7 @@ namespace Bruh.Model.DBs
     //        return db;
     //    }
     //}
-
+    */
     public class DB
     {
         static List<ISampleDB> sampleDBs = new List<ISampleDB>();
