@@ -104,105 +104,159 @@
             <Button Content="Категории" Style="{DynamicResource MainMenuButton}" Command="{Binding OpenCategories}"/>
         </StackPanel>
 
-        <StackPanel Grid.Column="1">
-            <TextBlock Text="{Binding TitleOfList}" FontSize="20" FontWeight="SemiBold"/>
-            <TextBox Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}" MaxLength="255"/>
-            <StackPanel Orientation="Horizontal">
-                <Button Content="+ Добавить" Style="{DynamicResource Operations}" Command="{Binding AddEntry}"/>
-                <Button Content="Изменить" Style="{DynamicResource Operations}" Command="{Binding EditEntry}"/>
-                <Button Content="Удалить" Style="{DynamicResource Operations}" Command="{Binding RemoveEntry}"/>
-            </StackPanel>
+        <Grid Grid.Column="1">
+            <StackPanel>
+                <StackPanel.Resources>
+                    <Style TargetType="ListView">
+                        <Setter Property="MinHeight" Value="220"/>
+                    </Style>
+                </StackPanel.Resources>
+                <TextBlock Text="{Binding TitleOfList}" FontSize="20" FontWeight="SemiBold"/>
+            
 
-            <StackPanel x:Name="Operations" Grid.Column="1" Visibility="Collapsed">
-                <ListView ItemsSource="{Binding Operations}" SelectedItem="{Binding SelectedEntry}">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="Название" DisplayMemberBinding="{Binding Title}"/>
-                            <GridViewColumn Header="Доход/Расход" DisplayMemberBinding="{Binding IsIncome}" Width="Auto"/>
-                            <GridViewColumn Header="Категория" DisplayMemberBinding="{Binding Category.Title}"/>
-                            <GridViewColumn Header="Сумма" DisplayMemberBinding="{Binding GetCost}"/>
-                            <GridViewColumn Header="Дата операции" DisplayMemberBinding="{Binding TransactDate, StringFormat={}dd.MM.yyyy HH:mm}"/>
-                            <GridViewColumn Header="Счёт" DisplayMemberBinding="{Binding Account.Title}"/>
-                            <!--<GridViewColumn Header="Периодичность" DisplayMemberBinding="{Binding Periodicity.Value}"/>-->
-                        </GridView>
-                    </ListView.View>
-                </ListView>
+                <StackPanel x:Name="Operations" Grid.Column="1" Visibility="Collapsed">
+                    <ListView ItemsSource="{Binding Operations}" SelectedItem="{Binding SelectedEntry}">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Название" DisplayMemberBinding="{Binding Title}"/>
+                                <GridViewColumn Header="Доход/Расход" DisplayMemberBinding="{Binding IsIncome}" Width="Auto"/>
+                                <GridViewColumn Header="Категория" DisplayMemberBinding="{Binding Category.Title}"/>
+                                <GridViewColumn Header="Сумма" DisplayMemberBinding="{Binding GetCost}"/>
+                                <GridViewColumn Header="Дата операции" DisplayMemberBinding="{Binding TransactDate, StringFormat={}dd.MM.yyyy HH:mm}"/>
+                                <GridViewColumn Header="Счёт" DisplayMemberBinding="{Binding Account.Title}"/>
+                                <!--<GridViewColumn Header="Периодичность" DisplayMemberBinding="{Binding Periodicity.Value}"/>-->
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </StackPanel>
+                <StackPanel x:Name="Incomes" Grid.Column="1" Visibility="Collapsed">
+                    <ListView ItemsSource="{Binding Operations}" SelectedItem="{Binding SelectedEntry}">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Название" DisplayMemberBinding="{Binding Title}"/>
+                                <GridViewColumn Header="Категория" DisplayMemberBinding="{Binding Category.Title}"/>
+                                <GridViewColumn Header="Сумма" DisplayMemberBinding="{Binding GetCost}"/>
+                                <GridViewColumn Header="Дата операции" DisplayMemberBinding="{Binding TransactDate, StringFormat={}dd.MM.yyyy HH:mm}"/>
+                                <GridViewColumn Header="Счёт" DisplayMemberBinding="{Binding Account.Title}"/>
+                                <!--<GridViewColumn Header="Периодичность" DisplayMemberBinding="{Binding Periodicity.Value}"/>-->
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </StackPanel>
+                <StackPanel x:Name="Expenses" Grid.Column="1" Visibility="Collapsed">
+                    <ListView ItemsSource="{Binding Operations}" SelectedItem="{Binding SelectedEntry}">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Название" DisplayMemberBinding="{Binding Title}"/>
+                                <GridViewColumn Header="Категория" DisplayMemberBinding="{Binding Category.Title}"/>
+                                <GridViewColumn Header="Сумма" DisplayMemberBinding="{Binding GetCost}"/>
+                                <GridViewColumn Header="Дата операции" DisplayMemberBinding="{Binding TransactDate, StringFormat={}dd.MM.yyyy HH:mm}"/>
+                                <GridViewColumn Header="Счёт" DisplayMemberBinding="{Binding Account.Title}"/>
+                                <!--<GridViewColumn Header="Периодичность" DisplayMemberBinding="{Binding Periodicity.Value}"/>-->
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </StackPanel>
+                <StackPanel x:Name="Debts" Grid.Column="1" Visibility="Collapsed">
+                    <ListView ItemsSource="{Binding Debts}" SelectedItem="{Binding SelectedEntry}">
+                        <ListView.View>
+                            <GridView >
+                                <GridViewColumn Header="Название" DisplayMemberBinding="{Binding Title}"/>
+                                <GridViewColumn Header="Сумма" DisplayMemberBinding="{Binding GetSumm}"/>
+                                <GridViewColumn Header="Ставка" DisplayMemberBinding="{Binding AnnualInterest, StringFormat={}{0}%}"/>
+                                <GridViewColumn Header="Выплачено" DisplayMemberBinding="{Binding GetPaidSumm}"/>
+                                <GridViewColumn Header="Дата взятия" DisplayMemberBinding="{Binding DateOfPick, StringFormat=dd.MM.yyyy}"/>
+                                <GridViewColumn Header="Дата возвращения" DisplayMemberBinding="{Binding DateOfReturn, StringFormat=dd.MM.yyyy}"/>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </StackPanel>
+                <StackPanel x:Name="Deposits" Grid.Column="1" Visibility="Collapsed">
+                    <ListView ItemsSource="{Binding Deposits}" SelectedItem="{Binding SelectedEntry}">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Название" DisplayMemberBinding="{Binding Title}"/>
+                                <GridViewColumn Header="Сумма вклада" DisplayMemberBinding="{Binding InitalSumm}"/>
+                                <GridViewColumn Header="Сумма на данный момент" DisplayMemberBinding="{Binding GetCurrentSumm}"/>
+                                <GridViewColumn Header="Ставка" DisplayMemberBinding="{Binding InterestRate, StringFormat={}{0}%}"/>
+                                <GridViewColumn Header="Периодичность выплат" DisplayMemberBinding="{Binding PeriodicityOfPayment.Name}"/>
+                                <GridViewColumn Header="Капитализация">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding Capitalization}" IsEnabled="False"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </StackPanel>
+                <StackPanel x:Name="Accounts" Grid.Column="1" Visibility="Collapsed">
+                    <ListView ItemsSource="{Binding Accounts}" SelectedItem="{Binding SelectedEntry}">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Банк" DisplayMemberBinding="{Binding Bank.Title}"/>
+                                <GridViewColumn Header="Название" DisplayMemberBinding="{Binding Title}"/>
+                                <GridViewColumn Header="Баланс" DisplayMemberBinding="{Binding Balance}"/>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </StackPanel>
+
+
+                
             </StackPanel>
-            <StackPanel x:Name="Incomes" Grid.Column="1" Visibility="Collapsed">
-                <ListView ItemsSource="{Binding Operations}" SelectedItem="{Binding SelectedEntry}">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="Название" DisplayMemberBinding="{Binding Title}"/>
-                            <GridViewColumn Header="Категория" DisplayMemberBinding="{Binding Category.Title}"/>
-                            <GridViewColumn Header="Сумма" DisplayMemberBinding="{Binding GetCost}"/>
-                            <GridViewColumn Header="Дата операции" DisplayMemberBinding="{Binding TransactDate, StringFormat={}dd.MM.yyyy HH:mm}"/>
-                            <GridViewColumn Header="Счёт" DisplayMemberBinding="{Binding Account.Title}"/>
-                            <!--<GridViewColumn Header="Периодичность" DisplayMemberBinding="{Binding Periodicity.Value}"/>-->
-                        </GridView>
-                    </ListView.View>
-                </ListView>
+            <StackPanel VerticalAlignment="Bottom">
+                <TextBlock Text="Поиск"/>
+                <TextBox Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}" MaxLength="255"/>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Фильтр"/>
+                    <Button Content="Отчистить" Command="{Binding ClearFilter}"/>
+                </StackPanel>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel x:Name="FilterDates">
+                            <TextBlock Text="В период"/>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="С"/>
+                                <DatePicker SelectedDate="{Binding FilterLowerDate}"/>
+                                <TextBlock Text="По"/>
+                                <DatePicker SelectedDate="{Binding FilterUpperDate}"/>
+                            </StackPanel>                        
+                        </StackPanel>
+
+                        <StackPanel x:Name="FilterAmount" Orientation="Horizontal">
+                            <TextBlock Text="Больше"/>
+                            <TextBox Text="{Binding FilterMinAmount, UpdateSourceTrigger=PropertyChanged}" Width="50"/>
+                            <TextBlock Text="Меньше"/>
+                            <TextBox Text="{Binding FilterMaxAmount, UpdateSourceTrigger=PropertyChanged}" Width="50"/>
+                        </StackPanel>
+                    </StackPanel>
+                    
+                    
+                    <StackPanel Grid.Row="1">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="С счёта"/>
+                            <ComboBox ItemsSource="{Binding Categories}" SelectedItem="{Binding FilterCategory}" DisplayMemberPath="Title"/>
+                        </StackPanel>
+                    </StackPanel>
+                    
+                    
+
+                </Grid>
+                
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="+ Добавить" Style="{DynamicResource Operations}" Command="{Binding AddEntry}"/>
+                    <Button Content="Изменить" Style="{DynamicResource Operations}" Command="{Binding EditEntry}"/>
+                    <Button Content="Удалить" Style="{DynamicResource Operations}" Command="{Binding RemoveEntry}"/>
+                </StackPanel>
             </StackPanel>
-            <StackPanel x:Name="Expenses" Grid.Column="1" Visibility="Collapsed">
-                <ListView ItemsSource="{Binding Operations}" SelectedItem="{Binding SelectedEntry}">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="Название" DisplayMemberBinding="{Binding Title}"/>
-                            <GridViewColumn Header="Категория" DisplayMemberBinding="{Binding Category.Title}"/>
-                            <GridViewColumn Header="Сумма" DisplayMemberBinding="{Binding GetCost}"/>
-                            <GridViewColumn Header="Дата операции" DisplayMemberBinding="{Binding TransactDate, StringFormat={}dd.MM.yyyy HH:mm}"/>
-                            <GridViewColumn Header="Счёт" DisplayMemberBinding="{Binding Account.Title}"/>
-                            <!--<GridViewColumn Header="Периодичность" DisplayMemberBinding="{Binding Periodicity.Value}"/>-->
-                        </GridView>
-                    </ListView.View>
-                </ListView>
-            </StackPanel>
-            <StackPanel x:Name="Debts" Grid.Column="1" Visibility="Collapsed">
-                <ListView ItemsSource="{Binding Debts}" SelectedItem="{Binding SelectedEntry}">
-                    <ListView.View>
-                        <GridView >
-                            <GridViewColumn Header="Название" DisplayMemberBinding="{Binding Title}"/>
-                            <GridViewColumn Header="Сумма" DisplayMemberBinding="{Binding GetSumm}"/>
-                            <GridViewColumn Header="Ставка" DisplayMemberBinding="{Binding AnnualInterest, StringFormat={}{0}%}"/>
-                            <GridViewColumn Header="Выплачено" DisplayMemberBinding="{Binding GetPaidSumm}"/>
-                            <GridViewColumn Header="Дата взятия" DisplayMemberBinding="{Binding DateOfPick, StringFormat=dd.MM.yyyy}"/>
-                            <GridViewColumn Header="Дата возвращения" DisplayMemberBinding="{Binding DateOfReturn, StringFormat=dd.MM.yyyy}"/>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
-            </StackPanel>
-            <StackPanel x:Name="Deposits" Grid.Column="1" Visibility="Collapsed">
-                <ListView ItemsSource="{Binding Deposits}" SelectedItem="{Binding SelectedEntry}">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="Название" DisplayMemberBinding="{Binding Title}"/>
-                            <GridViewColumn Header="Сумма вклада" DisplayMemberBinding="{Binding InitalSumm}"/>
-                            <GridViewColumn Header="Сумма на данный момент" DisplayMemberBinding="{Binding GetCurrentSumm}"/>
-                            <GridViewColumn Header="Ставка" DisplayMemberBinding="{Binding InterestRate, StringFormat={}{0}%}"/>
-                            <GridViewColumn Header="Периодичность выплат" DisplayMemberBinding="{Binding PeriodicityOfPayment.Name}"/>
-                            <GridViewColumn Header="Капитализация">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <CheckBox IsChecked="{Binding Capitalization}" IsEnabled="False"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
-            </StackPanel>
-            <StackPanel x:Name="Accounts" Grid.Column="1" Visibility="Collapsed">
-                <ListView ItemsSource="{Binding Accounts}" SelectedItem="{Binding SelectedEntry}">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="Банк" DisplayMemberBinding="{Binding Bank.Title}"/>
-                            <GridViewColumn Header="Название" DisplayMemberBinding="{Binding Title}"/>
-                            <GridViewColumn Header="Баланс" DisplayMemberBinding="{Binding Balance}"/>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
-            </StackPanel>
-        </StackPanel>
-        
-        
+        </Grid>
+
+
     </Grid>
 </Window>

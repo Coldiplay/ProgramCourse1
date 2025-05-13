@@ -22,7 +22,7 @@ namespace Bruh.Model.DBs
         public bool Insert(IModel obj, bool changeCorrespondingEntries);
         public bool Update(IModel obj, bool changeCorrespondingEntries);
         public bool Remove(IModel obj, bool changeCorrespondingEntries);
-        public List<IModel> GetEntries(string search, string filter);
+        public List<IModel> GetEntries(string search, List<string> filter);
         public IModel GetSingleEntry(int id);
     }
 

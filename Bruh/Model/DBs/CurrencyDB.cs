@@ -13,7 +13,7 @@ namespace Bruh.Model.DBs
 {
     public class CurrencyDB : ISampleDB
     {
-        public List<IModel> GetEntries(string search, string filter)
+        public List<IModel> GetEntries(string search, List<string> filter)
         {
             List<IModel> currencies = new();
             if (DbConnection.GetDbConnection() == null)

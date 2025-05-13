@@ -8,12 +8,18 @@ namespace Bruh.Model.DBs
 {
     public class DebtsDB : ISampleDB
     {
-        public List<IModel> GetEntries(string search, string filter)
+        public List<IModel> GetEntries(string search, List<string> filterlist)
         {
             List<IModel> debts = new();
             if (DbConnection.GetDbConnection() == null)
                 return debts;
 
+            string filter = "";
+            filterlist.ForEach(f =>
+            {
+                if (!string.IsNullOrEmpty(f))
+                    filter = $"{filter} && {f}";
+            });
             using (var cmd = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID`, `Title`, `Summ`, `AnnualInterest`, `DateOfPick`, `DateOfReturn`, `CurrencyID` FROM `Debts` WHERE `Title` LIKE @search OR `Summ` LIKE @search OR `DateOfPick` LIKE @search OR `DateOfReturn` LIKE @search OR `AnnualInterest` LIKE @search {filter}"))
             {
                 cmd.Parameters.Add(new MySqlParameter("search", $"%{search}%"));

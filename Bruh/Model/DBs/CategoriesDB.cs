@@ -13,7 +13,7 @@ namespace Bruh.Model.DBs
 {
     public class CategoriesDB : ISampleDB
     {
-        public List<IModel> GetEntries(string search, string filter)
+        public List<IModel> GetEntries(string search, List<string> filter)
         {
             List<IModel> categories = new();
             if (DbConnection.GetDbConnection() == null)

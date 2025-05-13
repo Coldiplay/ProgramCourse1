@@ -29,7 +29,7 @@ namespace Bruh.VM
                 if (Entry is Deposit deposit)
                     SetDurationType(deposit);
                 //else if (Entry is Debt debt)
-                  //  SetDurationType(debt);
+                //  SetDurationType(debt);
             }
         }
         public string DurationType
@@ -43,14 +43,14 @@ namespace Bruh.VM
             }
         }
 
-        public List<Currency> Currencies { get; set; } = new(DB.GetDb(typeof(CurrencyDB)).GetEntries("","").Select(c => (Currency)c));
-        public List<Bank> Banks { get; set; } = new(DB.GetDb(typeof(BanksDB)).GetEntries("", "").Select(b => (Bank)b));
-        public List<Account> Accounts { get; set; } = new(DB.GetDb(typeof(AccountsDB)).GetEntries("", "").Select(a => (Account)a));
-        public List<Category> Categories { get; set; } = new(DB.GetDb(typeof(CategoriesDB)).GetEntries("", "").Select(c => (Category)c));
-        public List<Debt> Debts { get; set; } = new(DB.GetDb(typeof(DebtsDB)).GetEntries("", "").Select(d => (Debt)d));
-        public List<Periodicity> Periodicities { get; set; } = new(DB.GetDb(typeof(PeriodicitiesDB)).GetEntries("", "").Select(p => (Periodicity)p));
-        public List<PeriodicityOfPayment> PeriodicitiesOfPayment { get; set; } = new(DB.GetDb(typeof(PeriodicitiesOfPaymentDB)).GetEntries("", "").Select(c => (PeriodicityOfPayment)c));
-        public List<TypeOfDeposit> TypesOfDeposits { get; set; } = new(DB.GetDb(typeof(TypesOfDepositDB)).GetEntries("", "").Select(t => (TypeOfDeposit)t));
+        public List<Currency> Currencies { get; set; } = new(DB.GetDb(typeof(CurrencyDB)).GetEntries("", []).Select(c => (Currency)c));
+        public List<Bank> Banks { get; set; } = new(DB.GetDb(typeof(BanksDB)).GetEntries("", []).Select(b => (Bank)b));
+        public List<Account> Accounts { get; set; } = new(DB.GetDb(typeof(AccountsDB)).GetEntries("", []).Select(a => (Account)a));
+        public List<Category> Categories { get; set; } = new(DB.GetDb(typeof(CategoriesDB)).GetEntries("", []).Select(c => (Category)c));
+        public List<Debt> Debts { get; set; } = new(DB.GetDb(typeof(DebtsDB)).GetEntries("", []).Select(d => (Debt)d));
+        public List<Periodicity> Periodicities { get; set; } = new(DB.GetDb(typeof(PeriodicitiesDB)).GetEntries("", []).Select(p => (Periodicity)p));
+        public List<PeriodicityOfPayment> PeriodicitiesOfPayment { get; set; } = new(DB.GetDb(typeof(PeriodicitiesOfPaymentDB)).GetEntries("", []).Select(c => (PeriodicityOfPayment)c));
+        public List<TypeOfDeposit> TypesOfDeposits { get; set; } = new(DB.GetDb(typeof(TypesOfDepositDB)).GetEntries("", []).Select(t => (TypeOfDeposit)t));
 
         public ICommand Save { get; set; }
         public ICommand Cancel { get; set; }

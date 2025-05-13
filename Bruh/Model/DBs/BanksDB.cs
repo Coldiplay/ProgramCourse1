@@ -8,7 +8,7 @@ namespace Bruh.Model.DBs
 {
     public class BanksDB : ISampleDB
     {
-        public List<IModel> GetEntries(string search, string filter)
+        public List<IModel> GetEntries(string search, List<string> filter)
         {
             List<IModel> banks = new();
             if (DbConnection.GetDbConnection() == null)

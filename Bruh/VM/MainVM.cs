@@ -25,12 +25,17 @@ namespace Bruh.VM
 
         private List<StackPanel> StackPanels = new();
         private string search;
+        //private List<string> filter;
+        //private List<string>? parametres = [];
         private string titleOfList = "";
         private uint codeOper;
         private IModel? selectedEntry;
-        private List<string>? parametres = [];
-
-        //private object? filter;
+        private List<Category> categories;
+        private Category? filterCategory;
+        private decimal filterMaxAmount;
+        private decimal filterMinAmount;
+        private DateTime? filterUpperDate;
+        private DateTime? filterLowerDate;
 
         public ObservableCollection<Operation> Operations
         {
@@ -68,6 +73,7 @@ namespace Bruh.VM
                 Signal();
             }
         }
+
 
         public IModel? SelectedEntry
         {
@@ -129,6 +135,84 @@ namespace Bruh.VM
                 UpdateLists(CodeOper);
             }
         }
+        private List<string> Filter = [];
+
+        /*
+        public List<string>? Parametres
+        {
+            get => parametres;
+            set
+            {
+                parametres = value;
+                Filter = "";
+                parametres?.ForEach(p =>
+                {
+                    Filter = $"{Filter} {p}";
+                });
+                Signal();
+                Signal(nameof(Filter));
+            }
+        }
+        */
+        public DateTime? FilterUpperDate
+        {
+            get => filterUpperDate;
+            set
+            {
+                filterUpperDate = value;
+                Signal();
+                UpdateFilter();
+            }
+        }
+        public DateTime? FilterLowerDate
+        {
+            get => filterLowerDate;
+            set
+            {
+                filterLowerDate = value;
+                Signal();
+                UpdateFilter();
+            }
+        }
+        public decimal FilterMaxAmount
+        {
+            get => filterMaxAmount;
+            set
+            {
+                filterMaxAmount = value;
+                Signal();
+                UpdateFilter();
+            }
+        }
+        public decimal FilterMinAmount
+        {
+            get => filterMinAmount;
+            set
+            {
+                filterMinAmount = value;
+                Signal();
+                UpdateFilter();
+            }
+        }
+        public List<Category> Categories
+        {
+            get => categories;
+            set
+            {
+                categories = value;
+                Signal();
+            }
+        }
+        public Category? FilterCategory
+        {
+            get => filterCategory;
+            set
+            {
+                filterCategory = value;
+                Signal();
+                UpdateFilter();
+            }
+        }
 
         public string TitleOfList
         {
@@ -154,31 +238,18 @@ namespace Bruh.VM
             set
             {
                 codeOper = value;
-                Parametres = null;
+                //Parametres = null;
                 UpdateLists(codeOper);
             }
         }
-        public List<string>? Parametres
-        {
-            get => parametres;
-            set
-            {
-                parametres = value;
-                Filter = "";
-                parametres?.ForEach(p => 
-                {
-                    Filter = $"{Filter} {p}";
-                });
-                Signal();
-                Signal(nameof(Filter));
-            }
-        }
-        public string Filter { get; set; }
+
+
 
         public ICommand AddEntry { get; set; }
         public ICommand EditEntry { get; set; }
         public ICommand RemoveEntry { get; set; }
         public ICommand OpenCategories { get; set; }
+        public ICommand ClearFilter { get; set; }
 
         public ICommand SetIncomes { get; set; }
         public ICommand SetExpenses { get; set; }
@@ -190,6 +261,7 @@ namespace Bruh.VM
 
         public MainVM()
         {
+            Help();
             CodeOper = 0;
 
             SetOperations = new CommandVM(() => CodeOper = 0, () => true);
@@ -239,9 +311,19 @@ namespace Bruh.VM
             {
                 new CategoriesWindow().ShowDialog();
             }, () => true);
+            ClearFilter = new CommandVM(() => 
+            {
+                FilterLowerDate = null;
+                FilterUpperDate = null;
+                FilterMinAmount = 0;
+                FilterMaxAmount = 0;
+                FilterCategory = null;
+                
+
+            }, () => true);
         }
 
-        public void UpdateLists(uint i)
+        private void UpdateLists(uint i)
         {
             if (StackPanels.Count == 0)
                 return;
@@ -297,6 +379,33 @@ namespace Bruh.VM
                     Accounts = new(DB.GetDb(typeof(AccountsDB)).GetEntries(Search, Filter).Select(a => (Account)a).OrderBy(a => a.Title));
                     break;
             }
+        }
+        private void UpdateFilter()
+        {
+            switch (CodeOper)
+            {
+                case 0:
+                case 1:
+                case 2:
+                    if (FilterMinAmount > 0)
+                        Filter.Add($"`Cost` >= {FilterMinAmount}");
+                    if (FilterMaxAmount > 0)
+                        Filter.Add($"`Cost` <= {FilterMaxAmount}");
+                    if (FilterCategory != null && FilterCategory.ID != 0)
+                        Filter.Add($"CategoryID = {FilterCategory.ID}");
+                    if (FilterLowerDate.HasValue && FilterLowerDate < FilterUpperDate)
+                        Filter.Add($"`TransactDate` >= {FilterLowerDate}");
+                    if (FilterUpperDate.HasValue && FilterUpperDate > FilterLowerDate)
+                        Filter.Add($"`TransactDate` <= {FilterUpperDate}");
+                    break;
+            }           
+
+            UpdateLists(CodeOper);
+        }
+        private void Help()
+        {
+            Accounts = [..DB.GetDb(typeof(AccountsDB)).GetEntries("", []).Select(a => (Account)a)];
+            Categories = [.. DB.GetDb(typeof(CategoriesDB)).GetEntries("", []).Select(c => (Category)c)];
         }
 
         public void Set(List<StackPanel> stackPanels)

@@ -13,13 +13,19 @@ namespace Bruh.Model.DBs
 {
     public class OperationsDB : ISampleDB
     {
-        public List<IModel> GetEntries(string search, string filter)
+        public List<IModel> GetEntries(string search, List<string> filterlist)
         {
             List<IModel> operations = new();
             if (DbConnection.GetDbConnection() == null)
                 return operations;
 
-            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID`, `Title`, `Cost`, `TransactDate`, `DateOfCreate`, `Income`, `Description`, `PeriodicityID`, `CategoryID`, `DebtID`, `AccountID` FROM `Operations` WHERE `Title` LIKE @search OR `Cost` LIKE @search OR `Description` LIKE @search OR `TransactDate` LIKE @search {filter}"))
+            string filter = "";
+            filterlist.ForEach(f =>
+            {
+                if (!string.IsNullOrEmpty(f))
+                    filter = $"{filter} && {f}";
+            });
+            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID`, `Title`, `Cost`, `TransactDate`, `DateOfCreate`, `Income`, `Description`, `PeriodicityID`, `CategoryID`, `DebtID`, `AccountID` FROM `Operations` WHERE (`Title` LIKE @search OR `Cost` LIKE @search OR `Description` LIKE @search OR `TransactDate` LIKE @search) {filter}"))
             {
                 cmd.Parameters.Add(new MySqlParameter("search", $"%{search}%"));
 

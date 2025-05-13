@@ -15,7 +15,7 @@ namespace Bruh.VM
 {
     public class CategoriesWindowVM : BaseVM
     {
-        public ObservableCollection<Category> Categories { get; set; } = new(DB.GetDb(typeof(CategoriesDB)).GetEntries("","").Select(c => (Category)c));
+        public ObservableCollection<Category> Categories { get; set; } = new(DB.GetDb(typeof(CategoriesDB)).GetEntries("", []).Select(c => (Category)c));
         public Category? SelectedCategory { get; set; }
 
         public ICommand AddCategory { get; set; }
@@ -53,7 +53,7 @@ namespace Bruh.VM
 
         public void UpdateList()
         {
-            Categories = new(DB.GetDb(typeof(CategoriesDB)).GetEntries("","").Select(c => (Category)c));
+            Categories = new(DB.GetDb(typeof(CategoriesDB)).GetEntries("", []).Select(c => (Category)c));
             Signal(nameof(Categories));
         }
         
