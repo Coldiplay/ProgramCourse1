@@ -113,6 +113,8 @@
                 </StackPanel>
                 <TextBlock Text="Дата закрытия вклада"/>
                 <TextBlock Text="{Binding CloseDate, StringFormat=dd.MM.yyyy}"/>
+                <TextBlock Text="Периодичность выплат"/>
+                <ComboBox ItemsSource="{Binding DataContext.PeriodicitiesOfPayment, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" SelectedItem="{Binding PeriodicityOfPayment}" DisplayMemberPath="Name"/>
                 <TextBlock Text="Примерная конечная сумма"/>
                 <TextBlock Text="{Binding GetProbSumm}"/>
             </StackPanel>

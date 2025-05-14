@@ -165,6 +165,9 @@ namespace Bruh.VM
                     SetDurationType(debt);
                 }
             }, () => true);
+
+            if (Entry is Deposit)
+                Banks.Add(new Bank { ID = 0});
         }
         private void SetDurationType(Deposit deposit)
         {

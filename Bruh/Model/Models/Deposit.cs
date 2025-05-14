@@ -161,6 +161,8 @@ namespace Bruh.Model.Models
         }
         public string GetProbableSumm(DateTime startTime, DateTime endTime, bool capitilize)        
         {
+            if (PeriodicityOfPayment == null)
+                return "Не все нужные поля веденны";
             try
             {
                 decimal initSumm = InitalSumm;
@@ -320,6 +322,10 @@ namespace Bruh.Model.Models
             {
                 MessageBox.Show("Вы ввели слишком большое число. Пожалуйста, введите число поменьше.");
                 return "";
+            }
+            catch (NullReferenceException)
+            {
+                return "Не все нужные поля выведены";
             }
         }
     }

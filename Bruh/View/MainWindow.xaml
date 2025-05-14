@@ -114,7 +114,7 @@
                 <TextBlock Text="{Binding TitleOfList}" FontSize="20" FontWeight="SemiBold"/>
             
 
-                <StackPanel x:Name="Operations" Grid.Column="1" Visibility="Collapsed">
+                <StackPanel Visibility="{Binding OperationsSP}" Grid.Column="1">
                     <ListView ItemsSource="{Binding Operations}" SelectedItem="{Binding SelectedEntry}">
                         <ListView.View>
                             <GridView>
@@ -129,7 +129,7 @@
                         </ListView.View>
                     </ListView>
                 </StackPanel>
-                <StackPanel x:Name="Incomes" Grid.Column="1" Visibility="Collapsed">
+                <StackPanel Visibility="{Binding IncomesSP}" Grid.Column="1">
                     <ListView ItemsSource="{Binding Operations}" SelectedItem="{Binding SelectedEntry}">
                         <ListView.View>
                             <GridView>
@@ -143,7 +143,7 @@
                         </ListView.View>
                     </ListView>
                 </StackPanel>
-                <StackPanel x:Name="Expenses" Grid.Column="1" Visibility="Collapsed">
+                <StackPanel Visibility="{Binding ExpensesSP}" Grid.Column="1">
                     <ListView ItemsSource="{Binding Operations}" SelectedItem="{Binding SelectedEntry}">
                         <ListView.View>
                             <GridView>
@@ -157,7 +157,7 @@
                         </ListView.View>
                     </ListView>
                 </StackPanel>
-                <StackPanel x:Name="Debts" Grid.Column="1" Visibility="Collapsed">
+                <StackPanel Visibility="{Binding DebtsSP}" Grid.Column="1">
                     <ListView ItemsSource="{Binding Debts}" SelectedItem="{Binding SelectedEntry}">
                         <ListView.View>
                             <GridView >
@@ -171,7 +171,7 @@
                         </ListView.View>
                     </ListView>
                 </StackPanel>
-                <StackPanel x:Name="Deposits" Grid.Column="1" Visibility="Collapsed">
+                <StackPanel Visibility="{Binding DepositsSP}" Grid.Column="1">
                     <ListView ItemsSource="{Binding Deposits}" SelectedItem="{Binding SelectedEntry}">
                         <ListView.View>
                             <GridView>
@@ -191,7 +191,7 @@
                         </ListView.View>
                     </ListView>
                 </StackPanel>
-                <StackPanel x:Name="Accounts" Grid.Column="1" Visibility="Collapsed">
+                <StackPanel Visibility="{Binding AccountsSP}" Grid.Column="1">
                     <ListView ItemsSource="{Binding Accounts}" SelectedItem="{Binding SelectedEntry}">
                         <ListView.View>
                             <GridView>
@@ -206,30 +206,34 @@
 
                 
             </StackPanel>
+            
             <StackPanel VerticalAlignment="Bottom">
                 <StackPanel.Resources>
                     <Style TargetType="TextBlock">
                         <Setter Property="Margin" Value="3"/>
-                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="VerticalAlignment" Value="Bottom"/>
                     </Style>
                     <Style TargetType="TextBox">
-                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="VerticalAlignment" Value="Bottom"/>
                         <Setter Property="Margin" Value="3"/>
                     </Style>
                 </StackPanel.Resources>
                 <TextBlock Text="Поиск"/>
                 <TextBox Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}" MaxLength="255"/>
-                <StackPanel x:Name="Filter" Orientation="Horizontal">
+                
+                <StackPanel Visibility="{Binding FilterSP}" Orientation="Horizontal">
                     <TextBlock Text="Фильтр"/>
-                    <Button Content="Отчистить" Command="{Binding ClearFilter}" Margin="10 0 0 0"/>
+                    <Button Content="Очистить" Command="{Binding ClearFilter}" Margin="10 0 0 0"/>
                 </StackPanel>
+                
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
+                    
                     <StackPanel Orientation="Horizontal">
-                        <StackPanel x:Name="FilterDates">
+                        <StackPanel Visibility="{Binding FilterDatesSP}">
                             <TextBlock Text="В период"/>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="С"/>
@@ -239,7 +243,7 @@
                             </StackPanel>                        
                         </StackPanel>
 
-                        <StackPanel x:Name="FilterAmount" Orientation="Horizontal">
+                        <StackPanel Visibility="{Binding FilterAmountSP}" Orientation="Horizontal" Margin="10 0 0 0">
                             <TextBlock Text="Больше"/>
                             <TextBox Text="{Binding FilterMinAmount, UpdateSourceTrigger=PropertyChanged}" Width="50"/>
                             <TextBlock Text="Меньше"/>
@@ -247,19 +251,16 @@
                         </StackPanel>
                     </StackPanel>
 
-
                     <StackPanel Grid.Row="1" Orientation="Horizontal">
-                        <StackPanel x:Name="CategoryFilter" Orientation="Horizontal" Margin="0 0 10 0">
+                        <StackPanel Visibility="{Binding FilterCategorySP}" Orientation="Horizontal" Margin="0 0 10 0">
                             <TextBlock Text="Категория"/>
                             <ComboBox ItemsSource="{Binding Categories}" SelectedItem="{Binding FilterCategory}" DisplayMemberPath="Title"/>
                         </StackPanel>
-                        <StackPanel x:Name="AccountFilter" Orientation="Horizontal">
+                        <StackPanel Visibility="{Binding FilterAccountSP}" Orientation="Horizontal">
                             <TextBlock Text="Счёт"/>
                             <ComboBox ItemsSource="{Binding AccountsForFilter}" SelectedItem="{Binding FilterAccount}" DisplayMemberPath="Title"/>
                         </StackPanel>
                     </StackPanel>
-
-
 
                 </Grid>
                 

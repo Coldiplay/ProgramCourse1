@@ -21,6 +21,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         DataContext = new MainVM();
-        ((MainVM)DataContext).Set(new List<StackPanel> { Operations, Expenses, Incomes, Debts, Deposits, Accounts });
+
+        //((MainVM)DataContext).Set([Operations, Expenses, Incomes, Debts, Deposits, Accounts, FilterAmount, FilterDates, AccountFilter, CategoryFilter, Filter]);
     }
 }
