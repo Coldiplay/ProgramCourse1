@@ -103,12 +103,39 @@ namespace Bruh.Model.DBs
             if (DbConnection.GetDbConnection() == null)
                 return result;
 
-            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"DELETE FROM `Banks` WHERE ID = {bank.ID}"))
+            // Проверка на наличие привязанных записей к банку
+            bool isEverythingBad = false;
+            using (var cmd1 = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID` FROM `Accounts` WHERE `BankID` = {bank.ID}"))
+            {
+                DbConnection.GetDbConnection().OpenConnection();
+                ExeptionHandler.Try(() => isEverythingBad = (int?)cmd1.ExecuteScalar() != null);
+                DbConnection.GetDbConnection().CloseConnection();                    
+            }
+            if (!isEverythingBad)
+            {
+                MessageBox.Show($"Вы не можете удалить этот банк пока к нему привязаны счета. Пожалуйста, отвяжите все счета привязанные к банку '{bank.Title}'");
+                return result;
+            }
+
+            using (var cmd2 = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID` FROM `Deposits` WHERE `BankID` = {bank.ID}"))
+            {
+                DbConnection.GetDbConnection().OpenConnection();
+                ExeptionHandler.Try(() => isEverythingBad = (int?)cmd2.ExecuteScalar() != null);
+                DbConnection.GetDbConnection().CloseConnection();
+            }
+            if (!isEverythingBad)
+            {
+                MessageBox.Show($"Вы не можете удалить этот банк пока к нему привязаны вклады. Пожалуйста, отвяжите все вклады привязанные к банку '{bank.Title}'");
+                return result;
+            }
+            //
+
+            using (var cmd3 = DbConnection.GetDbConnection().CreateCommand($"DELETE FROM `Banks` WHERE ID = {bank.ID}"))
             {
                 DbConnection.GetDbConnection().OpenConnection();
                 ExeptionHandler.Try(() =>
                 {
-                    cmd.ExecuteNonQuery();
+                    cmd3.ExecuteNonQuery();
                     result = true;
                 });
                 DbConnection.GetDbConnection().CloseConnection();

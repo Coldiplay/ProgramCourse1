@@ -35,44 +35,8 @@ namespace Bruh.VM
         private decimal? filterMinAmount;
         private DateTime? filterUpperDate;
         private DateTime? filterLowerDate;
-
-        public ObservableCollection<Operation> Operations
-        {
-            get => operations;
-            set
-            {
-                operations = value;
-                Signal();
-            }
-        }
-        public ObservableCollection<Debt> Debts
-        {
-            get => debts;
-            set
-            {
-                debts = value;
-                Signal();
-            }
-        }
-        public ObservableCollection<Deposit> Deposits
-        {
-            get => deposits;
-            set
-            {
-                deposits = value;
-                Signal();
-            }
-        }
-        public ObservableCollection<Account> Accounts
-        {
-            get => accounts;
-            set
-            {
-                accounts = value;
-                Signal();
-            }
-        }
-
+        private Account? filterAccount;
+        private List<Account> accountsForFilter;
 
         public IModel? SelectedEntry
         {
@@ -124,6 +88,45 @@ namespace Bruh.VM
             }
         }
         */
+
+        public ObservableCollection<Operation> Operations
+        {
+            get => operations;
+            set
+            {
+                operations = value;
+                Signal();
+            }
+        }
+        public ObservableCollection<Debt> Debts
+        {
+            get => debts;
+            set
+            {
+                debts = value;
+                Signal();
+            }
+        }
+        public ObservableCollection<Deposit> Deposits
+        {
+            get => deposits;
+            set
+            {
+                deposits = value;
+                Signal();
+            }
+        }
+        public ObservableCollection<Account> Accounts
+        {
+            get => accounts;
+            set
+            {
+                accounts = value;
+                Signal();
+            }
+        }
+
+
         public string Search
         {
             get => search;
@@ -135,9 +138,6 @@ namespace Bruh.VM
             }
         }
         private List<string> Filter = [];
-        private Account? filterAccount;
-        private List<Account> accountsForFilter;
-
         /*
         public List<string>? Parametres
         {
@@ -258,18 +258,19 @@ namespace Bruh.VM
             set
             {
                 codeOper = value;
-                //Parametres = null;
+                ClearFilter();
                 UpdateLists(codeOper);
             }
         }
-
 
 
         public ICommand AddEntry { get; set; }
         public ICommand EditEntry { get; set; }
         public ICommand RemoveEntry { get; set; }
         public ICommand OpenCategories { get; set; }
-        public ICommand ClearFilter { get; set; }
+        public ICommand OpenBanks { get; set; }
+        public ICommand OpenCurrencies { get; set; }
+        public ICommand ClearFilterCMD { get; set; }
 
         public ICommand SetIncomes { get; set; }
         public ICommand SetExpenses { get; set; }
@@ -281,7 +282,9 @@ namespace Bruh.VM
 
         public MainVM()
         {
-            AllSp = [OperationsSP, DebtsSP, IncomesSP, ExpensesSP, DepositsSP, AccountsSP, FilterSP, FilterAccountSP, FilterAmountSP, FilterCategorySP, FilterDatesSP];
+            //AllSp = [OperationsSP, DebtsSP, IncomesSP, ExpensesSP, DepositsSP, AccountsSP, FilterSP, FilterAccountSP, FilterAmountSP, FilterCategorySP, FilterDatesSP];
+
+            //Что-нибудь сделать с этим, сомнительно же каждый раз сбрасывать фильтр при обновлении списков, разве нет?
             Help();
             CodeOper = 0;
 
@@ -291,7 +294,8 @@ namespace Bruh.VM
             SetDebts = new CommandVM(() => CodeOper = 3, () => true);
             SetDeposits = new CommandVM(() => CodeOper = 4, () => true);
             SetAccounts = new CommandVM(() => CodeOper = 5, () => true);
-            
+
+
             AddEntry = new CommandVM(() =>
             {
                 var add = new EditWindow();
@@ -333,17 +337,20 @@ namespace Bruh.VM
             OpenCategories = new CommandVM(() => 
             {
                 new CategoriesWindow().ShowDialog();
+                UpdateLists(CodeOper);
+                Help();
             }, () => true);
-            ClearFilter = new CommandVM(() => 
+            OpenBanks = new CommandVM(() => 
             {
-                FilterLowerDate = null;
-                FilterUpperDate = null;
-                FilterMinAmount = null;
-                FilterMaxAmount = null;
-                FilterCategory = null;
-                FilterAccount = null;
-
+                new BanksWindow().ShowDialog();
+                UpdateLists(CodeOper);
             }, () => true);
+            OpenCurrencies = new CommandVM(() =>
+                {
+                    new CurrenciesWindow().ShowDialog();
+                    UpdateLists(CodeOper);
+                }, () => true);
+            ClearFilterCMD = new CommandVM(ClearFilter, () => true);
         }
 
 
@@ -359,10 +366,12 @@ namespace Bruh.VM
         public Visibility ExpensesSP { get; set; }
         public Visibility DepositsSP { get; set; }
         public Visibility AccountsSP { get; set; }
-        private List<Visibility> AllSp { get; set; }
+        //private List<Visibility> AllSp { get; set; }
+        //private List<object> Sps { get; set; }
 
         private void UpdateLists(byte i)
         {
+            HideAllSps();
 
             SelectedEntry = null;
             /*
@@ -371,48 +380,79 @@ namespace Bruh.VM
             SelectedDeposit = null;
             SelectedAccount = null;
             */
-            List<Visibility> neededPanels = [];
-            AllSp.ForEach(sp => sp = Visibility.Collapsed);
+            //List<Visibility> neededPanels = [];
+            //AllSp.ForEach(sp => sp = Visibility.Collapsed);
             switch (i)
             {
                 case 0:
-                    neededPanels = [OperationsSP, FilterSP, FilterAccountSP, FilterAmountSP, FilterCategorySP, FilterDatesSP];
+                    OperationsSP = Visibility.Visible;
+                    FilterSP = Visibility.Visible;
+                    FilterAccountSP = Visibility.Visible;
+                    FilterAmountSP = Visibility.Visible;
+                    FilterCategorySP = Visibility.Visible;
+                    FilterDatesSP = Visibility.Visible;
                     TitleOfList = "Все операции";
                     Operations = new(DB.GetDb(typeof(OperationsDB)).GetEntries(Search, Filter).Select(s => (Operation)s).OrderBy(oper => oper.TransactDate));
                     break;                    
 
                 case 1:
-                    neededPanels = [IncomesSP, FilterSP, FilterAccountSP, FilterAmountSP, FilterCategorySP, FilterDatesSP];
+                    //neededPanels = [IncomesSP, FilterSP, FilterAccountSP, FilterAmountSP, FilterCategorySP, FilterDatesSP];
+                    IncomesSP = Visibility.Visible;
+                    FilterSP = Visibility.Visible;
+                    FilterAccountSP = Visibility.Visible;
+                    FilterAmountSP = Visibility.Visible;
+                    FilterCategorySP = Visibility.Visible;
+                    FilterDatesSP = Visibility.Visible;
                     TitleOfList = "Доходы";
                     Operations = new(DB.GetDb(typeof(OperationsDB)).GetEntries(Search, Filter).Select(s => (Operation)s).Where(oper => oper.Income == true).OrderBy(oper => oper.TransactDate));
                     break;
 
                 case 2:
-                    neededPanels = [ExpensesSP, FilterSP, FilterAccountSP, FilterAmountSP, FilterCategorySP, FilterDatesSP];
+                    //neededPanels = [ExpensesSP, FilterSP, FilterAccountSP, FilterAmountSP, FilterCategorySP, FilterDatesSP];
+                    ExpensesSP = Visibility.Visible;
+                    FilterSP = Visibility.Visible;
+                    FilterAccountSP = Visibility.Visible;
+                    FilterAmountSP = Visibility.Visible;
+                    FilterCategorySP = Visibility.Visible;
+                    FilterDatesSP = Visibility.Visible;
                     TitleOfList = "Расходы";
                     Operations = new(DB.GetDb(typeof(OperationsDB)).GetEntries(Search, Filter).Select(s => (Operation)s).Where(oper => oper.Income == false).OrderBy(oper => oper.TransactDate));
                     break;
 
                 case 3:
-                    neededPanels = [DebtsSP];
+                    //neededPanels = [DebtsSP];
+                    DebtsSP = Visibility.Visible;
                     TitleOfList = "Долги";
                     Debts = new(DB.GetDb(typeof(DebtsDB)).GetEntries(Search, Filter).Select(d => (Debt)d).OrderBy(d => d.DateOfPick));
                     break;
 
                 case 4:
-                    neededPanels = [DepositsSP];
+                    //neededPanels = [DepositsSP];
+                    DepositsSP = Visibility.Visible;
                     TitleOfList = "Вклады";
                     Deposits = new(DB.GetDb(typeof(DepositsDB)).GetEntries(Search, Filter).Select(d => (Deposit)d).OrderBy(d => d.OpenDate));
                     break;
 
                 case 5:
-                    neededPanels = [AccountsSP];
+                    //neededPanels = [AccountsSP];
+                    AccountsSP = Visibility.Visible;
                     TitleOfList = "Счета";
                     Accounts = new(DB.GetDb(typeof(AccountsDB)).GetEntries(Search, Filter).Select(a => (Account)a).OrderBy(a => a.Title));
                     break;
             }
-            neededPanels.ForEach(sp => sp = Visibility.Visible);
-            AllSp.ForEach(sp => Signal(nameof(sp)));
+            //neededPanels.ForEach(sp => sp = Visibility.Visible);
+            //AllSp.ForEach(sp => Signal(nameof(sp)));
+            Signal(nameof(OperationsSP));
+            Signal(nameof(IncomesSP));
+            Signal(nameof(ExpensesSP));
+            Signal(nameof(DebtsSP));
+            Signal(nameof(DepositsSP));
+            Signal(nameof(AccountsSP));
+            Signal(nameof(FilterSP));
+            Signal(nameof(FilterAccountSP));
+            Signal(nameof(FilterAmountSP));
+            Signal(nameof(FilterCategorySP));
+            Signal(nameof(FilterDatesSP));
         }
         private void UpdateFilter()
         {
@@ -438,6 +478,31 @@ namespace Bruh.VM
             }
 
             UpdateLists(CodeOper);
+        }
+        private void ClearFilter()
+        {
+            Filter.Clear();
+            FilterLowerDate = null;
+            FilterUpperDate = null;
+            FilterMinAmount = null;
+            FilterMaxAmount = null;
+            FilterCategory = null;
+            FilterAccount = null;
+        }
+        private void HideAllSps()
+        {
+            //Sps = [FilterSP, FilterAccountSP, FilterAmountSP, FilterCategorySP, FilterDatesSP];
+            OperationsSP = Visibility.Collapsed;
+            IncomesSP = Visibility.Collapsed;
+            ExpensesSP = Visibility.Collapsed;
+            DebtsSP = Visibility.Collapsed;
+            DepositsSP = Visibility.Collapsed;
+            AccountsSP = Visibility.Collapsed;
+            FilterSP = Visibility.Collapsed;
+            FilterAccountSP = Visibility.Collapsed;
+            FilterAmountSP = Visibility.Collapsed;
+            FilterCategorySP = Visibility.Collapsed;
+            FilterDatesSP = Visibility.Collapsed;
         }
         private void Help()
         {

@@ -11,6 +11,7 @@ using System.Windows;
 
 namespace Bruh.Model.DBs
 {
+    // А оно мне надо?
     public class PeriodicitiesDB : ISampleDB
     {
         public List<IModel> GetEntries(string search, List<string> filter)

@@ -68,7 +68,6 @@ namespace Bruh.Model.DBs
             return category;
         }
 
-
         public bool Insert(IModel categ, bool changeCorrespondingEntries)
         {
             Category category = (Category)categ;
@@ -106,12 +105,28 @@ namespace Bruh.Model.DBs
             if (DbConnection.GetDbConnection() == null)
                 return result;
 
-            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"DELETE FROM `Categories` WHERE ID = {category.ID}"))
+
+            //Проверка на привязку категории к операциям
+            bool IsBad = false;
+            using (var cmd1 = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID` FROM `Operations` WHERE `CategoryID` = {category.ID}"))
+            {
+                DbConnection.GetDbConnection().OpenConnection();
+                ExeptionHandler.Try(() => IsBad = (int?)cmd1.ExecuteScalar() != null);
+                DbConnection.GetDbConnection().CloseConnection();
+            }
+            if (IsBad)
+            {
+                MessageBox.Show("Нельзя удалить категорию операций, если к ней привязаны операции. Пожалуйста, отвяжите категорию от операций.");
+                return result;
+            }
+            //
+
+            using (var cmd3 = DbConnection.GetDbConnection().CreateCommand($"DELETE FROM `Categories` WHERE ID = {category.ID}"))
             {
                 DbConnection.GetDbConnection().OpenConnection();
                 ExeptionHandler.Try(() =>
                 {
-                    cmd.ExecuteNonQuery();
+                    cmd3.ExecuteNonQuery();
                     result = true;
                 });
                 DbConnection.GetDbConnection().CloseConnection();

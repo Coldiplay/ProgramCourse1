@@ -259,7 +259,7 @@ namespace Bruh.Model.DBs
                 return result;
         }
 
-        private void ChangeSummOnAccount(Operation operation ,decimal summ)
+        private static void ChangeSummOnAccount(Operation operation ,decimal summ)
         {
             decimal balance = 0;
 

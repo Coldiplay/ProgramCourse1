@@ -70,7 +70,6 @@ namespace Bruh.Model.DBs
             return currency;
         }
 
-
         public bool Insert(IModel curr, bool changeCorrespondingEntries)
         {
             Currency currency = (Currency)curr;
@@ -108,6 +107,43 @@ namespace Bruh.Model.DBs
             bool result = false;
             if (DbConnection.GetDbConnection() == null)
                 return result;
+
+            //Проверка на привязку валюты к записям
+            bool isBad = false;
+            using (var cmd1 = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID` FROM `Debts` WHERE `CurrencyID` = {currency.ID}"))
+            {
+                DbConnection.GetDbConnection().OpenConnection();
+                ExeptionHandler.Try(() => isBad = (int?)cmd1.ExecuteScalar() != null);
+                DbConnection.GetDbConnection().CloseConnection();
+            }
+            if (isBad)
+            {
+                MessageBox.Show("Нельзя удалить валюту пока к ней привязаны долги. Пожалуйста, отвяжите валюту от долгов.");
+                return result;
+            }
+            using (var cmd2 = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID` FROM `Deposits` WHERE `CurrencyID` = {currency.ID}"))
+            {
+                DbConnection.GetDbConnection().OpenConnection();
+                ExeptionHandler.Try(() => isBad = (int?)cmd2.ExecuteScalar() != null);
+                DbConnection.GetDbConnection().CloseConnection();
+            }
+            if (isBad)
+            {
+                MessageBox.Show("Нельзя удалить валюту пока к ней привязаны вклады. Пожалуйста, отвяжите валюту от вкладов.");
+                return result;
+            }
+            using (var cmd3 = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID` FROM `Accounts` WHERE `CurrencyID` = {currency.ID}"))
+            {
+                DbConnection.GetDbConnection().OpenConnection();
+                ExeptionHandler.Try(() => isBad = (int?)cmd3.ExecuteScalar() != null);
+                DbConnection.GetDbConnection().CloseConnection();
+            }
+            if (isBad)
+            {
+                MessageBox.Show("Нельзя удалить валюту пока к ней привязаны счета. Пожалуйста, отвяжите валюту от счетов.");
+                return result;
+            }
+
 
             using (var cmd = DbConnection.GetDbConnection().CreateCommand($"DELETE FROM `Currencies` WHERE ID = {currency.ID}"))
             {

@@ -15,11 +15,11 @@ using System.Windows.Shapes;
 namespace Bruh.View
 {
     /// <summary>
-    /// Логика взаимодействия для FilterWindow.xaml
+    /// Логика взаимодействия для CurrenciesWindow.xaml
     /// </summary>
-    public partial class FilterWindow : Window
+    public partial class CurrenciesWindow : Window
     {
-        public FilterWindow()
+        public CurrenciesWindow()
         {
             InitializeComponent();
         }

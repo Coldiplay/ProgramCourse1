@@ -102,6 +102,8 @@
             <Button Content="Вклады" Style="{DynamicResource MainMenuButton}" Command="{Binding SetDeposits}"/>
             <Button Content="Счета" Style="{DynamicResource MainMenuButton}" Command="{Binding SetAccounts}"/>
             <Button Content="Категории" Style="{DynamicResource MainMenuButton}" Command="{Binding OpenCategories}"/>
+            <Button Content="Банки" Style="{DynamicResource MainMenuButton}" Command="{Binding OpenBanks}"/>
+            <Button Content="Валюты" Style="{DynamicResource MainMenuButton}" Command="{Binding OpenCurrencies}"/>
         </StackPanel>
 
         <Grid Grid.Column="1">
@@ -112,7 +114,7 @@
                     </Style>
                 </StackPanel.Resources>
                 <TextBlock Text="{Binding TitleOfList}" FontSize="20" FontWeight="SemiBold"/>
-            
+
 
                 <StackPanel Visibility="{Binding OperationsSP}" Grid.Column="1">
                     <ListView ItemsSource="{Binding Operations}" SelectedItem="{Binding SelectedEntry}">
@@ -203,8 +205,6 @@
                     </ListView>
                 </StackPanel>
 
-
-                
             </StackPanel>
             
             <StackPanel VerticalAlignment="Bottom">
@@ -223,7 +223,7 @@
                 
                 <StackPanel Visibility="{Binding FilterSP}" Orientation="Horizontal">
                     <TextBlock Text="Фильтр"/>
-                    <Button Content="Очистить" Command="{Binding ClearFilter}" Margin="10 0 0 0"/>
+                    <Button Content="Очистить" Command="{Binding ClearFilterCMD}" Margin="10 0 0 0"/>
                 </StackPanel>
                 
                 <Grid>

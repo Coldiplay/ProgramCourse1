@@ -71,7 +71,6 @@ namespace Bruh.Model.DBs
             return typeDeposit;
         }
 
-
         public bool Insert(IModel typeDepos, bool changeCorrespondingEntries)
         {
             throw new NotImplementedException();
