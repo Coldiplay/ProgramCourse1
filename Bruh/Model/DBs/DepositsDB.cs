@@ -113,6 +113,10 @@ namespace Bruh.Model.DBs
             if (DbConnection.GetDbConnection() == null)
                 return result;
 
+            deposit.CurrencyID = deposit.Currency.ID;
+            deposit.BankID = deposit.Bank.ID;
+            deposit.PeriodicityOfPaymentID = deposit.PeriodicityOfPayment.ID;
+            deposit.TypeOfDepositID = deposit.Type.ID;
             using (MySqlCommand cmd = DbConnection.GetDbConnection().CreateCommand("INSERT INTO `Deposits` VALUES(0, @title, @initalSumm, @dateOfOpening, @dateOfClosing, @capitalization, @interestRate, @periodicityOfPaymentId, @bankID, @typeOfDeposit, @currencyId); SELECT LAST_INSERT_ID();"))
             {
                 cmd.Parameters.Add(new MySqlParameter("title", deposit.Title));
@@ -173,6 +177,10 @@ namespace Bruh.Model.DBs
             if (DbConnection.GetDbConnection() == null)
                 return result;
 
+            deposit.CurrencyID = deposit.Currency.ID;
+            deposit.BankID = deposit.Bank.ID;
+            deposit.PeriodicityOfPaymentID = deposit.PeriodicityOfPayment.ID;
+            deposit.TypeOfDepositID = deposit.Type.ID;
             using (var cmd = DbConnection.GetDbConnection().CreateCommand($"UPDATE `Deposits` set `Title`=@title, `InitalSumm`=@initalSumm, `DateOfOpening`=@dateOfOpening, `DateOfClosing`=@dateOfClosing, `Capitalization`=@capitalization, `InterestRate`=@interestRate, `PeriodicityOfPaymentID`=@periodicityOfPaymentId, `BankID`=@bankId, `TypeOfDepositID`=@typeOfDeposit, `CurrencyID`=@currencyId WHERE `ID`={deposit.ID};"))
             {
                 cmd.Parameters.Add(new MySqlParameter("title", deposit.Title));

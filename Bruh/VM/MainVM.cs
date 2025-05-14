@@ -32,8 +32,8 @@ namespace Bruh.VM
         private IModel? selectedEntry;
         private List<Category> categories;
         private Category? filterCategory;
-        private decimal filterMaxAmount;
-        private decimal filterMinAmount;
+        private decimal? filterMaxAmount;
+        private decimal? filterMinAmount;
         private DateTime? filterUpperDate;
         private DateTime? filterLowerDate;
 
@@ -136,6 +136,8 @@ namespace Bruh.VM
             }
         }
         private List<string> Filter = [];
+        private Account? filterAccount;
+        private List<Account> accountsForFilter;
 
         /*
         public List<string>? Parametres
@@ -174,7 +176,7 @@ namespace Bruh.VM
                 UpdateFilter();
             }
         }
-        public decimal FilterMaxAmount
+        public decimal? FilterMaxAmount
         {
             get => filterMaxAmount;
             set
@@ -184,7 +186,7 @@ namespace Bruh.VM
                 UpdateFilter();
             }
         }
-        public decimal FilterMinAmount
+        public decimal? FilterMinAmount
         {
             get => filterMinAmount;
             set
@@ -203,12 +205,31 @@ namespace Bruh.VM
                 Signal();
             }
         }
+        public List<Account> AccountsForFilter
+        {
+            get => accountsForFilter;
+            set
+            {
+                accountsForFilter = value;
+                Signal();
+            }
+        }
         public Category? FilterCategory
         {
             get => filterCategory;
             set
             {
                 filterCategory = value;
+                Signal();
+                UpdateFilter();
+            }
+        }
+        public Account? FilterAccount
+        {
+            get => filterAccount;
+            set
+            {
+                filterAccount = value;
                 Signal();
                 UpdateFilter();
             }
@@ -315,10 +336,10 @@ namespace Bruh.VM
             {
                 FilterLowerDate = null;
                 FilterUpperDate = null;
-                FilterMinAmount = 0;
-                FilterMaxAmount = 0;
+                FilterMinAmount = null;
+                FilterMaxAmount = null;
                 FilterCategory = null;
-                
+                FilterAccount = null;
 
             }, () => true);
         }
@@ -382,29 +403,34 @@ namespace Bruh.VM
         }
         private void UpdateFilter()
         {
+            Filter.Clear();
             switch (CodeOper)
             {
                 case 0:
                 case 1:
                 case 2:
-                    if (FilterMinAmount > 0)
+                    if (FilterMinAmount.HasValue && FilterMinAmount > 0)
                         Filter.Add($"`Cost` >= {FilterMinAmount}");
-                    if (FilterMaxAmount > 0)
+                    if (FilterMaxAmount.HasValue && FilterMaxAmount > 0)
                         Filter.Add($"`Cost` <= {FilterMaxAmount}");
                     if (FilterCategory != null && FilterCategory.ID != 0)
                         Filter.Add($"CategoryID = {FilterCategory.ID}");
-                    if (FilterLowerDate.HasValue && FilterLowerDate < FilterUpperDate)
-                        Filter.Add($"`TransactDate` >= {FilterLowerDate}");
-                    if (FilterUpperDate.HasValue && FilterUpperDate > FilterLowerDate)
-                        Filter.Add($"`TransactDate` <= {FilterUpperDate}");
+                    if (FilterAccount != null && FilterAccount.ID != 0)
+                        Filter.Add($"AccountID = {FilterAccount.ID}");
+                    // Pls fix
+                    if (FilterLowerDate.HasValue && (FilterLowerDate < FilterUpperDate || FilterUpperDate == null))
+                        Filter.Add($"`TransactDate` >= {FilterLowerDate.Value:dd-MM-yyyy}");
+                    if (FilterUpperDate.HasValue && (FilterUpperDate > FilterLowerDate || FilterLowerDate == null))
+                        Filter.Add($"`TransactDate` <= {FilterUpperDate.Value:dd-MM-yyyy}");
+                    //
                     break;
-            }           
+            }
 
             UpdateLists(CodeOper);
         }
         private void Help()
         {
-            Accounts = [..DB.GetDb(typeof(AccountsDB)).GetEntries("", []).Select(a => (Account)a)];
+            AccountsForFilter = [..DB.GetDb(typeof(AccountsDB)).GetEntries("", []).Select(a => (Account)a)];
             Categories = [.. DB.GetDb(typeof(CategoriesDB)).GetEntries("", []).Select(c => (Category)c)];
         }
 

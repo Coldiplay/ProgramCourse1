@@ -116,6 +116,10 @@ namespace Bruh.Model.DBs
             if (DbConnection.GetDbConnection() == null)
                 return result;
 
+            operation.DebtID = operation.Debt?.ID;
+            operation.PeriodicityID = operation.Periodicity?.ID;
+            operation.AccountID = operation.Account.ID;
+            operation.CategoryID = operation.Category.ID;
             using (MySqlCommand cmd = DbConnection.GetDbConnection().CreateCommand("INSERT INTO `Operations` VALUES(0, @title, @cost, @transactDate, @DateOfCreate, @income, @description,  @periodicityId, @categotyId, @debtId, @accountId); SELECT LAST_INSERT_ID();"))
             {
                 cmd.Parameters.Add(new MySqlParameter("title", operation.Title));
@@ -214,6 +218,10 @@ namespace Bruh.Model.DBs
             if (DbConnection.GetDbConnection() == null)
                 return result;
 
+            operation.DebtID = operation.Debt?.ID;
+            operation.PeriodicityID = operation.Periodicity?.ID;
+            operation.AccountID = operation.Account.ID;
+            operation.CategoryID = operation.Category.ID;
             if (changeCorrespondingEntries)
             {
                 decimal cost = 0;

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -204,11 +205,15 @@ namespace Bruh.VM
                  * TypeOfDeposit
                  */
                 case Account account:
+                    if (account.ID == 0)
+                        break;
                     account.Currency = Currencies.First(c => c.ID == account.CurrencyID);
                     account.Bank = Banks.First(b => b.ID == account.CurrencyID);
                     break;
 
                 case Operation operation:
+                    if (operation.ID == 0)
+                        break;
                     operation.Account = Accounts.First(a => a.ID == operation.AccountID);
                     operation.Category = Categories.First(c => c.ID == operation.CategoryID);
                     operation.Debt = Debts.FirstOrDefault(d => d.ID == operation.DebtID);
@@ -216,10 +221,14 @@ namespace Bruh.VM
                     break;
 
                 case Debt debt:
+                    if (debt.ID == 0)
+                        break;
                     debt.Currency = Currencies.First(c => c.ID == debt.CurrencyID);
                     break;
 
                 case Deposit deposit:
+                    if (deposit.ID == 0)
+                        break;
                     deposit.Bank = Banks.First(b => b.ID == deposit.BankID);
                     deposit.PeriodicityOfPayment = PeriodicitiesOfPayment.First(p => p.ID == deposit.PeriodicityOfPaymentID);
                     deposit.Type = TypesOfDeposits.First(t => t.ID == deposit.TypeOfDepositID);

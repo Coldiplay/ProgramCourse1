@@ -132,6 +132,8 @@ namespace Bruh.Model.DBs
             if (DbConnection.GetDbConnection() == null)
                 return result;
 
+            debt.CurrencyID = debt.Currency.ID;
+
             using (MySqlCommand cmd = DbConnection.GetDbConnection().CreateCommand("INSERT INTO `Debts` VALUES(0, @title, @summ, @annualInterest, @dateOfPick, @dateOfReturn,  @currencyId); SELECT LAST_INSERT_ID();"))
             {
                 cmd.Parameters.Add(new MySqlParameter("title", debt.Title));
@@ -187,6 +189,8 @@ namespace Bruh.Model.DBs
             bool result = false;
             if (DbConnection.GetDbConnection() == null)
                 return result;
+
+            debt.CurrencyID = debt.Currency.ID;
 
             using (var cmd = DbConnection.GetDbConnection().CreateCommand($"UPDATE `Debts` set `Title`=@title, `Summ`=@summ, `AnnualInterest`=@annualInterest, `DateOfPick`=@dateOfPick, `DateOfReturn`=@dateOfReturn, `CurrencyID`=@currencyId WHERE `ID` = {debt.ID} ;"))
             {

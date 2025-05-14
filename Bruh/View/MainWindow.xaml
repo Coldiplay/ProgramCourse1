@@ -207,11 +207,21 @@
                 
             </StackPanel>
             <StackPanel VerticalAlignment="Bottom">
+                <StackPanel.Resources>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Margin" Value="3"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                    </Style>
+                    <Style TargetType="TextBox">
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="Margin" Value="3"/>
+                    </Style>
+                </StackPanel.Resources>
                 <TextBlock Text="Поиск"/>
                 <TextBox Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}" MaxLength="255"/>
-                <StackPanel Orientation="Horizontal">
+                <StackPanel x:Name="Filter" Orientation="Horizontal">
                     <TextBlock Text="Фильтр"/>
-                    <Button Content="Отчистить" Command="{Binding ClearFilter}"/>
+                    <Button Content="Отчистить" Command="{Binding ClearFilter}" Margin="10 0 0 0"/>
                 </StackPanel>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -236,16 +246,20 @@
                             <TextBox Text="{Binding FilterMaxAmount, UpdateSourceTrigger=PropertyChanged}" Width="50"/>
                         </StackPanel>
                     </StackPanel>
-                    
-                    
-                    <StackPanel Grid.Row="1">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="С счёта"/>
+
+
+                    <StackPanel Grid.Row="1" Orientation="Horizontal">
+                        <StackPanel x:Name="CategoryFilter" Orientation="Horizontal" Margin="0 0 10 0">
+                            <TextBlock Text="Категория"/>
                             <ComboBox ItemsSource="{Binding Categories}" SelectedItem="{Binding FilterCategory}" DisplayMemberPath="Title"/>
                         </StackPanel>
+                        <StackPanel x:Name="AccountFilter" Orientation="Horizontal">
+                            <TextBlock Text="Счёт"/>
+                            <ComboBox ItemsSource="{Binding AccountsForFilter}" SelectedItem="{Binding FilterAccount}" DisplayMemberPath="Title"/>
+                        </StackPanel>
                     </StackPanel>
-                    
-                    
+
+
 
                 </Grid>
                 

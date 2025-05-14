@@ -91,13 +91,15 @@ namespace Bruh.Model.DBs
             return account;
         }
 
-
         public bool Insert(IModel acc, bool changeCorrespondingEntries)
         {
             Account account = (Account)acc;
             bool result = false;
             if (DbConnection.GetDbConnection() == null)
                 return result;
+
+            account.CurrencyID = account.Currency.ID;
+            account.BankID = account.Bank?.ID;
 
             using (MySqlCommand cmd = DbConnection.GetDbConnection().CreateCommand("INSERT INTO `Accounts` VALUES(0, @title, @balance, @currencyId, @bankId); SELECT LAST_INSERT_ID();"))
             {
@@ -151,6 +153,9 @@ namespace Bruh.Model.DBs
             bool result = false;
             if (DbConnection.GetDbConnection() == null)
                 return result;
+
+            account.CurrencyID = account.Currency.ID;
+            account.BankID = account.Bank?.ID;
 
             using (var cmd = DbConnection.GetDbConnection().CreateCommand($"UPDATE `Accounts` set `Title`=@title, `Balance`=@balance, `CurrencyID`=@currencyId, `BankID`=@bankId WHERE `ID` = {account.ID};"))
             {
