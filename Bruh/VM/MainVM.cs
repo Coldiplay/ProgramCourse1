@@ -5,38 +5,29 @@ using Bruh.VMTools;
 using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace Bruh.VM
 {
     public class MainVM : BaseVM
     {
-        /*
-        private Operation? selectedOperation;
-        private Debt? selectedDebt;
-        private Deposit? selectedDeposit;
-        private Account? selectedAccount;
-        */
         private ObservableCollection<Operation> operations;
         private ObservableCollection<Debt> debts;
         private ObservableCollection<Deposit> deposits;
         private ObservableCollection<Account> accounts;
 
         private string search;
-        //private List<string> filter;
-        //private List<string>? parametres = [];
         private string titleOfList = "";
         private byte codeOper;
         private IModel? selectedEntry;
-        private List<Category> categories;
+        private List<Category>? categories;
         private Category? filterCategory;
         private decimal? filterMaxAmount;
         private decimal? filterMinAmount;
         private DateTime? filterUpperDate;
         private DateTime? filterLowerDate;
         private Account? filterAccount;
-        private List<Account> accountsForFilter;
+        private List<Account>? accountsForFilter;
 
         public IModel? SelectedEntry
         {
@@ -47,47 +38,6 @@ namespace Bruh.VM
                 Signal();
             }
         }
-        /*
-        public Operation? SelectedOperation
-        {
-            get => selectedOperation;
-            set
-            {
-                selectedOperation = value;// as Operation;
-                Signal();
-            }
-        }
-
-        public Debt? SelectedDebt
-        {
-            get => selectedDebt;
-            set
-            {
-                selectedDebt = value;
-                Signal();
-            }
-        }
-
-        public Deposit? SelectedDeposit
-        {
-            get => selectedDeposit;
-            set
-            {
-                selectedDeposit = value;
-                Signal();
-            }
-        }
-
-        public Account? SelectedAccount
-        {
-            get => selectedAccount;
-            set
-            {
-                selectedAccount = value;
-                Signal();
-            }
-        }
-        */
 
         public ObservableCollection<Operation> Operations
         {
@@ -126,7 +76,6 @@ namespace Bruh.VM
             }
         }
 
-
         public string Search
         {
             get => search;
@@ -149,24 +98,10 @@ namespace Bruh.VM
         private Visibility expensesSP;
         private Visibility depositsSP;
         private Visibility accountsSP;
+        private Visibility filterModeSP;
+        private string selectedMode;
+        private List<string> filterModes;
 
-        /*
-public List<string>? Parametres
-{
-get => parametres;
-set
-{
-parametres = value;
-Filter = "";
-parametres?.ForEach(p =>
-{
-Filter = $"{Filter} {p}";
-});
-Signal();
-Signal(nameof(Filter));
-}
-}
-*/
         public DateTime? FilterUpperDate
         {
             get => filterUpperDate;
@@ -207,7 +142,7 @@ Signal(nameof(Filter));
                 UpdateFilter();
             }
         }
-        public List<Category> Categories
+        public List<Category>? Categories
         {
             get => categories;
             set
@@ -216,13 +151,24 @@ Signal(nameof(Filter));
                 Signal();
             }
         }
-        public List<Account> AccountsForFilter
+        public List<Account>? AccountsForFilter
         {
             get => accountsForFilter;
             set
             {
                 accountsForFilter = value;
                 Signal();
+            }
+        }
+        public string[] FilterModes { get; set; } = ["Дата открытия", "Дата закрытия"];
+        public string SelectedMode
+        {
+            get => selectedMode;
+            set
+            {
+                selectedMode = value;
+                Signal();
+                UpdateFilter();
             }
         }
         public Category? FilterCategory
@@ -295,9 +241,9 @@ Signal(nameof(Filter));
 
         public MainVM()
         {
-            //Что-нибудь сделать с этим, сомнительно же каждый раз сбрасывать фильтр при обновлении списков, разве нет?
-            Help();
+            UpdateListsForFilter();
             CodeOper = 0;
+
 
             SetOperations = new CommandVM(() => CodeOper = 0, () => true);
             SetIncomes = new CommandVM(() => CodeOper = 1, () => true);
@@ -349,7 +295,7 @@ Signal(nameof(Filter));
             {
                 new CategoriesWindow().ShowDialog();
                 UpdateLists(CodeOper);
-                Help();
+                UpdateListsForFilter();
             }, () => true);
             OpenBanks = new CommandVM(() => 
             {
@@ -373,6 +319,15 @@ Signal(nameof(Filter));
                 filterSP = value;
                 Signal(); 
             } 
+        }
+        public Visibility FilterModeSP
+        {
+            get => filterModeSP;
+            set
+            {
+                filterModeSP = value;
+                Signal();
+            }
         }
         public Visibility FilterAmountSP
         {
@@ -468,34 +423,29 @@ Signal(nameof(Filter));
 
         private void UpdateLists(byte i)
         {
+            //UpdateListsForFilter();
             HideAllSps();
-            
             SelectedEntry = null;
-            /*
-            SelectedOperation = null;
-            SelectedDebt = null;
-            SelectedDeposit = null;
-            SelectedAccount = null;
-            */
+
             switch (i)
             {
                 case 0:
                     OperationsSP = Visibility.Visible;
-                    ShowSpsForOperations();
+                    ShowFilterForOpers();
                     TitleOfList = "Все операции";
                     Operations = new(DB.GetDb(typeof(OperationsDB)).GetEntries(Search, Filter).Select(s => (Operation)s).OrderByDescending(oper => oper.TransactDate));
                     break;                    
 
                 case 1:
                     IncomesSP = Visibility.Visible;
-                    ShowSpsForOperations();
+                    ShowFilterForOpers();
                     TitleOfList = "Доходы";
                     Operations = new(DB.GetDb(typeof(OperationsDB)).GetEntries(Search, Filter).Select(s => (Operation)s).Where(oper => oper.Income == true).OrderByDescending(oper => oper.TransactDate));
                     break;
 
                 case 2:
                     ExpensesSP = Visibility.Visible;
-                    ShowSpsForOperations();
+                    ShowFilterForOpers();
                     TitleOfList = "Расходы";
                     Operations = new(DB.GetDb(typeof(OperationsDB)).GetEntries(Search, Filter).Select(s => (Operation)s).Where(oper => oper.Income == false).OrderByDescending(oper => oper.TransactDate));
                     break;
@@ -505,19 +455,21 @@ Signal(nameof(Filter));
                     FilterSP = Visibility.Visible;
                     FilterAmountSP = Visibility.Visible;
                     FilterDatesSP = Visibility.Visible;
+                    FilterModeSP = Visibility.Visible;
                     TitleOfList = "Долги";
                     Debts = new(DB.GetDb(typeof(DebtsDB)).GetEntries(Search, Filter).Select(d => (Debt)d).OrderByDescending(d => d.DateOfPick));
                     break;
 
                 case 4:
-                    //neededPanels = [DepositsSP];
                     DepositsSP = Visibility.Visible;
+                    FilterAmountSP = Visibility.Visible;
+                    FilterDatesSP = Visibility.Visible;
+                    FilterModeSP = Visibility.Visible;
                     TitleOfList = "Вклады";
                     Deposits = new(DB.GetDb(typeof(DepositsDB)).GetEntries(Search, Filter).Select(d => (Deposit)d).OrderByDescending(d => d.OpenDate));
                     break;
 
                 case 5:
-                    //neededPanels = [AccountsSP];
                     AccountsSP = Visibility.Visible;
                     TitleOfList = "Счета";
                     Accounts = new(DB.GetDb(typeof(AccountsDB)).GetEntries(Search, Filter).Select(a => (Account)a).OrderByDescending(a => a.Title));
@@ -527,15 +479,13 @@ Signal(nameof(Filter));
         private void UpdateFilter()
         {
             Filter.Clear();
+            string amountString = "";
             switch (CodeOper)
             {
                 case 0:
                 case 1:
                 case 2:
-                    if (FilterMinAmount.HasValue && FilterMinAmount > 0)
-                        Filter.Add($"`Cost` >= {FilterMinAmount}");
-                    if (FilterMaxAmount.HasValue && FilterMaxAmount > 0)
-                        Filter.Add($"`Cost` <= {FilterMaxAmount}");
+                    amountString = "Cost";
                     if (FilterCategory != null && FilterCategory.ID != 0)
                         Filter.Add($"CategoryID = {FilterCategory.ID}");
                     if (FilterAccount != null && FilterAccount.ID != 0)
@@ -545,10 +495,51 @@ Signal(nameof(Filter));
                     if (FilterUpperDate.HasValue && (FilterUpperDate > FilterLowerDate || FilterLowerDate == null))
                         Filter.Add($"DATE(`TransactDate`) <= '{FilterUpperDate.Value:yyyy-MM-dd}'");
                     break;
+                case 3:
+                    amountString = "Summ";
+                    if (SelectedMode == FilterModes[0])
+                    {
+                        if (FilterLowerDate.HasValue && (FilterLowerDate < FilterUpperDate || FilterUpperDate == null))
+                            Filter.Add($"DATE(`DateOfPick`) >= '{FilterLowerDate.Value:yyyy-MM-dd}'");
+                        if (FilterUpperDate.HasValue && (FilterUpperDate > FilterLowerDate || FilterLowerDate == null))
+                            Filter.Add($"DATE(`DateOfPick`) <= '{FilterUpperDate.Value:yyyy-MM-dd}'");
+                    }
+                    else
+                    {
+                        if (FilterLowerDate.HasValue && (FilterLowerDate < FilterUpperDate || FilterUpperDate == null))
+                            Filter.Add($"DATE(`DateOfReturn`) >= '{FilterLowerDate.Value:yyyy-MM-dd}'");
+                        if (FilterUpperDate.HasValue && (FilterUpperDate > FilterLowerDate || FilterLowerDate == null))
+                            Filter.Add($"DATE(`DateOfReturn`) <= '{FilterUpperDate.Value:yyyy-MM-dd}'");
+                    }
+                    break;
+                case 4:
+                    amountString = "InitalSumm";
+                    if (SelectedMode == FilterModes[0])
+                    {
+                        if (FilterLowerDate.HasValue && (FilterLowerDate < FilterUpperDate || FilterUpperDate == null))
+                            Filter.Add($"DATE(`DateOfOpening`) >= '{FilterLowerDate.Value:yyyy-MM-dd}'");
+                        if (FilterUpperDate.HasValue && (FilterUpperDate > FilterLowerDate || FilterLowerDate == null))
+                            Filter.Add($"DATE(`DateOfOpening`) <= '{FilterUpperDate.Value:yyyy-MM-dd}'");
+                    }
+                    else
+                    {
+                        if (FilterLowerDate.HasValue && (FilterLowerDate < FilterUpperDate || FilterUpperDate == null))
+                            Filter.Add($"DATE(`DateOfClosing`) >= '{FilterLowerDate.Value:yyyy-MM-dd}'");
+                        if (FilterUpperDate.HasValue && (FilterUpperDate > FilterLowerDate || FilterLowerDate == null))
+                            Filter.Add($"DATE(`DateOfClosing`) <= '{FilterUpperDate.Value:yyyy-MM-dd}'");
+                    }
+                    break;
+                case 5:
+                    amountString = "Balance";
+                    break;
             }
-
+            if (FilterMinAmount.HasValue && FilterMinAmount > 0)
+                Filter.Add($"`{amountString}` >= {FilterMinAmount}");
+            if (FilterMaxAmount.HasValue && FilterMaxAmount > 0)
+                Filter.Add($"`{amountString}` <= {FilterMaxAmount}");
             UpdateLists(CodeOper);
         }
+
         private void ClearFilter()
         {
             Filter.Clear();
@@ -561,7 +552,6 @@ Signal(nameof(Filter));
         }
         private void HideAllSps()
         {
-            //Sps = [FilterSP, FilterAccountSP, FilterAmountSP, FilterCategorySP, FilterDatesSP];
             OperationsSP = Visibility.Collapsed;
             IncomesSP = Visibility.Collapsed;
             ExpensesSP = Visibility.Collapsed;
@@ -569,12 +559,13 @@ Signal(nameof(Filter));
             DepositsSP = Visibility.Collapsed;
             AccountsSP = Visibility.Collapsed;
             FilterSP = Visibility.Collapsed;
+            FilterModeSP = Visibility.Collapsed;
             FilterAccountSP = Visibility.Collapsed;
             FilterAmountSP = Visibility.Collapsed;
             FilterCategorySP = Visibility.Collapsed;
             FilterDatesSP = Visibility.Collapsed;
         }
-        private void ShowSpsForOperations()
+        private void ShowFilterForOpers()
         {
             FilterSP = Visibility.Visible;
             FilterAccountSP = Visibility.Visible;
@@ -582,18 +573,18 @@ Signal(nameof(Filter));
             FilterCategorySP = Visibility.Visible;
             FilterDatesSP = Visibility.Visible;
         }
-        private void Help()
+        private void UpdateListsForFilter()
         {
+            int accountId = FilterAccount?.ID ?? 0;
+            int categoryId = FilterCategory?.ID ?? 0;
+            //filterAccount = null;
+            //filterCategory = null;
+            //AccountsForFilter?.Clear();
+            //Categories?.Clear();
             AccountsForFilter = [..DB.GetDb(typeof(AccountsDB)).GetEntries("", []).Select(a => (Account)a)];
             Categories = [.. DB.GetDb(typeof(CategoriesDB)).GetEntries("", []).Select(c => (Category)c)];
+            filterAccount = AccountsForFilter.FirstOrDefault(acc => acc.ID == accountId);
+            filterCategory = Categories.FirstOrDefault(c => c.ID == categoryId);
         }
-
-        /*
-        public void Set(List<StackPanel> stackPanels)
-        {
-            StackPanels = stackPanels;
-            UpdateLists(CodeOper);
-        }
-        */
     }
 }

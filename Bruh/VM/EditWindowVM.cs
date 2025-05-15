@@ -42,7 +42,6 @@ namespace Bruh.VM
             {
                 durationType = value;
                 Signal();
-                //ProbableSumm = ((Deposit)Entry).GetProbSumm;
             }
         }
         public byte Hours
@@ -79,18 +78,13 @@ namespace Bruh.VM
 
         public EditWindowVM()
         {
-            DurationType = "Месяцев";
+            DurationType = "Месяцы";
+
+            if (Entry is Deposit)
+                Banks.Add(new Bank { ID = 0 });
+
             Save = new CommandVM(() =>
             {
-                /*
-                Type type = Entry.GetType();
-                var test = type.GetCustomAttribute<DBContextAttribute>();
-                var db = DB.GetDb(test.Type);
-                if (((Operation)Entry).ID != 0)
-                    db.Update(Entry);
-                else
-                    db.Insert(Entry);
-                */
                 bool change = false;
                 if (Entry is Operation || Entry is Debt || Entry is Deposit)
                 { 
@@ -100,8 +94,6 @@ namespace Bruh.VM
 
                 if (Entry is Operation operation)
                 {
-                    //                                                                              23 - 12 = 11
-                    //                                                                              12 - 23 = -11
                     operation.TransactDate = operation.TransactDate.AddMinutes(Minutes - operation.TransactDate.Minute);
                     operation.TransactDate = operation.TransactDate.AddHours(Hours - operation.TransactDate.Hour);
                     
@@ -111,6 +103,7 @@ namespace Bruh.VM
                     DB.GetDb(Entry.GetType().GetCustomAttribute<DBContextAttribute>().Type).Update(Entry, change);
                 else
                     DB.GetDb(Entry.GetType().GetCustomAttribute<DBContextAttribute>().Type).Insert(Entry, change);
+
                 close?.Invoke();
             },
             
@@ -161,10 +154,6 @@ namespace Bruh.VM
                             return true;
                         break;
 
-                        /*
-                    default:
-                        return false;
-                        */
                 }
                 return false;
             });
@@ -194,9 +183,6 @@ namespace Bruh.VM
                     SetDurationType(debt);
                 }
             }, () => true);
-
-            if (Entry is Deposit)
-                Banks.Add(new Bank { ID = 0});
         }
         private void SetDurationType(Deposit deposit)
         {
@@ -207,7 +193,6 @@ namespace Bruh.VM
                 2 => "Года",
                 _ => throw new NotImplementedException()
                 };
-            //debt.Duration = debt.Duration;
         }
         private void SetDurationType(Debt debt)
         {
@@ -218,7 +203,6 @@ namespace Bruh.VM
                 2 => "Года",
                 _ => throw new NotImplementedException()
             };
-            //debt.Duration = debt.Duration;
         }
         public void Set(IModel obj, Action close)
         {
@@ -263,6 +247,7 @@ namespace Bruh.VM
                 case Deposit deposit:
                     if (deposit.ID == 0)
                         break;
+
                     deposit.Bank = Banks.First(b => b.ID == deposit.BankID);
                     deposit.PeriodicityOfPayment = PeriodicitiesOfPayment.First(p => p.ID == deposit.PeriodicityOfPaymentID);
                     deposit.Type = TypesOfDeposits.First(t => t.ID == deposit.TypeOfDepositID);
