@@ -232,7 +232,7 @@ namespace Bruh.Model.DBs
                     ExeptionHandler.Try(() => cost = (decimal)cmd2.ExecuteScalar());
                     DbConnection.GetDbConnection().CloseConnection();
                 }
-                ChangeSummOnAccount(operation, operation.Cost - cost);
+                ChangeSummOnAccount(operation, /*operation.Cost - cost);*/ operation.Cost != cost ? operation.Cost - cost : operation.Cost);
             }
 
             using (var cmd = DbConnection.GetDbConnection().CreateCommand($"UPDATE `Operations` set `Title`=@title, `Cost`=@cost, `TransactDate`=@transactDate, `DateOfCreate`=@dateOfCreate, `Income`=@income, `Description`=@description, `PeriodicityID`=@periodicityId, `CategoryID`=@categoryId, `DebtID`=@debtId, `AccountID`=@AccountId WHERE `ID`={operation.ID} ;"))

@@ -243,22 +243,27 @@
                             </StackPanel>                        
                         </StackPanel>
 
+                        <StackPanel Visibility="{Binding FilterCategorySP}" Orientation="Horizontal" Margin="0 0 10 0">
+                            <TextBlock Text="Категория"/>
+                            <ComboBox ItemsSource="{Binding Categories}" SelectedItem="{Binding FilterCategory}" DisplayMemberPath="Title" VerticalAlignment="Bottom"/>
+                        </StackPanel>
+                        <StackPanel Visibility="{Binding FilterAccountSP}" Orientation="Horizontal">
+                            <TextBlock Text="Счёт"/>
+                            <ComboBox ItemsSource="{Binding AccountsForFilter}" SelectedItem="{Binding FilterAccount}" DisplayMemberPath="Title" VerticalAlignment="Bottom"/>
+                        </StackPanel>
+                        
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" Orientation="Horizontal">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Режим фильтра"/>
+                            <ComboBox />
+                        </StackPanel>
                         <StackPanel Visibility="{Binding FilterAmountSP}" Orientation="Horizontal" Margin="10 0 0 0">
                             <TextBlock Text="Больше"/>
                             <TextBox Text="{Binding FilterMinAmount, UpdateSourceTrigger=PropertyChanged}" Width="50"/>
                             <TextBlock Text="Меньше"/>
                             <TextBox Text="{Binding FilterMaxAmount, UpdateSourceTrigger=PropertyChanged}" Width="50"/>
-                        </StackPanel>
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="1" Orientation="Horizontal">
-                        <StackPanel Visibility="{Binding FilterCategorySP}" Orientation="Horizontal" Margin="0 0 10 0">
-                            <TextBlock Text="Категория"/>
-                            <ComboBox ItemsSource="{Binding Categories}" SelectedItem="{Binding FilterCategory}" DisplayMemberPath="Title"/>
-                        </StackPanel>
-                        <StackPanel Visibility="{Binding FilterAccountSP}" Orientation="Horizontal">
-                            <TextBlock Text="Счёт"/>
-                            <ComboBox ItemsSource="{Binding AccountsForFilter}" SelectedItem="{Binding FilterAccount}" DisplayMemberPath="Title"/>
                         </StackPanel>
                     </StackPanel>
 

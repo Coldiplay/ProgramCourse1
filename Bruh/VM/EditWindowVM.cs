@@ -19,6 +19,8 @@ namespace Bruh.VM
         private Action? close;
         private IModel entry;
         private string durationType;
+        private byte hours;
+        private byte minutes;
 
         public IModel Entry
         {
@@ -43,6 +45,24 @@ namespace Bruh.VM
                 //ProbableSumm = ((Deposit)Entry).GetProbSumm;
             }
         }
+        public byte Hours
+        {
+            get => hours;
+            set
+            {
+                hours = value;
+                Signal();
+            }
+        }
+        public byte Minutes
+        {
+            get => minutes;
+            set
+            {
+                minutes = value;
+                Signal();
+            }
+        }
 
         public List<Currency> Currencies { get; set; } = new(DB.GetDb(typeof(CurrencyDB)).GetEntries("", []).Select(c => (Currency)c));
         public List<Bank> Banks { get; set; } = new(DB.GetDb(typeof(BanksDB)).GetEntries("", []).Select(b => (Bank)b));
@@ -59,8 +79,7 @@ namespace Bruh.VM
 
         public EditWindowVM()
         {
-            durationType = "Месяцев";
-            Signal(nameof(DurationType));
+            DurationType = "Месяцев";
             Save = new CommandVM(() =>
             {
                 /*
@@ -73,11 +92,21 @@ namespace Bruh.VM
                     db.Insert(Entry);
                 */
                 bool change = false;
-                if (Entry is Operation || Entry is Debt || Entry is Deposit || Entry is Operation)
+                if (Entry is Operation || Entry is Debt || Entry is Deposit)
                 { 
                     if (MessageBox.Show("Хотите ли вы изменить соответствующие записи?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                         change = true;
                 }
+
+                if (Entry is Operation operation)
+                {
+                    //                                                                              23 - 12 = 11
+                    //                                                                              12 - 23 = -11
+                    operation.TransactDate = operation.TransactDate.AddMinutes(Minutes - operation.TransactDate.Minute);
+                    operation.TransactDate = operation.TransactDate.AddHours(Hours - operation.TransactDate.Hour);
+                    
+                }
+
                 if (Entry.ID != 0)
                     DB.GetDb(Entry.GetType().GetCustomAttribute<DBContextAttribute>().Type).Update(Entry, change);
                 else
@@ -221,6 +250,8 @@ namespace Bruh.VM
                     operation.Category = Categories.First(c => c.ID == operation.CategoryID);
                     operation.Debt = Debts.FirstOrDefault(d => d.ID == operation.DebtID);
                     operation.Periodicity = Periodicities.FirstOrDefault(p => p.ID == operation.PeriodicityID);
+                    Minutes = (byte)operation.TransactDate.Minute;
+                    Hours = (byte)operation.TransactDate.Hour;
                     break;
 
                 case Debt debt:

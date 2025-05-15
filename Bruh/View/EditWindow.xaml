@@ -32,17 +32,23 @@
                 <TextBlock Text="Категория"/>
                 <ComboBox ItemsSource="{Binding DataContext.Categories, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" SelectedItem="{Binding Category, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Title"/>
                 <RadioButton IsChecked="{Binding Income, UpdateSourceTrigger=PropertyChanged}" Content="Доход"/>
-                <RadioButton Content="Расход"/>
+                <RadioButton Content="Расход" IsChecked="{Binding IsExpense}"/>
                 <TextBlock Text="Сумма операции"/>
                 <TextBox Text="{Binding Cost, UpdateSourceTrigger=PropertyChanged}"/>
-                <TextBlock Text="Время выполнения операции"/>
-                <DatePicker SelectedDate="{Binding TransactDate, UpdateSourceTrigger=PropertyChanged}" DisplayDate="{Binding TransactDate}"/>
+                <TextBlock Text="Дата выполнения операции"/>
+                <DatePicker SelectedDate="{Binding TransactDate, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Время выполнения операции (Часы | Минуты)"/>
+                <StackPanel Orientation="Horizontal">
+                    <TextBox Text="{Binding DataContext.Hours, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" Width="20" MaxLength="2"/>
+                    <TextBlock Text=":" Margin="2 0 2 0"/>
+                    <TextBox Text="{Binding DataContext.Minutes, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" Width="20" MaxLength="2"/>
+                </StackPanel>
                 <TextBlock Text="Счёт списания/зачисления"/>
                 <ComboBox ItemsSource="{Binding DataContext.Accounts, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" SelectedItem="{Binding Account, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Title"/>
                 <TextBlock Text="Описание"/>
                 <TextBox Text="{Binding Description}"/>
-                <TextBlock Text="Периодичность операции (опционально)"/>
-                <ComboBox ItemsSource="{Binding DataContext.Periodicities, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" SelectedItem="{Binding Periodicity, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name"/>
+                <!--<TextBlock Text="Периодичность операции (опционально)"/>
+                <ComboBox ItemsSource="{Binding DataContext.Periodicities, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" SelectedItem="{Binding Periodicity, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name"/>-->
                 <TextBlock Text="Погашаемый долг (опционально)"/>
                 <ComboBox ItemsSource="{Binding DataContext.Debts, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" SelectedItem="{Binding Debt, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Title"/>                
             </StackPanel>
