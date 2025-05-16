@@ -18,9 +18,9 @@ namespace Bruh.Model.DBs
             filterlist.ForEach(f =>
             {
                 if (!string.IsNullOrEmpty(f))
-                    filter = $"{filter} && {f}";
+                    filter = $"{filter} AND {f}";
             });
-            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID`, `Title`, `Summ`, `AnnualInterest`, `DateOfPick`, `DateOfReturn`, `CurrencyID` FROM `Debts` WHERE `Title` LIKE @search OR `Summ` LIKE @search OR `DateOfPick` LIKE @search OR `DateOfReturn` LIKE @search OR `AnnualInterest` LIKE @search {filter}"))
+            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID`, `Title`, `Summ`, `AnnualInterest`, `DateOfPick`, `DateOfReturn`, `CurrencyID` FROM `Debts` WHERE (`Title` LIKE @search OR `Summ` LIKE @search OR `DateOfPick` LIKE @search OR `DateOfReturn` LIKE @search OR `AnnualInterest` LIKE @search) {filter}"))
             {
                 cmd.Parameters.Add(new MySqlParameter("search", $"%{search}%"));
 

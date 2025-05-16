@@ -13,13 +13,20 @@ namespace Bruh.Model.DBs
 {
     public class AccountsDB : ISampleDB
     {
-        public List<IModel> GetEntries(string search, List<string> filter)
+        public List<IModel> GetEntries(string search, List<string> filterList)
         {
             List<IModel> accounts = new();
             if (DbConnection.GetDbConnection() == null)
                 return accounts;
 
-            using (var cmd = DbConnection.GetDbConnection().CreateCommand("SELECT a.`ID`, a.`Title`, a.`Balance`, a.`BankID`, a.`CurrencyID` FROM `Accounts` a LEFT JOIN `Banks` b ON a.`BankID` = b.`ID` WHERE `a`.`Title` LIKE @search OR `a`.`Balance` LIKE @search OR `b`.`Title` LIKE @search;"))
+            string filter = "";
+            filterList.ForEach(f =>
+            {
+                if (!string.IsNullOrEmpty(f))
+                    filter = $"{filter} AND {f}";
+            });
+
+            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"SELECT a.`ID`, a.`Title`, a.`Balance`, a.`BankID`, a.`CurrencyID` FROM `Accounts` a LEFT JOIN `Banks` b ON a.`BankID` = b.`ID` WHERE (`a`.`Title` LIKE @search OR `a`.`Balance` LIKE @search OR `b`.`Title` LIKE @search) {filter};"))
             {
                     cmd.Parameters.Add(new MySqlParameter("search", $"%{search}%"));
 
@@ -69,17 +76,13 @@ namespace Bruh.Model.DBs
                     while (dr.Read())
                     {
                         if (dr.IsDBNull("ID"))
-                        {
                             break;
-                        }
-                        else
-                        {
-                            account.ID = dr.GetInt32("ID");
-                            account.Title = dr.GetString("Title");
-                            account.Balance = dr.GetDecimal("Balance");
-                            account.CurrencyID = dr.GetInt32("CurrencyID");
-                            account.BankID = dr.IsDBNull("BankID") ? null : dr.GetInt32("BankID");                        
-                        }                    
+
+                        account.ID = dr.GetInt32("ID");
+                        account.Title = dr.GetString("Title");
+                        account.Balance = dr.GetDecimal("Balance");
+                        account.CurrencyID = dr.GetInt32("CurrencyID");
+                        account.BankID = dr.IsDBNull("BankID") ? null : dr.GetInt32("BankID");
                     }
                 }
                 DbConnection.GetDbConnection().CloseConnection();
@@ -99,7 +102,7 @@ namespace Bruh.Model.DBs
                 return result;
 
             account.CurrencyID = account.Currency.ID;
-            account.BankID = account.Bank?.ID;
+            account.BankID = account.Bank?.ID == 0 ? null : account.Bank?.ID;
 
             using (MySqlCommand cmd = DbConnection.GetDbConnection().CreateCommand("INSERT INTO `Accounts` VALUES(0, @title, @balance, @currencyId, @bankId); SELECT LAST_INSERT_ID();"))
             {

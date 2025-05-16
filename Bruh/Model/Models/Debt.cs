@@ -146,5 +146,7 @@ namespace Bruh.Model.Models
             Duration = ((help.Year - DateOfPick.Year) * 12) + (help.Month - DateOfPick.Month) - (help.Day < DateOfPick.Day ? 1 : 0);
             DateOfReturn = help;
         }
+
+        public bool AllFieldsAreCorrect => !(DateOfPick >= DateOfReturn || Currency == null || Summ <= 0);
     }
 }

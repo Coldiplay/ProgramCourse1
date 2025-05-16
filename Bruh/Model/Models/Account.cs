@@ -22,5 +22,7 @@ namespace Bruh.Model.Models
         {
             get => Currency == null || char.IsWhiteSpace(Currency.Symbol) ? $"{Balance} " : $"{Balance} {Currency.Symbol}";
         }
+
+        public bool AllFieldsAreCorrect => !(string.IsNullOrWhiteSpace(Title) || Currency == null);
     }
 }

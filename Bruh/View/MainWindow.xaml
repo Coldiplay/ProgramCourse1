@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Bruh"
         xmlns:vm="clr-namespace:Bruh.VM"
+        xmlns:vmtools="clr-namespace:Bruh.VMTools"
         mc:Ignorable="d"
         DataContext="{DynamicResource vm}"
         Title="MainWindow" Height="480" Width="560"
@@ -13,7 +14,7 @@
     
     <Window.Resources>
         <vm:MainVM x:Key="vm"/>
-
+        <vmtools:StringConverter x:Key="AmountConverter"/>
         <Style TargetType="Button" x:Key="MainMenuButton">
             <Setter Property="Template">
                 <Setter.Value>
@@ -116,7 +117,6 @@
                 </StackPanel.Resources>
                 <TextBlock Text="{Binding TitleOfList}" FontSize="20" FontWeight="SemiBold"/>
 
-
                 <StackPanel Visibility="{Binding OperationsSP}" Grid.Column="1">
                     <ListView ItemsSource="{Binding Operations}" SelectedItem="{Binding SelectedEntry}">
                         <ListView.View>
@@ -200,9 +200,9 @@
                     <ListView ItemsSource="{Binding Accounts}" SelectedItem="{Binding SelectedEntry}">
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn Header="Банк" DisplayMemberBinding="{Binding Bank.Title}"/>
                                 <GridViewColumn Header="Название" DisplayMemberBinding="{Binding Title}"/>
                                 <GridViewColumn Header="Баланс" DisplayMemberBinding="{Binding Balance}"/>
+                                <GridViewColumn Header="Банк" DisplayMemberBinding="{Binding Bank.Title}"/>
                             </GridView>
                         </ListView.View>
                     </ListView>
@@ -235,7 +235,6 @@
                         <RowDefinition/>
                     </Grid.RowDefinitions>
                     <StackPanel Orientation="Horizontal">
-                        
                         <Grid Visibility="{Binding FilterDatesSP}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition/>

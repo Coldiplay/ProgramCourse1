@@ -9,7 +9,7 @@
         DataContext="{DynamicResource vm}"
         WindowStartupLocation="CenterScreen"
         SizeToContent="WidthAndHeight"
-        Title="CurrenciesWindow" Height="450" Width="800">
+        Title="Валюты" Height="150" Width="250">
     <Window.Resources>
         <vm:CurrenciesWindowVM x:Key="vm"/>
     </Window.Resources>
@@ -18,6 +18,11 @@
         <ListView ItemsSource="{Binding Currencies}" SelectedItem="{Binding SelectedCurrency}">
             <ListView.View>
                 <GridView>
+                    <GridView.ColumnHeaderContainerStyle>
+                        <Style>
+                            <Setter Property="FrameworkElement.Visibility" Value="Collapsed"/>
+                        </Style>
+                    </GridView.ColumnHeaderContainerStyle>
                     <GridViewColumn Header="" DisplayMemberBinding="{Binding Symbol}"/>
                     <GridViewColumn Header="" DisplayMemberBinding="{Binding Title}"/>
                 </GridView>

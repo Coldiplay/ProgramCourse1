@@ -55,11 +55,11 @@ namespace Bruh.Model.Models
         {
             get
             {
-                if (Account == null || Account.Currency == null)
-                    return $"{Cost}";
-                else
+                if (Account != null && Account.Currency != null)
                     return $"{Cost} {Account.Currency.Symbol}";
-                
+                else
+                    return $"{Cost}";
+
             }
         }
         public string IsIncome
@@ -81,5 +81,7 @@ namespace Bruh.Model.Models
                     return Periodicity.Name;
             }
         }
+
+        public bool AllFieldsAreCorrect => !(Category == null || string.IsNullOrWhiteSpace(Title) || Cost <= 0 || Account == null);
     }
 }

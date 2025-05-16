@@ -98,8 +98,8 @@ namespace Bruh.Model.Models
                 };
             }
         }
-        public int Duration 
-        { 
+        public int Duration
+        {
             get => duration;
             set
             {
@@ -114,6 +114,9 @@ namespace Bruh.Model.Models
         // Придумай сам
         public string GetCurrentSumm => GetProbableSumm(OpenDate, DateTime.Today, Capitalization);
         public string GetProbSumm => GetProbableSumm(OpenDate, CloseDate, Capitalization);
+
+        public bool AllFieldsAreCorrect => !(Currency == null || Type == null || Bank == null || CloseDate <= OpenDate || PeriodicityOfPayment == null || string.IsNullOrWhiteSpace(Title) || InitalSumm <= 0 || InterestRate <= 0);
+
         public void ChangeCloseDate(int duration, int code)
         {
             try 

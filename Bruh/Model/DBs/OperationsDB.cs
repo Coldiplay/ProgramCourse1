@@ -23,8 +23,9 @@ namespace Bruh.Model.DBs
             filterlist.ForEach(f =>
             {
                 if (!string.IsNullOrEmpty(f))
-                    filter = $"{filter} && {f}";
+                    filter = $"{filter} AND {f}";
             });
+
             using (var cmd = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID`, `Title`, `Cost`, `TransactDate`, `DateOfCreate`, `Income`, `Description`, `PeriodicityID`, `CategoryID`, `DebtID`, `AccountID` FROM `Operations` WHERE (`Title` LIKE @search OR `Cost` LIKE @search OR `Description` LIKE @search OR `TransactDate` LIKE @search) {filter}"))
             {
                 cmd.Parameters.Add(new MySqlParameter("search", $"%{search}%"));
@@ -218,8 +219,8 @@ namespace Bruh.Model.DBs
             if (DbConnection.GetDbConnection() == null)
                 return result;
 
-            operation.DebtID = operation.Debt?.ID;
-            operation.PeriodicityID = operation.Periodicity?.ID;
+            operation.DebtID = operation.Debt?.ID == 0 ? null : operation.Debt?.ID;
+            operation.PeriodicityID = operation.Periodicity?.ID == 0 ? null : operation.Periodicity?.ID;
             operation.AccountID = operation.Account.ID;
             operation.CategoryID = operation.Category.ID;
             if (changeCorrespondingEntries)
@@ -261,6 +262,9 @@ namespace Bruh.Model.DBs
 
         private static void ChangeSummOnAccount(Operation operation ,decimal summ)
         {
+            if (summ == 0)
+                return;
+
             decimal balance = 0;
 
             using (var cmd = DbConnection.GetDbConnection().CreateCommand("SELECT `Balance` FROM `Accounts` WHERE `ID`=@idAccount"))

@@ -12,5 +12,7 @@ namespace Bruh.Model.Models
     {
         public int ID { get; set; }
         public string Title { get; set; }
+
+        public bool AllFieldsAreCorrect => !string.IsNullOrWhiteSpace(Title);
     }
 }

@@ -13,13 +13,17 @@
     <Window.Resources>
         <vm:CategoriesWindowVM x:Key="vm"/>
     </Window.Resources>
-    <!--<Grid>
-    </Grid>-->
+    
     <StackPanel>
         
         <ListView ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory}">
             <ListView.View>
                 <GridView>
+                    <GridView.ColumnHeaderContainerStyle>
+                        <Style>
+                            <Setter Property="FrameworkElement.Visibility" Value="Collapsed"/>
+                        </Style>
+                    </GridView.ColumnHeaderContainerStyle>
                     <GridViewColumn Header="" DisplayMemberBinding="{Binding Title}"/>
                 </GridView>
             </ListView.View>

@@ -1,15 +1,8 @@
 ﻿using Bruh.Model.DBs;
 using Bruh.Model.Models;
 using Bruh.VMTools;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace Bruh.VM
@@ -17,12 +10,12 @@ namespace Bruh.VM
     public class EditWindowVM : BaseVM
     {
         private Action? close;
-        private IModel entry;
-        private string durationType;
+        private IModel? entry;
+        private string durationType = "Месяцы";
         private byte hours;
         private byte minutes;
 
-        public IModel Entry
+        public IModel? Entry
         {
             get => entry;
             set
@@ -78,16 +71,17 @@ namespace Bruh.VM
 
         public EditWindowVM()
         {
-            DurationType = "Месяцы";
+            //DurationType = "Месяцы";
 
-            if (Entry is Deposit)
-                Banks.Add(new Bank { ID = 0 });
+            //Зачем?
+            //if (Entry is Deposit)
+            //    Banks.Add(new Bank { ID = 0 });
 
             Save = new CommandVM(() =>
             {
                 bool change = false;
                 if (Entry is Operation || Entry is Debt || Entry is Deposit)
-                { 
+                {
                     if (MessageBox.Show("Хотите ли вы изменить соответствующие записи?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                         change = true;
                 }
@@ -96,19 +90,21 @@ namespace Bruh.VM
                 {
                     operation.TransactDate = operation.TransactDate.AddMinutes(Minutes - operation.TransactDate.Minute);
                     operation.TransactDate = operation.TransactDate.AddHours(Hours - operation.TransactDate.Hour);
-                    
+
                 }
 
-                if (Entry.ID != 0)
+                if (Entry?.ID != 0)
                     DB.GetDb(Entry.GetType().GetCustomAttribute<DBContextAttribute>().Type).Update(Entry, change);
                 else
                     DB.GetDb(Entry.GetType().GetCustomAttribute<DBContextAttribute>().Type).Insert(Entry, change);
 
                 close?.Invoke();
             },
-            
-            () =>
+
+            () => Entry?.AllFieldsAreCorrect ?? false);
+            /*
             {
+                
                 switch (Entry)
                 {
                     case Operation operation:
@@ -122,7 +118,7 @@ namespace Bruh.VM
                         break;
 
                     case Debt debt:
-                        if (/*(debt.DateOfReturn != null &&*/ debt.DateOfPick < debt.DateOfReturn && debt.Currency != null && debt.Summ > 0)
+                        if ( debt.DateOfPick < debt.DateOfReturn && debt.Currency != null && debt.Summ > 0)
                             return true;
                         break;
 
@@ -142,12 +138,12 @@ namespace Bruh.VM
                         break;
 
                     // Зачем? я же не собирался добавлять, вроде.....
-                    /*
-                    case Periodicity:
-                        if (!string.IsNullOrEmpty(((Periodicity)Entry).Name))
-                            return true;
-                        break;
-                    */
+                    //
+                    //case Periodicity:
+                    //    if (!string.IsNullOrEmpty(((Periodicity)Entry).Name))
+                    //        return true;
+                    //    break;
+                    //
 
                     case Currency currency:
                         if (!string.IsNullOrEmpty(currency.Title) && !char.IsWhiteSpace(currency.Symbol))
@@ -155,8 +151,10 @@ namespace Bruh.VM
                         break;
 
                 }
+                
                 return false;
             });
+            */
             Cancel = new CommandVM(() => close?.Invoke(), () => true);
             ChangeDurationType = new CommandVM(() =>
             {
@@ -221,6 +219,7 @@ namespace Bruh.VM
                  * TypeOfDeposit
                  */
                 case Account account:
+                    Banks.Insert(0 ,new Bank { ID = 0, Title = "Без привязки к банку" });
                     if (account.ID == 0)
                         break;
                     account.Currency = Currencies.First(c => c.ID == account.CurrencyID);
@@ -228,6 +227,8 @@ namespace Bruh.VM
                     break;
 
                 case Operation operation:
+                    Debts.Insert(0, new Debt { ID = 0, Title = "Нет" });
+                    Periodicities.Insert(0, new Periodicity { ID = 0, Name = "Нет"});
                     if (operation.ID == 0)
                         break;
                     operation.Account = Accounts.First(a => a.ID == operation.AccountID);

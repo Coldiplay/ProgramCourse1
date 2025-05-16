@@ -11,5 +11,6 @@ namespace Bruh.Model.Models
     public interface IModel
     {
         public int ID { get; set; }
+        public bool AllFieldsAreCorrect { get; }
     }
 }

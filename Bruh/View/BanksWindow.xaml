@@ -18,6 +18,11 @@
         <ListView ItemsSource="{Binding Banks}" SelectedItem="{Binding SelectedBank}">
             <ListView.View>
                 <GridView>
+                    <GridView.ColumnHeaderContainerStyle>
+                        <Style>
+                            <Setter Property="FrameworkElement.Visibility" Value="Collapsed"/>
+                        </Style>
+                    </GridView.ColumnHeaderContainerStyle>
                     <GridViewColumn Header="" DisplayMemberBinding="{Binding Title}"/>
                 </GridView>
             </ListView.View>

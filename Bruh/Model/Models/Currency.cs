@@ -18,5 +18,7 @@ namespace Bruh.Model.Models
         {
             get => $"{Title} ({Symbol})";
         }
+
+        public bool AllFieldsAreCorrect => !(string.IsNullOrEmpty(Title) || char.IsWhiteSpace(Symbol));
     }
 }

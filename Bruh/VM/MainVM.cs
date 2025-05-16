@@ -100,7 +100,6 @@ namespace Bruh.VM
         private Visibility accountsSP;
         private Visibility filterModeSP;
         private string selectedMode;
-        private List<string> filterModes;
 
         public DateTime? FilterUpperDate
         {
@@ -421,13 +420,13 @@ namespace Bruh.VM
             }
         }
 
-        private void UpdateLists(byte i)
+        private void UpdateLists(byte code)
         {
             //UpdateListsForFilter();
             HideAllSps();
             SelectedEntry = null;
 
-            switch (i)
+            switch (code)
             {
                 case 0:
                     OperationsSP = Visibility.Visible;
@@ -471,6 +470,7 @@ namespace Bruh.VM
 
                 case 5:
                     AccountsSP = Visibility.Visible;
+                    FilterAmountSP = Visibility.Visible;
                     TitleOfList = "Счета";
                     Accounts = new(DB.GetDb(typeof(AccountsDB)).GetEntries(Search, Filter).Select(a => (Account)a).OrderByDescending(a => a.Title));
                     break;

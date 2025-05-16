@@ -125,10 +125,7 @@
                 <TextBlock Text="{Binding GetProbSumm}"/>
             </StackPanel>
         </DataTemplate>
-
-
     </Window.Resources>
-
 
     <Grid>
         <Grid.RowDefinitions>
