@@ -96,7 +96,7 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel Margin="3">
-            <Button Content="Главная" Style="{DynamicResource MainMenuButton}" Command=""/>
+            <Button Content="Главная" Style="{DynamicResource MainMenuButton}" Command="{Binding SetToMain}"/>
             <Button Content="Все операции" Style="{DynamicResource MainMenuButton}" Command="{Binding SetOperations}"/>
             <Button Content="Доходы" Style="{DynamicResource MainMenuButton}" Command="{Binding SetIncomes}"/>
             <Button Content="Расходы" Style="{DynamicResource MainMenuButton}" Command="{Binding SetExpenses}"/>
@@ -109,7 +109,29 @@
         </StackPanel>
 
         <Grid Grid.Column="1">
-            <StackPanel>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.6*"/>
+                <RowDefinition Height="0.4*"/>
+            </Grid.RowDefinitions>
+            <!--{Binding MainSp}-->
+            <StackPanel Visibility="Visible">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Все расходы за "/>
+                    <Button Content="{Binding ExpensesMode}" Command="{Binding ChangeExpensesMode}"/>
+                </StackPanel>
+                <TextBlock Text="{Binding AllExpenses}"/>
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Все доходы за "/>
+                    <Button Content="{Binding IncomesMode}" Command="{Binding ChangeIncomesMode}"/>
+                </StackPanel>
+                <TextBlock Text="{Binding AllIncomes}"/>
+
+                <TextBlock Text="{Binding NDFL}"/>
+
+            </StackPanel>
+            <!--{Binding EntriesSp}-->
+            <StackPanel Visibility="Collapsed">
                 <StackPanel.Resources>
                     <Style TargetType="ListView">
                         <Setter Property="MinHeight" Value="220"/>
@@ -210,7 +232,7 @@
 
             </StackPanel>
             
-            <StackPanel VerticalAlignment="Bottom">
+            <StackPanel Grid.Row="1" VerticalAlignment="Bottom">
                 <StackPanel.Resources>
                     <Style TargetType="TextBlock">
                         <Setter Property="Margin" Value="3"/>

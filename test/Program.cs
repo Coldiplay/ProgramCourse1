@@ -6,6 +6,10 @@ namespace test
 {
     internal class Program
     {
+        enum Sides
+        {
+            Left, Right, Top, Bottom
+        }
         static void Main(string[] args)
         {
             /*
@@ -43,6 +47,7 @@ namespace test
             Console.WriteLine(result*months);
             //Console.WriteLine(result*months+result*3);
             */
+            /*
             MySqlConnection _connection;
             MySqlConnectionStringBuilder sb = new MySqlConnectionStringBuilder();
             sb.UserID = "student";
@@ -56,7 +61,13 @@ namespace test
             _connection.Open();
             Console.WriteLine(_connection.Ping());
             _connection.Close();
+            */
 
+
+        Sides side = Sides.Bottom;
+
+        object val = Convert.ChangeType(side, side.GetTypeCode());
+        Console.WriteLine(val);
         }
     }
 }
