@@ -64,10 +64,22 @@ namespace test
             */
 
 
-        Sides side = Sides.Bottom;
+            //Sides side = Sides.Bottom;
 
-        object val = Convert.ChangeType(side, side.GetTypeCode());
-        Console.WriteLine(val);
+            //object val = Convert.ChangeType(side, side.GetTypeCode());
+            //Console.WriteLine(val);
+            decimal a = 1;
+            decimal help = 0;
+            //Console.WriteLine(a/3);
+            //Console.WriteLine(a/3 %10);
+            while ((a / (decimal)3) % 10 != 0)
+            {
+                help = a % 3;
+                Console.WriteLine(help);
+                Console.WriteLine(help % 3);
+                a++;
+            }
+
         }
     }
 }

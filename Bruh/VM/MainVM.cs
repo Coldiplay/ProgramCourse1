@@ -208,15 +208,19 @@ namespace Bruh.VM
         }
         public string IncomesMode 
         {
-            get
+            get 
             {
                 return IncomesCode switch
                 {
-                    0 => "месяц",
-                    1 => "квартал",
-                    2 => "год",
-                    3 => "неделю",
-                    _ => "месяц"
+                    0 => "Предыдущий месяц",
+                    1 => "Предыдущий год",
+                    2 => "Предыдущию неделю",
+                    3 => "Предыдущий квартал",
+                    4 => "Текущий месяц",
+                    5 => "Текущую неделю",
+                    6 => "Текущий год",
+                    7 => "Текущий квартал",
+                    _ => "Как так-то"
                 };
             }
         }
@@ -226,11 +230,15 @@ namespace Bruh.VM
             {
                 return ExpensesCode switch
                 {
-                    0 => "месяц",
-                    1 => "квартал",
-                    2 => "год",
-                    3 => "неделю",
-                    _ => "месяц"
+                    0 => "Предыдущий месяц",
+                    1 => "Предыдущий год",
+                    2 => "Предыдущию неделю",
+                    3 => "Предыдущий квартал",
+                    4 => "Текущий месяц",
+                    5 => "Текущую неделю",
+                    6 => "Текущий год",
+                    7 => "Текущий квартал",
+                    _ => "Как так-то"
                 };
             }
         }
@@ -313,7 +321,7 @@ namespace Bruh.VM
              * 6 - Текущий год
              * 7 - Текущий квартал
             */
-            DateTime today = DateTime.Today;
+            DateTime today = DateTime.Today.AddDays(-1);
             DateTime date;
             /*
             DateTime date = (income ? IncomesCode : ExpensesCode) switch
@@ -334,7 +342,7 @@ namespace Bruh.VM
                     summ += oper.Cost;
             }
             */
-            switch (IncomesCode)
+            switch (income ? IncomesCode : ExpensesCode)
             {
                 case 0:
                     date = today.AddMonths(-1);
@@ -343,11 +351,12 @@ namespace Bruh.VM
                     date = today.AddYears(-1);
                     return GetSumm(new(date.Year, 1, 1), new(date.Year, 12, 31), income);
                 case 2:
-                    return GetSumm(today.DayOfWeek != DayOfWeek.Sunday ? today.AddDays((((int)today.DayOfWeek - 1) * -1) - 7) : today.AddDays(-13), today, income);
+                    today = today.DayOfWeek != DayOfWeek.Sunday ? today.AddDays((((int)today.DayOfWeek - 1) * -1) - 7) : today.AddDays(-13);
+                    return GetSumm(today, today.AddDays(6), income);
                 case 3:
                     DateTime date2 = today;
                     // зДЕСЬ ХРЕНЬ ПОСОМТРИ
-                    while (((decimal)date2.Month / (decimal)3) % 10 != 0)
+                    while (date2.Month % 3 != 0)
                         date2 = date2.AddMonths(1);
                     /*
                     // Зачем это я делал?
@@ -520,7 +529,11 @@ namespace Bruh.VM
                     0 => 1,
                     1 => 2,
                     2 => 3,
-                    3 => 0,
+                    3 => 4,
+                    4 => 5,
+                    5 => 6,
+                    6 => 7,
+                    7 => 0,
                     _ => 0
                 };
             }, () => true);
@@ -531,7 +544,11 @@ namespace Bruh.VM
                     0 => 1,
                     1 => 2,
                     2 => 3,
-                    3 => 0,
+                    3 => 4,
+                    4 => 5,
+                    5 => 6,
+                    6 => 7,
+                    7 => 0,
                     _ => 0
                 };
             }, () => true);
