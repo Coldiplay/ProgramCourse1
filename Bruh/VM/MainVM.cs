@@ -13,7 +13,7 @@ namespace Bruh.VM
     {
         private ObservableCollection<Operation> operations;
         private ObservableCollection<Debt> debts;
-        private ObservableCollection<Deposit> deposits;
+        private ObservableCollection<Deposit>? deposits;
         private ObservableCollection<Account> accounts;
 
         private string search;
