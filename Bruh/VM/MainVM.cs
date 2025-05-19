@@ -55,7 +55,7 @@ namespace Bruh.VM
             }
         }
 
-        public ObservableCollection<Operation> Operations
+        public ObservableCollection<Operation>? Operations
         {
             get => operations;
             set
@@ -103,8 +103,10 @@ namespace Bruh.VM
             }
         }
         private List<string> Filter = [];
-        private byte expensesCode;
+        //private byte expensesCode;
         private bool isSalaryNeededForNDFL;
+        private string incomesMode;
+        private string expensesMode;
 
         public DateTime? FilterUpperDate
         {
@@ -206,42 +208,27 @@ namespace Bruh.VM
                 Signal();
             }
         }
-        public string IncomesMode 
+        public string IncomesMode
         {
-            get 
+            get => incomesMode;
+            set
             {
-                return IncomesCode switch
-                {
-                    0 => "Предыдущий месяц",
-                    1 => "Предыдущий год",
-                    2 => "Предыдущию неделю",
-                    3 => "Предыдущий квартал",
-                    4 => "Текущий месяц",
-                    5 => "Текущую неделю",
-                    6 => "Текущий год",
-                    7 => "Текущий квартал",
-                    _ => "Как так-то"
-                };
+                incomesMode = value;
+                Signal();
+                Signal(nameof(AllIncomes));
             }
         }
-        public string ExpensesMode 
+        public string ExpensesMode
         {
-            get 
+            get => expensesMode;
+            set
             {
-                return ExpensesCode switch
-                {
-                    0 => "Предыдущий месяц",
-                    1 => "Предыдущий год",
-                    2 => "Предыдущию неделю",
-                    3 => "Предыдущий квартал",
-                    4 => "Текущий месяц",
-                    5 => "Текущую неделю",
-                    6 => "Текущий год",
-                    7 => "Текущий квартал",
-                    _ => "Как так-то"
-                };
+                expensesMode = value;
+                Signal();
+                Signal(nameof(AllExpenses));
             }
         }
+
         private byte CodeOper
         {
             /*
@@ -261,26 +248,29 @@ namespace Bruh.VM
                 UpdateLists(codeOper);
             }
         }
-        private byte IncomesCode
-        {
-            get => incomesCode;
-            set
-            {
-                incomesCode = value;
-                Signal(nameof(AllIncomes));                
-                Signal(nameof(IncomesMode));                
-            }
-        }
-        private byte ExpensesCode
-        {
-            get => expensesCode;
-            set
-            {
-                expensesCode = value;
-                Signal(nameof(AllExpenses));
-                Signal(nameof(ExpensesMode));
-            }
-        }
+        /*
+        //private byte IncomesCode
+        //{
+        //    get => incomesCode;
+        //    set
+        //    {
+        //        incomesCode = value;
+        //        Signal(nameof(AllIncomes));                
+        //        Signal(nameof(IncomesMode));                
+        //    }
+        //}
+        //private byte ExpensesCode
+        //{
+        //    get => expensesCode;
+        //    set
+        //    {
+        //        expensesCode = value;
+        //        Signal(nameof(AllExpenses));
+        //        Signal(nameof(ExpensesMode));
+        //    }
+        //}
+        */
+        public List<string> Ranges { get; set; } = ["Предыдущий месяц", "Предыдущий год", "Предыдущию неделю", "Предыдущий квартал", "Текущий месяц", "Текущую неделю", "Текущий год", "Текущий квартал"];
         public decimal AllIncomes => GetSumm(true);
         public decimal AllExpenses => GetSumm(false);
         public bool IsSalaryNeededForNDFL
@@ -342,7 +332,7 @@ namespace Bruh.VM
                     summ += oper.Cost;
             }
             */
-            switch (income ? IncomesCode : ExpensesCode)
+            switch (income ? Ranges.IndexOf(IncomesMode) : Ranges.IndexOf(ExpensesMode))
             {
                 case 0:
                     date = today.AddMonths(-1);
@@ -405,8 +395,9 @@ namespace Bruh.VM
         {
             decimal summ = 0;
             List<string> salary = ["зп", "зарплата", "заработная плата", "премия"];
-            foreach (Operation oper in Operations)
+            for (int i = 0; i < Operations?.Count; i++)
             {
+                Operation oper = Operations[i];
                 if (salary.Contains(oper.Category.Title.ToLower()) && !isSalaryNeeded)
                     continue;
 
@@ -415,7 +406,6 @@ namespace Bruh.VM
             }
             return summ;
         }
-
         private void GetSummsForNDFL(out string result1, out string result2)
         {
             // Для НДФЛ с 1 по 22, Для НДФЛ с 22 по 5
@@ -427,7 +417,7 @@ namespace Bruh.VM
             date2lower = new DateTime(date2lower.Year, date2lower.Month, 23);
             DateTime date2upper = new(date2lower.Year, date2lower.Month, DateTime.DaysInMonth(date2lower.Year, date2lower.Month));
 
-            summ1 += GetSummForNDFL(date1lower, date2upper, IsSalaryNeededForNDFL);
+            summ1 += GetSummForNDFL(date1lower, date1upper, IsSalaryNeededForNDFL);
             summ2 += GetSummForNDFL(date2lower, date2upper, IsSalaryNeededForNDFL);
 
             for (int i = 0; i < Deposits?.Count; i++)
@@ -458,8 +448,8 @@ namespace Bruh.VM
                 {
                 }
             }
-            result1 = summ1.ToString();
-            result2 = summ2.ToString();
+            result1 = Math.Round(summ1 * 0.13M, 2).ToString();
+            result2 = Math.Round(summ2 * 0.13M, 2).ToString();
             /*
         //if (today < new DateTime(today.Year, today.Month, 22))//&& today < new DateTime(today.Year, today.Month, DateTime.DaysInMonth(today.Year, today.Month)) ?
         //{
@@ -505,15 +495,14 @@ namespace Bruh.VM
         public ICommand SetDeposits { get; set; }
         public ICommand SetAccounts { get; set; }
         public ICommand SetToMain { get; set; }
-        public ICommand ChangeIncomesMode { get; set; }
-        public ICommand ChangeExpensesMode { get; set; }
+        //public ICommand ChangeIncomesMode { get; set; }
+        //public ICommand ChangeExpensesMode { get; set; }
 
 
         public MainVM()
         {
             UpdateListsForFilter();
-            CodeOper = 0;
-
+            CodeOper = 6;
 
             SetOperations = new CommandVM(() => CodeOper = 0, () => true);
             SetIncomes = new CommandVM(() => CodeOper = 1, () => true);
@@ -522,6 +511,7 @@ namespace Bruh.VM
             SetDeposits = new CommandVM(() => CodeOper = 4, () => true);
             SetAccounts = new CommandVM(() => CodeOper = 5, () => true);
             SetToMain = new CommandVM(() => CodeOper = 6, () => true);
+            /*
             ChangeIncomesMode = new CommandVM(() =>
             {
                 IncomesCode = IncomesCode switch
@@ -552,6 +542,7 @@ namespace Bruh.VM
                     _ => 0
                 };
             }, () => true);
+            */
 
             AddEntry = new CommandVM(() =>
             {
@@ -654,6 +645,7 @@ namespace Bruh.VM
             {
                 filterAccountSP = value;
                 Signal();
+                //UpdateListsForFilter();
             }
         }
         public Visibility FilterCategorySP
@@ -800,7 +792,11 @@ namespace Bruh.VM
 
                 case 6:
                     MainSp = Visibility.Visible;
-
+                    if (Operations == null || Deposits == null)
+                    {
+                        Operations = [.. DB.GetDb(typeof(OperationsDB)).GetEntries(Search, Filter).Select(s => (Operation)s).OrderByDescending(oper => oper.TransactDate)];
+                        Deposits = [.. DB.GetDb(typeof(DepositsDB)).GetEntries(Search, Filter).Select(d => (Deposit)d).OrderByDescending(d => d.OpenDate)];
+                    }                    
                     TitleOfList = "Главная";
 
                     break;

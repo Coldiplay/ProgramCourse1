@@ -50,7 +50,8 @@
                 <!--<TextBlock Text="Периодичность операции (опционально)"/>
                 <ComboBox ItemsSource="{Binding DataContext.Periodicities, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" SelectedItem="{Binding Periodicity, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name"/>-->
                 <TextBlock Text="Погашаемый долг (опционально)"/>
-                <ComboBox ItemsSource="{Binding DataContext.Debts, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" SelectedItem="{Binding Debt, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Title"/>                
+                <ComboBox ItemsSource="{Binding DataContext.Debts, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" SelectedItem="{Binding Debt, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Title"/>
+                <CheckBox Content="Изменить баланс на счету в соответствии с суммой операции" IsChecked="{Binding DataContext.ChangeCorrespondingEntries, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
             </StackPanel>
         </DataTemplate>
         <DataTemplate DataType="{x:Type model:Bank}">
