@@ -2,16 +2,20 @@
 using Bruh.Model.Models;
 using Bruh.View;
 using Bruh.VMTools;
+using OxyPlot;
+using OxyPlot.Series;
 using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Bruh.VM
 {
     public class MainVM : BaseVM
     {
-        private ObservableCollection<Operation> operations;
+        private ObservableCollection<Operation>? operations;
         private ObservableCollection<Debt> debts;
         private ObservableCollection<Deposit>? deposits;
         private ObservableCollection<Account> accounts;
@@ -107,6 +111,7 @@ namespace Bruh.VM
         private bool isSalaryNeededForNDFL;
         private string incomesMode;
         private string expensesMode;
+        private Visibility miscSP;
 
         public DateTime? FilterUpperDate
         {
@@ -287,12 +292,12 @@ namespace Bruh.VM
         {
             get
             {
-                GetSummsForNDFL(out string case1, out string case2);
+                GetAllIncomesForNDFL(out string case1, out string case2);
                 switch (DateTime.Today.Day)
                 {
                     case <= 28 and >= 5:
                         return $"Подоходный налог за ближайший отчетный период\n(С {DateTime.Today:01.MM.yyyy} по {DateTime.Today:22.MM.yyyy})\nсоставляет {case1} Рублей";
-                    case < 5 or >=28:
+                    case > 5 or < 28:
                         DateTime date = DateTime.Today.AddMonths(-1);
                         return $"Подоходный налог за ближайший отчетный период \n(С {date:23.MM.yyyy} по {date.ToString($"{DateTime.DaysInMonth(date.Year, date.Month)}.MM.yyyy")})\nсоставляет {case2} Рублей";
                 }
@@ -311,27 +316,8 @@ namespace Bruh.VM
              * 6 - Текущий год
              * 7 - Текущий квартал
             */
-            DateTime today = DateTime.Today.AddDays(-1);
+            DateTime today = DateTime.Today;
             DateTime date;
-            /*
-            DateTime date = (income ? IncomesCode : ExpensesCode) switch
-            {
-                0 => today.AddMonths(-1),
-                1 => today.AddMonths(-3),
-                2 => today.AddYears(-1),
-                3 => today.AddDays(-7),
-                4 => new DateTime(today.Year, today.Month, 1),
-                5 => today.DayOfWeek != DayOfWeek.Sunday ? today.AddDays(((int)today.DayOfWeek-1)*-1) : today.AddDays(-6),
-                6 => new DateTime(today.Year, 1, 1),
-                _ => today.AddMonths(-1)
-            };
-
-            foreach (Operation oper in Operations)
-            {
-                if (oper.TransactDate >= date && oper.Income == income)
-                    summ += oper.Cost;
-            }
-            */
             switch (income ? Ranges.IndexOf(IncomesMode) : Ranges.IndexOf(ExpensesMode))
             {
                 case 0:
@@ -345,33 +331,28 @@ namespace Bruh.VM
                     return GetSumm(today, today.AddDays(6), income);
                 case 3:
                     DateTime date2 = today;
-                    // зДЕСЬ ХРЕНЬ ПОСОМТРИ
+                    // зДЕСЬ ХРЕНЬ ПОСОМТРИ // Вроде всё
                     while (date2.Month % 3 != 0)
                         date2 = date2.AddMonths(1);
-                    /*
-                    // Зачем это я делал?
-                    //if (date2.Month / 3 == 0)
-                    //{
-                    //    date2 = date2.AddMonths(-6);
-                    //    date = new(date2.Year, date2.Month, 1);
-                    //    date2 = date.AddMonths(3);
-                    //    date2 = new(date2.Year, date2.Month, DateTime.DaysInMonth(date2.Year ,date2.Month));                        
-                    //}
-                    */
+
                     date2 = date2.AddMonths(-5);
                     date = new(date2.Year, date2.Month, 1);
                     date2 = date.AddMonths(3);
                     date2 = new(date2.Year, date2.Month, DateTime.DaysInMonth(date2.Year, date2.Month));
                     return GetSumm(date, date2, income);
+
                 case 4:
                     return GetSumm(new DateTime(today.Year, today.Month, 1), today, income);
+
                 case 5:
                     return GetSumm(today.DayOfWeek != DayOfWeek.Sunday ? today.AddDays(((int)today.DayOfWeek - 1) * -1) : today.AddDays(-6), today, income);
+
                 case 6:
                     return GetSumm(new DateTime(today.Year, 1, 1), today, income);
+
                 case 7:
                     if (today.Month <= 3)
-                        return GetSumm(new DateTime(today.Year, 1, 1), today, income);//new DateTime(today.Year, 3, DateTime.DaysInMonth(today.Year, 3)));
+                        return GetSumm(new DateTime(today.Year, 1, 1), today, income);
                     else if (today.Month <= 6)
                         return GetSumm(new(today.Year, 4, 1), today, income);
                     else if (today.Month <= 9)
@@ -384,8 +365,9 @@ namespace Bruh.VM
         private decimal GetSumm(DateTime lowerDate, DateTime upperDate, bool income)
         {
             decimal summ = 0;
-            foreach (Operation oper in Operations)
+            for (int i = 0; i < Operations?.Count; i++)
             {
+                Operation oper = Operations[i];
                 if (oper.TransactDate >= lowerDate && oper.TransactDate <= upperDate && oper.Income == income)
                     summ += oper.Cost;
             }
@@ -406,79 +388,207 @@ namespace Bruh.VM
             }
             return summ;
         }
-        private void GetSummsForNDFL(out string result1, out string result2)
+        private void GetAllIncomesForNDFL(out string result1, out string result2)
         {
             // Для НДФЛ с 1 по 22, Для НДФЛ с 22 по 5
             decimal summ1 = 0, summ2 = 0;
             DateTime today = DateTime.Today;
-            DateTime date1lower = new DateTime(today.Year, today.Month, 1);
+            DateTime date1lower = new(today.Year, today.Month, 1);
             DateTime date1upper = date1lower.AddDays(21);
             DateTime date2lower = today.AddMonths(-1);
             date2lower = new DateTime(date2lower.Year, date2lower.Month, 23);
             DateTime date2upper = new(date2lower.Year, date2lower.Month, DateTime.DaysInMonth(date2lower.Year, date2lower.Month));
 
-            summ1 += GetSummForNDFL(date1lower, date1upper, IsSalaryNeededForNDFL);
-            summ2 += GetSummForNDFL(date2lower, date2upper, IsSalaryNeededForNDFL);
+            summ1 += GetSummForNDFL(date1lower, date1upper, IsSalaryNeededForNDFL) + IncomeFromDeposits(date1lower, date1upper);
+            summ2 += GetSummForNDFL(date2lower, date2upper, IsSalaryNeededForNDFL) + IncomeFromDeposits(date2lower, date2upper);
 
+            result1 = Math.Round(summ1 * 0.13M, 2).ToString();
+            result2 = Math.Round(summ2 * 0.13M, 2).ToString();
+
+            GC.Collect();
+            return;
+        }
+        public decimal IncomeFromDeposits(DateTime lowerDate, DateTime upperDate)
+        {
+            decimal summ = 0;
             for (int i = 0; i < Deposits?.Count; i++)
             {
                 Deposit deposit = Deposits[i];
                 try
                 {
-                    if (date1upper > deposit.CloseDate)
-                    {
-                        summ1 += decimal.Parse(deposit.GetProbSumm) - decimal.Parse(deposit.GetProbableSumm(deposit.OpenDate, date1lower, deposit.Capitalization));
-                    }
-                    else
-                    {
-                        summ1 += decimal.Parse(deposit.GetProbableSumm(deposit.OpenDate, date1upper, deposit.Capitalization)) - decimal.Parse(deposit.GetProbableSumm(deposit.OpenDate, date1lower, deposit.Capitalization));
-                        if (date2upper > deposit.CloseDate)
-                            summ2 += decimal.Parse(deposit.GetProbSumm) - decimal.Parse(deposit.GetProbableSumm(deposit.OpenDate, date2lower, deposit.Capitalization));
-                        else
-                            summ2 += decimal.Parse(deposit.GetProbableSumm(deposit.OpenDate, date2upper, deposit.Capitalization)) - decimal.Parse(deposit.GetProbableSumm(deposit.OpenDate, date2lower, deposit.Capitalization));
-                    }
-
-                    //if (decimal.TryParse(deposit.GetProbableSumm(deposit.OpenDate, date1upper, deposit.Capitalization), out decimal result) &&
-                    //    decimal.TryParse(deposit.GetCurrentSumm, out decimal currentSumm))
-                    //{
-                    //    help += currentSumm - result;
-                    //}
+                     summ += decimal.Parse(deposit.GetProbSumm) - decimal.Parse(deposit.GetProbableSumm(lowerDate, upperDate, deposit.Capitalization));
                 }
-                catch (Exception) 
+                catch (Exception)
                 {
                 }
             }
-            result1 = Math.Round(summ1 * 0.13M, 2).ToString();
-            result2 = Math.Round(summ2 * 0.13M, 2).ToString();
+            return summ;
+        }
+        private void GetRange(int oper ,out DateTime lowerDate, out DateTime upperDate)
+        {
+            DateTime today = DateTime.Today;
+            switch (oper)
+            {
+                case 0:
+                    lowerDate = today.AddMonths(-1);
+                    lowerDate = new(lowerDate.Year, lowerDate.Month, 1);
+                    upperDate = new(lowerDate.Year, lowerDate.Month, DateTime.DaysInMonth(lowerDate.Year, lowerDate.Month));
+                    break;
+
+                case 1:
+                    lowerDate = today.AddYears(-1);
+                    lowerDate = new(lowerDate.Year,1,1);
+                    upperDate = new(lowerDate.Year,12,31);
+                    break;
+                case 2:
+                    lowerDate = today.DayOfWeek != DayOfWeek.Sunday ? today.AddDays((((int)today.DayOfWeek - 1) * -1) - 7) : today.AddDays(-13);
+                    upperDate = today.AddDays(6);
+                    break;
+                case 3:
+                    upperDate = today;
+                    while (upperDate.Month % 3 != 0)
+                        upperDate = upperDate.AddMonths(1);
+
+                    upperDate = upperDate.AddMonths(-5);
+                    lowerDate = new(upperDate.Year, upperDate.Month, 1);
+                    upperDate = lowerDate.AddMonths(3);
+                    upperDate = new(upperDate.Year, upperDate.Month, DateTime.DaysInMonth(upperDate.Year, upperDate.Month));
+                    break;
+
+                case 4:
+                    lowerDate = new(today.Year, today.Month, 1);
+                    upperDate = today;
+                    break;
+
+                case 5:
+                    lowerDate = today.DayOfWeek != DayOfWeek.Sunday ? today.AddDays(((int)today.DayOfWeek - 1) * -1) : today.AddDays(-6);
+                    upperDate = today;
+                    break;
+
+                case 6:
+                    lowerDate = new(today.Year, 1, 1);
+                    upperDate = today;
+                    break;
+
+                case 7:
+                    if (today.Month <= 3)
+                        lowerDate = new(today.Year, 1, 1);
+                    else if (today.Month <= 6)
+                        lowerDate = new(today.Year, 4, 1);
+                    else if (today.Month <= 9)
+                        lowerDate = new(today.Year, 7, 1);
+                    else
+                        lowerDate = new(today.Year, 10, 1);
+
+                    upperDate = today;
+                    break;
+                default:
+                    upperDate = new(1,1,1);
+                    lowerDate = upperDate;
+                    break;
+            }
+        }
+        private void GetCategories(out List<Cat> incomesCats, out List<Cat> expensesCats)
+        {
+            incomesCats = [];
+            expensesCats = [];
+            GetRange(Ranges.IndexOf(IncomesMode), out var lowerIncomes, out var upperIncomes);
+            GetRange(Ranges.IndexOf(ExpensesMode), out var lowerExpenses, out var upperExpenses);
+            for (int i = 0; i < Operations?.Count; i++)
+            {
+                Operation oper = Operations[i];
+
+                List<Cat> list;
+                DateTime lowerDate;
+                DateTime upperDate;
+                if (oper.Income)
+                {
+                    list = incomesCats;
+                    lowerDate = lowerIncomes;
+                    upperDate = upperIncomes;
+                }
+                else
+                { 
+                    list = expensesCats;
+                    lowerDate = lowerExpenses;
+                    upperDate = upperExpenses;
+                }
+                var cat = list.FirstOrDefault(c => c.Link?.ID == oper.Category.ID);
+                if (cat == null)
+                {
+                    list.Add(new Cat { Link = oper.Category, TotalAmount = oper.Cost });
+                }
+                else
+                {
+                    cat.TotalAmount += oper.Cost;
+                }
+            }
+        }
+        protected class Cat 
+        {
+            public Category? Link { get; set; }
+            public decimal TotalAmount { get; set; }
+        }
+        public PlotModel CategoriesIncomesPlot { get; private set; }
+        public PlotModel CategoriesExpensesPlot { get; private set; }
+        private void ChangePlotModels()
+        {
             /*
-        //if (today < new DateTime(today.Year, today.Month, 22))//&& today < new DateTime(today.Year, today.Month, DateTime.DaysInMonth(today.Year, today.Month)) ?
-        //{
-        //    lowerDate = new DateTime(today.Year, today.Month, 1);
-        //    upperDate = new(today.Year, today.Month, DateTime.DaysInMonth(today.Year, today.Month));
-        //}
-        //else
-        //{
-        //    lowerDate = today.AddMonths(-1);
-        //}
-        */
+            //if (CategoriesIncomesPlot == null || CategoriesExpensesPlot == null)
+            //{
+            //    CategoriesIncomesPlot = new()
+            //    {
+            //        EdgeRenderingMode = EdgeRenderingMode.PreferSpeed,
+            //        Title = "Категории доходов"
+
+            //    };
+
+            //    CategoriesExpensesPlot = new()
+            //    {
+            //        EdgeRenderingMode = EdgeRenderingMode.PreferSpeed,
+            //        Title = "Категории расходов"
+            //    };
+            //}
+            //CategoriesIncomesPlot.Series.Clear();
+            //CategoriesExpensesPlot.Series.Clear();
+            */
+            PlotModel incomesPlot = new()
+            {
+                EdgeRenderingMode = EdgeRenderingMode.PreferSpeed,
+                Title = "Категории расходов"
+            };
+            PlotModel expensesPlot = new()
+            {
+                EdgeRenderingMode = EdgeRenderingMode.PreferSpeed,
+                Title = "Категории доходов"
+            };
+
+
+            PieSeries incomesCategories = new();
+            PieSeries expensesCategories = new();
+            GetCategories(out List<Cat> incomesCats, out List<Cat> expensesCats);
+            for (int i = 0; i < incomesCats.Count; i++)
+            {
+                Cat? item = incomesCats[i];
+                var slice = new PieSlice($"{item.Link?.Title} ({item.TotalAmount})", (double)item.TotalAmount);
+                incomesCategories.Slices.Add(slice);
+            }
+            for (int i = 0; i < expensesCats.Count; i++)
+            {
+                Cat? item = expensesCats[i];
+                var slice = new PieSlice($"{item.Link?.Title} ({item.TotalAmount})", (double)item.TotalAmount);
+                expensesCategories.Slices.Add(slice);
+            }
+
+            incomesPlot.Series.Add(incomesCategories);
+            //incomesPlot.Series[0].
+            expensesPlot.Series.Add(expensesCategories);
+
+            CategoriesIncomesPlot = incomesPlot;
+            CategoriesExpensesPlot = expensesPlot;
 
             GC.Collect();
-            return;
         }
-        public decimal AllDepositsIncomes 
-        {
-            get 
-            {
-                decimal allSumms = 0;
-                foreach (Deposit deposit in Deposits)
-                {
-                    allSumms += decimal.TryParse(deposit.GetProbableSumm(deposit.OpenDate, DateTime.Today, deposit.Capitalization), out decimal summ) ? summ : 0;
-                }
-
-                return 2;
-            }
-        }
-
 
         public ICommand AddEntry { get; set; }
         public ICommand EditEntry { get; set; }
@@ -511,38 +621,6 @@ namespace Bruh.VM
             SetDeposits = new CommandVM(() => CodeOper = 4, () => true);
             SetAccounts = new CommandVM(() => CodeOper = 5, () => true);
             SetToMain = new CommandVM(() => CodeOper = 6, () => true);
-            /*
-            ChangeIncomesMode = new CommandVM(() =>
-            {
-                IncomesCode = IncomesCode switch
-                {
-                    0 => 1,
-                    1 => 2,
-                    2 => 3,
-                    3 => 4,
-                    4 => 5,
-                    5 => 6,
-                    6 => 7,
-                    7 => 0,
-                    _ => 0
-                };
-            }, () => true);
-            ChangeExpensesMode = new CommandVM(() =>
-            {
-                ExpensesCode = ExpensesCode switch
-                {
-                    0 => 1,
-                    1 => 2,
-                    2 => 3,
-                    3 => 4,
-                    4 => 5,
-                    5 => 6,
-                    6 => 7,
-                    7 => 0,
-                    _ => 0
-                };
-            }, () => true);
-            */
 
             AddEntry = new CommandVM(() =>
             {
@@ -657,6 +735,15 @@ namespace Bruh.VM
                 Signal();
             }
         }
+        public Visibility MiscSP
+        {
+            get => miscSP;
+            set
+            {
+                miscSP = value;
+                Signal();
+            }
+        }
         public Visibility MainSp
         {
             get => mainSp;
@@ -735,10 +822,10 @@ namespace Bruh.VM
             //UpdateListsForFilter();
             HideAllSps();
             SelectedEntry = null;
+            EntriesSp = Visibility.Visible;
             switch (code)
             {
                 case 0:
-                    EntriesSp = Visibility.Visible;
                     OperationsSP = Visibility.Visible;
                     ShowFilterForOpers();
                     TitleOfList = "Все операции";
@@ -746,7 +833,6 @@ namespace Bruh.VM
                     break;                    
 
                 case 1:
-                    EntriesSp = Visibility.Visible;
                     IncomesSP = Visibility.Visible;
                     ShowFilterForOpers();
                     TitleOfList = "Доходы";
@@ -754,7 +840,6 @@ namespace Bruh.VM
                     break;
 
                 case 2:
-                    EntriesSp = Visibility.Visible;
                     ExpensesSP = Visibility.Visible;
                     ShowFilterForOpers();
                     TitleOfList = "Расходы";
@@ -762,7 +847,6 @@ namespace Bruh.VM
                     break;
 
                 case 3:
-                    EntriesSp = Visibility.Visible;
                     DebtsSP = Visibility.Visible;
                     FilterSP = Visibility.Visible;
                     FilterAmountSP = Visibility.Visible;
@@ -773,8 +857,8 @@ namespace Bruh.VM
                     break;
 
                 case 4:
-                    EntriesSp = Visibility.Visible;
                     DepositsSP = Visibility.Visible;
+                    MiscSP = Visibility.Visible;
                     FilterAmountSP = Visibility.Visible;
                     FilterDatesSP = Visibility.Visible;
                     FilterModeSP = Visibility.Visible;
@@ -783,7 +867,7 @@ namespace Bruh.VM
                     break;
 
                 case 5:
-                    EntriesSp = Visibility.Visible;
+                    MiscSP = Visibility.Visible;
                     AccountsSP = Visibility.Visible;
                     FilterAmountSP = Visibility.Visible;
                     TitleOfList = "Счета";
@@ -791,12 +875,14 @@ namespace Bruh.VM
                     break;
 
                 case 6:
+                    EntriesSp = Visibility.Collapsed;
                     MainSp = Visibility.Visible;
                     if (Operations == null || Deposits == null)
                     {
                         Operations = [.. DB.GetDb(typeof(OperationsDB)).GetEntries(Search, Filter).Select(s => (Operation)s).OrderByDescending(oper => oper.TransactDate)];
                         Deposits = [.. DB.GetDb(typeof(DepositsDB)).GetEntries(Search, Filter).Select(d => (Deposit)d).OrderByDescending(d => d.OpenDate)];
-                    }                    
+                    }
+                    ChangePlotModels();
                     TitleOfList = "Главная";
 
                     break;
@@ -860,6 +946,7 @@ namespace Bruh.VM
         }
         private void HideAllSps()
         {
+            MiscSP = Visibility.Hidden;
             OperationsSP = Visibility.Collapsed;
             IncomesSP = Visibility.Collapsed;
             ExpensesSP = Visibility.Collapsed;
@@ -878,6 +965,7 @@ namespace Bruh.VM
         }
         private void ShowFilterForOpers()
         {
+            MiscSP = Visibility.Visible;
             FilterSP = Visibility.Visible;
             FilterAccountSP = Visibility.Visible;
             FilterAmountSP = Visibility.Visible;

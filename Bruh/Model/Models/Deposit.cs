@@ -168,6 +168,10 @@ namespace Bruh.Model.Models
                 return "Не все нужные поля веденны";
             try
             {
+                if (endTime > CloseDate)
+                    endTime = CloseDate;
+                if (startTime < OpenDate)
+                    startTime = OpenDate;
                 decimal initSumm = InitalSumm;
                 int monthsPassed = ((endTime.Year - startTime.Year) * 12) + (endTime.Month - startTime.Month) - (endTime.Day < startTime.Day ? 1 : 0);
                 int days;
@@ -186,7 +190,6 @@ namespace Bruh.Model.Models
                             return Math.Round(initSumm, 2).ToString();
 
                         case "Каждый месяц":
-                            //int monthsPassed = ((endTime.Year - startTime.Year) * 12) + (endTime.Month - startTime.Month) - (endTime.Day < startTime.Day ? 1 : 0);
                             for (int i = 0; i < monthsPassed; i++)
                             {
                                 intRate = (double)(1 + (InterestRate / 100 / (DateTime.IsLeapYear(startTime.Year) ? 366 : 365)));
@@ -195,25 +198,8 @@ namespace Bruh.Model.Models
                                 initSumm = result;
                                 startTime = startTime.AddMonths(1);
                             }
-                            /* Old method
-                            //while (startTime < DateTime.Now)
-                            //{
-                            //    if (startTime.Month == DateTime.Now.Month && startTime.Year == DateTime.Now.Year && startTime.Day < DateTime.Now.Day)
-                            //        break;
-
-                            //    if (startTime.Year < DateTime.Now.Year)
-                            //        days = DateTime.DaysInMonth(startTime.Year, startTime.Month);
-                            //    else 
-                            //        days = startTime.Month < DateTime.Now.Month ? DateTime.DaysInMonth(startTime.Year, startTime.Month) : DateTime.Now.Day - startTime.Day;
-
-                            //    intRate = (double)(1 + (InterestRate / 100 / (DateTime.IsLeapYear(startTime.Year) ? 366 : 365)));
-                            //    result = (decimal)((double)initSumm * Math.Pow(intRate, days));
-                            //    initSumm = result;
-                            //    startTime = startTime.AddDays(DateTime.DaysInMonth(startTime.Year, startTime.Month));
-                            }*/
                             return Math.Round(initSumm, 2).ToString();
 
-                        // Completed
                         case "Каждый квартал":
                             int quartersPassed = monthsPassed / 3;
 
@@ -238,7 +224,7 @@ namespace Bruh.Model.Models
                                 startTime = startTime.AddMonths(6);
                             }
                             return Math.Round(initSumm, 2).ToString();
-                        //return $"{Math.Round(InitalSumm * (decimal)Math.Pow((double)(1 + (InterestRate / 100 / 6)), Math.Round((DateTime.Now - OpenDate).TotalDays / 31 / 6, MidpointRounding.ToZero)), 2)} {Currency.Symbol}";
+
                         case "Каждый год":
                             int yearsPassed = monthsPassed / 12;
                             for (int i = 0; i < yearsPassed; i++)
@@ -314,11 +300,6 @@ namespace Bruh.Model.Models
                         default:
                             return "Ошибка";
                     }
-                    /*
-                    days = (endTime - startTime).Days;
-                    result = InterestRate * initSumm * days / (DateTime.IsLeapYear(startTime.Year) ? 366 : 365) / 100 + initSumm;
-                    return Math.Round(result, 2).ToString();
-                    */
                 }
             }
             catch (OverflowException)
