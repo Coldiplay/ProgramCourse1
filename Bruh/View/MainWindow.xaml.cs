@@ -20,8 +20,5 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        DataContext = new MainVM();
-
-        //((MainVM)DataContext).Set([Operations, Expenses, Incomes, Debts, Deposits, Accounts, FilterAmount, FilterDates, AccountFilter, CategoryFilter, Filter]);
     }
 }

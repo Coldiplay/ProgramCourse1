@@ -90,7 +90,6 @@ namespace Bruh.VM
             {
                 accounts = value;
                 Signal();
-                UpdateListsForFilter();
             }
         }
 
@@ -244,7 +243,7 @@ namespace Bruh.VM
              * 3 - Долги
              * 4 - Вклады
              * 5 - Счета
-             * 6 - Главная страница?
+             * 6 - Главная страница
              */
             get => codeOper;
             set
@@ -295,65 +294,8 @@ namespace Bruh.VM
         }
         private decimal GetSumm(bool income)
         {
-            /*  За
-             * 0 - Предыдущий месяц
-             * 1 - Предыдущий год  --Квартал--
-             * 2 - Пред неделю --Год--
-             * 3 - Пред квартал
-             * 4 - Текущий месяц
-             * 5 - Текущую неделю
-             * 6 - Текущий год
-             * 7 - Текущий квартал
-            */
-            DateTime today = DateTime.Today;
             GetRange(income ? Ranges.IndexOf(IncomesMode) : Ranges.IndexOf(ExpensesMode), out var lowerDate, out var upperDate);
             return GetSumm(lowerDate, upperDate, income);
-            /*
-            DateTime date;
-            switch (income ? Ranges.IndexOf(IncomesMode) : Ranges.IndexOf(ExpensesMode))
-            {
-                case 0:
-                    date = today.AddMonths(-1);
-                    return GetSumm(new(date.Year, date.Month, 1), new(date.Year,date.Month, DateTime.DaysInMonth(date.Year, date.Month)), income);
-                case 1:
-                    date = today.AddYears(-1);
-                    return GetSumm(new(date.Year, 1, 1), new(date.Year, 12, 31), income);
-                case 2:
-                    today = today.DayOfWeek != DayOfWeek.Sunday ? today.AddDays((((int)today.DayOfWeek - 1) * -1) - 7) : today.AddDays(-13);
-                    return GetSumm(today, today.AddDays(6), income);
-                case 3:
-                    DateTime date2 = today;
-                    // зДЕСЬ ХРЕНЬ ПОСОМТРИ // Вроде всё
-                    while (date2.Month % 3 != 0)
-                        date2 = date2.AddMonths(1);
-
-                    date2 = date2.AddMonths(-5);
-                    date = new(date2.Year, date2.Month, 1);
-                    date2 = date.AddMonths(3);
-                    date2 = new(date2.Year, date2.Month, DateTime.DaysInMonth(date2.Year, date2.Month));
-                    return GetSumm(date, date2, income);
-
-                case 4:
-                    return GetSumm(new DateTime(today.Year, today.Month, 1), today, income);
-
-                case 5:
-                    return GetSumm(today.DayOfWeek != DayOfWeek.Sunday ? today.AddDays(((int)today.DayOfWeek - 1) * -1) : today.AddDays(-6), today, income);
-
-                case 6:
-                    return GetSumm(new DateTime(today.Year, 1, 1), today, income);
-
-                case 7:
-                    if (today.Month <= 3)
-                        return GetSumm(new DateTime(today.Year, 1, 1), today, income);
-                    else if (today.Month <= 6)
-                        return GetSumm(new(today.Year, 4, 1), today, income);
-                    else if (today.Month <= 9)
-                        return GetSumm(new(today.Year, 7, 1), today, income);
-                    else
-                        return GetSumm(new(today.Year, 10, 1), today, income);
-            }
-            return 0;
-            */
         }
         private decimal GetSumm(DateTime lowerDate, DateTime upperDate, bool income)
         {
@@ -419,6 +361,16 @@ namespace Bruh.VM
         }
         private void GetRange(int oper ,out DateTime lowerDate, out DateTime upperDate)
         {
+            /*  За
+             * 0 - Предыдущий месяц
+             * 1 - Предыдущий год
+             * 2 - Пред неделю
+             * 3 - Пред квартал
+             * 4 - Текущий месяц
+             * 5 - Текущую неделю
+             * 6 - Текущий год
+             * 7 - Текущий квартал
+             */
             DateTime today = DateTime.Today;
             switch (oper)
             {
@@ -547,25 +499,6 @@ namespace Bruh.VM
         }
         private void ChangePlotModels()
         {
-            /*
-            //if (CategoriesIncomesPlot == null || CategoriesExpensesPlot == null)
-            //{
-            //    CategoriesIncomesPlot = new()
-            //    {
-            //        EdgeRenderingMode = EdgeRenderingMode.PreferSpeed,
-            //        Title = "Категории доходов"
-
-            //    };
-
-            //    CategoriesExpensesPlot = new()
-            //    {
-            //        EdgeRenderingMode = EdgeRenderingMode.PreferSpeed,
-            //        Title = "Категории расходов"
-            //    };
-            //}
-            //CategoriesIncomesPlot.Series.Clear();
-            //CategoriesExpensesPlot.Series.Clear();
-            */
             PlotModel incomesPlot = new()
             {
                 EdgeRenderingMode = EdgeRenderingMode.PreferSpeed,
@@ -595,7 +528,6 @@ namespace Bruh.VM
             }
 
             incomesPlot.Series.Add(incomesCategories);
-            //incomesPlot.Series[0].
             expensesPlot.Series.Add(expensesCategories);
 
             CategoriesIncomesPlot = incomesPlot;
@@ -622,7 +554,6 @@ namespace Bruh.VM
 
         public MainVM()
         {
-            UpdateListsForFilter();
             CodeOper = 6;
 
             SetOperations = new CommandVM(() => CodeOper = 0, () => true);
@@ -674,8 +605,8 @@ namespace Bruh.VM
             OpenCategories = new CommandVM(() => 
             {
                 new CategoriesWindow().ShowDialog();
+                //UpdateListsForFilter();
                 UpdateLists(CodeOper);
-                UpdateListsForFilter();
             }, () => true);
             OpenBanks = new CommandVM(() => 
             {
@@ -734,7 +665,6 @@ namespace Bruh.VM
             {
                 filterAccountSP = value;
                 Signal();
-                //UpdateListsForFilter();
             }
         }
         public Visibility FilterCategorySP
@@ -830,7 +760,6 @@ namespace Bruh.VM
 
         private void UpdateLists(byte code)
         {
-            //UpdateListsForFilter();
             HideAllSps();
             SelectedEntry = null;
             EntriesSp = Visibility.Visible;
@@ -895,9 +824,9 @@ namespace Bruh.VM
                     }
                     ChangePlotModels();
                     TitleOfList = "Главная";
-
                     break;
-            }            
+            }
+            UpdateListsForFilter();
         }
         private void UpdateFilter()
         {
@@ -948,12 +877,12 @@ namespace Bruh.VM
         private void ClearFilter()
         {
             Filter.Clear();
-            FilterLowerDate = null;
-            FilterUpperDate = null;
-            FilterMinAmount = null;
-            FilterMaxAmount = null;
-            FilterCategory = null;
-            FilterAccount = null;
+            filterLowerDate = null;
+            filterUpperDate = null;
+            filterMinAmount = null;
+            filterMaxAmount = null;
+            filterCategory = null;
+            filterAccount = null;
         }
         private void HideAllSps()
         {
@@ -987,10 +916,15 @@ namespace Bruh.VM
         {
             int accountId = FilterAccount?.ID ?? 0;
             int categoryId = FilterCategory?.ID ?? 0;
+            //filterCategory = null;
+            //AccountsForFilter?.Clear();
+            //Categories?.Clear();
             AccountsForFilter = [..DB.GetDb(typeof(AccountsDB)).GetEntries("", []).Select(a => (Account)a)];
-            Categories = [.. DB.GetDb(typeof(CategoriesDB)).GetEntries("", []).Select(c => (Category)c)];
-            filterAccount = AccountsForFilter.FirstOrDefault(acc => acc.ID == accountId);
-            filterCategory = Categories.FirstOrDefault(c => c.ID == categoryId);
+            categories = [.. DB.GetDb(typeof(CategoriesDB)).GetEntries("", []).Select(c => (Category)c)];
+            //Signal(nameof(Categories));
+
+            filterAccount = AccountsForFilter?.FirstOrDefault(acc => acc.ID == accountId);
+            filterCategory = Categories?.FirstOrDefault(c => c.ID == categoryId);
         }
     }
 }

@@ -26,12 +26,29 @@ namespace Bruh.Model.DBs
             MySqlConnectionStringBuilder sb = new MySqlConnectionStringBuilder();
             sb.UserID = "student";
             sb.Password = "student";
-            //sb.Server = "95.154.107.102";
-            sb.Server = "192.168.200.13";
+            //sb.Server = "192.168.200.13";
+            sb.Server = "95.154.107.102";
             sb.Database = "Bruhgalter";
             sb.CharacterSet = "utf8mb4";
+            sb.ConnectionTimeout = 3;
 
             _connection = new MySqlConnection(sb.ToString());
+
+            while (true)
+            {
+                try
+                {
+                    _connection.Open();
+                    break;
+                }
+                catch (MySqlException)
+                {
+                    sb.Server = "95.154.107.102";
+                    _connection = new MySqlConnection(sb.ToString());
+                }
+            }
+            _connection.Close();
+
         }
 
         public bool OpenConnection()
