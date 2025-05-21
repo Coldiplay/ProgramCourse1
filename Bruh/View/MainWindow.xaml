@@ -114,26 +114,7 @@
                 <RowDefinition Height="0.6*"/>
                 <RowDefinition Height="0.4*"/>
             </Grid.RowDefinitions>
-            <!--{Binding MainSp}-->
-            <StackPanel Visibility="{Binding MainSp}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Все расходы за "/>
-                    <!--<Button Content="{Binding ExpensesMode}" Command="{Binding ChangeExpensesMode}"/>-->
-                    <ComboBox ItemsSource="{Binding Ranges}" SelectedItem="{Binding ExpensesMode}"/>
-                </StackPanel>
-                <TextBlock Text="{Binding AllExpenses}"/>
-
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Все доходы за "/>
-                    <!--<Button Content="{Binding IncomesMode}" Command="{Binding ChangeIncomesMode}"/>-->
-                    <ComboBox ItemsSource="{Binding Ranges}" SelectedItem="{Binding IncomesMode}"/>
-                </StackPanel>
-                <TextBlock Text="{Binding AllIncomes}"/>
-                <CheckBox Content="Учитывать зарплату" IsChecked="{Binding IsSalaryNeededForNDFL}"/>
-                <TextBlock Text="{Binding NDFL}"/>
-
-            </StackPanel>
-            <!--{Binding EntriesSp}-->
+            
             <StackPanel Visibility="{Binding EntriesSp}">
                 <StackPanel.Resources>
                     <Style TargetType="ListView">
@@ -308,13 +289,36 @@
                 </StackPanel>
             </StackPanel>
 
-            <Grid Grid.Row="1">
+            <Grid Grid.RowSpan="2" Visibility="{Binding MainSp}">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
+                    <ColumnDefinition MinWidth="220"/>
+                    <ColumnDefinition MinWidth="220"/>
                 </Grid.ColumnDefinitions>
-                <oxy:PlotView Model="{Binding CategoriesIncomesPlot}"/>
-                <oxy:PlotView Grid.Column="1" Model="{Binding CategoriesExpensesPlot}"/>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.ColumnSpan="2">
+                    <CheckBox Content="Учитывать зарплату" IsChecked="{Binding IsSalaryNeededForNDFL}"/>
+                    <TextBlock Text="{Binding NDFL}"/>
+                </StackPanel>
+                
+                <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
+                    <TextBlock Text="Все доходы за "/>
+                    <ComboBox ItemsSource="{Binding Ranges}" SelectedItem="{Binding IncomesMode}"/>
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+                    <TextBlock Text="Все расходы за "/>
+                    <ComboBox ItemsSource="{Binding Ranges}" SelectedItem="{Binding ExpensesMode}"/>
+                </StackPanel>
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="{Binding AllIncomes, StringFormat=Всего {0} рублей}"/>
+                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding AllExpenses, StringFormat=Всего {0} рублей}"/>
+                
+
+                <oxy:PlotView Grid.Row="3" Grid.Column="1" Model="{Binding CategoriesIncomesPlot}"/>
+                <oxy:PlotView Grid.Column="0" Grid.Row="3" Model="{Binding CategoriesExpensesPlot}"/>
             </Grid>
         </Grid>
     </Grid>

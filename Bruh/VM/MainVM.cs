@@ -1,15 +1,13 @@
-﻿using Bruh.Model.DBs;
+﻿using System.Collections.ObjectModel;
+using System.Reflection;
+using System.Windows;
+using System.Windows.Input;
+using Bruh.Model.DBs;
 using Bruh.Model.Models;
 using Bruh.View;
 using Bruh.VMTools;
 using OxyPlot;
 using OxyPlot.Series;
-using System.Collections.ObjectModel;
-using System.Reflection;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Bruh.VM
 {
@@ -112,6 +110,8 @@ namespace Bruh.VM
         private string incomesMode;
         private string expensesMode;
         private Visibility miscSP;
+        private PlotModel categoriesIncomesPlot;
+        private PlotModel categoriesExpensesPlot;
 
         public DateTime? FilterUpperDate
         {
@@ -221,6 +221,7 @@ namespace Bruh.VM
                 incomesMode = value;
                 Signal();
                 Signal(nameof(AllIncomes));
+                ChangePlotModels();
             }
         }
         public string ExpensesMode
@@ -231,6 +232,7 @@ namespace Bruh.VM
                 expensesMode = value;
                 Signal();
                 Signal(nameof(AllExpenses));
+                ChangePlotModels();
             }
         }
 
@@ -253,28 +255,6 @@ namespace Bruh.VM
                 UpdateLists(codeOper);
             }
         }
-        /*
-        //private byte IncomesCode
-        //{
-        //    get => incomesCode;
-        //    set
-        //    {
-        //        incomesCode = value;
-        //        Signal(nameof(AllIncomes));                
-        //        Signal(nameof(IncomesMode));                
-        //    }
-        //}
-        //private byte ExpensesCode
-        //{
-        //    get => expensesCode;
-        //    set
-        //    {
-        //        expensesCode = value;
-        //        Signal(nameof(AllExpenses));
-        //        Signal(nameof(ExpensesMode));
-        //    }
-        //}
-        */
         public List<string> Ranges { get; set; } = ["Предыдущий месяц", "Предыдущий год", "Предыдущию неделю", "Предыдущий квартал", "Текущий месяц", "Текущую неделю", "Текущий год", "Текущий квартал"];
         public decimal AllIncomes => GetSumm(true);
         public decimal AllExpenses => GetSumm(false);
@@ -317,6 +297,9 @@ namespace Bruh.VM
              * 7 - Текущий квартал
             */
             DateTime today = DateTime.Today;
+            GetRange(income ? Ranges.IndexOf(IncomesMode) : Ranges.IndexOf(ExpensesMode), out var lowerDate, out var upperDate);
+            return GetSumm(lowerDate, upperDate, income);
+            /*
             DateTime date;
             switch (income ? Ranges.IndexOf(IncomesMode) : Ranges.IndexOf(ExpensesMode))
             {
@@ -361,6 +344,7 @@ namespace Bruh.VM
                         return GetSumm(new(today.Year, 10, 1), today, income);
             }
             return 0;
+            */
         }
         private decimal GetSumm(DateTime lowerDate, DateTime upperDate, bool income)
         {
@@ -408,7 +392,7 @@ namespace Bruh.VM
             GC.Collect();
             return;
         }
-        public decimal IncomeFromDeposits(DateTime lowerDate, DateTime upperDate)
+        private decimal IncomeFromDeposits(DateTime lowerDate, DateTime upperDate)
         {
             decimal summ = 0;
             for (int i = 0; i < Deposits?.Count; i++)
@@ -513,6 +497,11 @@ namespace Bruh.VM
                     lowerDate = lowerExpenses;
                     upperDate = upperExpenses;
                 }
+
+                if (oper.TransactDate > upperDate || oper.TransactDate < lowerDate)
+                    continue;
+
+
                 var cat = list.FirstOrDefault(c => c.Link?.ID == oper.Category.ID);
                 if (cat == null)
                 {
@@ -524,13 +513,29 @@ namespace Bruh.VM
                 }
             }
         }
-        protected class Cat 
+        private class Cat 
         {
             public Category? Link { get; set; }
             public decimal TotalAmount { get; set; }
         }
-        public PlotModel CategoriesIncomesPlot { get; private set; }
-        public PlotModel CategoriesExpensesPlot { get; private set; }
+        public PlotModel CategoriesIncomesPlot
+        {
+            get => categoriesIncomesPlot;
+            private set
+            {
+                categoriesIncomesPlot = value;
+                Signal();
+            }
+        }
+        public PlotModel CategoriesExpensesPlot
+        {
+            get => categoriesExpensesPlot;
+            private set
+            {
+                categoriesExpensesPlot = value;
+                Signal();
+            }
+        }
         private void ChangePlotModels()
         {
             /*
@@ -605,9 +610,6 @@ namespace Bruh.VM
         public ICommand SetDeposits { get; set; }
         public ICommand SetAccounts { get; set; }
         public ICommand SetToMain { get; set; }
-        //public ICommand ChangeIncomesMode { get; set; }
-        //public ICommand ChangeExpensesMode { get; set; }
-
 
         public MainVM()
         {
