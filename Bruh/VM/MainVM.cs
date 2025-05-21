@@ -185,6 +185,8 @@ namespace Bruh.VM
             get => filterCategory;
             set
             {
+                if (value == filterCategory)
+                    return;
                 filterCategory = value;
                 Signal();
                 UpdateFilter();
@@ -195,6 +197,8 @@ namespace Bruh.VM
             get => filterAccount;
             set
             {
+                if (value == filterAccount)
+                    return;
                 filterAccount = value;
                 Signal();
                 UpdateFilter();
@@ -501,12 +505,12 @@ namespace Bruh.VM
         {
             PlotModel incomesPlot = new()
             {
-                EdgeRenderingMode = EdgeRenderingMode.PreferSpeed,
+                EdgeRenderingMode = EdgeRenderingMode.PreferGeometricAccuracy,
                 Title = "Категории доходов"
             };
             PlotModel expensesPlot = new()
             {
-                EdgeRenderingMode = EdgeRenderingMode.PreferSpeed,
+                EdgeRenderingMode = EdgeRenderingMode.PreferGeometricAccuracy,
                 Title = "Категории расходов"
             };
 
@@ -554,6 +558,7 @@ namespace Bruh.VM
 
         public MainVM()
         {
+            UpdateListsForFilter();
             CodeOper = 6;
 
             SetOperations = new CommandVM(() => CodeOper = 0, () => true);
@@ -605,7 +610,7 @@ namespace Bruh.VM
             OpenCategories = new CommandVM(() => 
             {
                 new CategoriesWindow().ShowDialog();
-                //UpdateListsForFilter();
+                UpdateListsForFilter();
                 UpdateLists(CodeOper);
             }, () => true);
             OpenBanks = new CommandVM(() => 
@@ -787,6 +792,7 @@ namespace Bruh.VM
                     break;
 
                 case 3:
+                    MiscSP = Visibility.Visible;
                     DebtsSP = Visibility.Visible;
                     FilterSP = Visibility.Visible;
                     FilterAmountSP = Visibility.Visible;
@@ -807,11 +813,13 @@ namespace Bruh.VM
                     break;
 
                 case 5:
+                    ClearFilter();
                     MiscSP = Visibility.Visible;
                     AccountsSP = Visibility.Visible;
                     FilterAmountSP = Visibility.Visible;
                     TitleOfList = "Счета";
                     Accounts = new(DB.GetDb(typeof(AccountsDB)).GetEntries(Search, Filter).Select(a => (Account)a).OrderByDescending(a => a.Title));
+                    AccountsForFilter = [.. Accounts];
                     break;
 
                 case 6:
@@ -826,7 +834,7 @@ namespace Bruh.VM
                     TitleOfList = "Главная";
                     break;
             }
-            UpdateListsForFilter();
+
         }
         private void UpdateFilter()
         {
@@ -848,12 +856,6 @@ namespace Bruh.VM
                 case 3:
                     amountString = "Summ";
                     dateString = SelectedMode == FilterModes[0] ? "DateOfPick" : "DateOfReturn";
-                    /*
-                    //if (SelectedMode == FilterModes[0])
-                    //    dateString = "DateOfPick";
-                    //else
-                    //    dateString = "DateOfReturn";
-                    */
                     break;
                 case 4:
                     amountString = "InitalSumm";
@@ -878,11 +880,13 @@ namespace Bruh.VM
         {
             Filter.Clear();
             filterLowerDate = null;
+            
             filterUpperDate = null;
             filterMinAmount = null;
             filterMaxAmount = null;
             filterCategory = null;
             filterAccount = null;
+            Signal(nameof(FilterCategory));
         }
         private void HideAllSps()
         {
@@ -921,7 +925,7 @@ namespace Bruh.VM
             //Categories?.Clear();
             AccountsForFilter = [..DB.GetDb(typeof(AccountsDB)).GetEntries("", []).Select(a => (Account)a)];
             categories = [.. DB.GetDb(typeof(CategoriesDB)).GetEntries("", []).Select(c => (Category)c)];
-            //Signal(nameof(Categories));
+            Signal(nameof(Categories));
 
             filterAccount = AccountsForFilter?.FirstOrDefault(acc => acc.ID == accountId);
             filterCategory = Categories?.FirstOrDefault(c => c.ID == categoryId);
