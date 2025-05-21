@@ -9,7 +9,7 @@ namespace Bruh.Model.Models
     public class Debt : BaseVM, IModel
     {
         private int duration;
-        private int code;
+        private byte code;
         private decimal summ;
         private short annualInterest;
 
@@ -54,7 +54,7 @@ namespace Bruh.Model.Models
                 SignalAll();
             }
         }
-        public int Code
+        public byte Code
         {
             get => code;
             set
@@ -113,14 +113,13 @@ namespace Bruh.Model.Models
         private int GetMonths => ((DateOfReturn.Year - DateOfPick.Year) * 12) + (DateOfReturn.Month - DateOfPick.Month) - (DateOfReturn.Day < DateOfPick.Day ? 1 : 0);
 
         private void SignalAll()
-        {
-            
+        {            
             Signal(nameof(GetApproximateMonthlyPayment));
             Signal(nameof(GetApproximateFullSumm));
             Signal(nameof(GetMonths));
             Signal(nameof(DateOfReturn));
         }
-        public void ChangeCloseDate(int duration, int code)
+        public void ChangeCloseDate(int duration, byte code)
         {
             try
             {

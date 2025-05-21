@@ -81,30 +81,12 @@ namespace Bruh.VM
 
         public EditWindowVM()
         {
-            //DurationType = "Месяцы";
-
-            //Зачем?
-            //if (Entry is Deposit)
-            //    Banks.Add(new Bank { ID = 0 });
-
             Save = new CommandVM(() =>
             {
-                /*
-                if (Entry is Operation || Entry is Debt || Entry is Deposit)
-                {
-                    change = ChangeCorrespondingEntries;
-                    
-                    if (MessageBox.Show("Хотите ли вы изменить соответствующие записи?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                        change = true;
-                    
-                }
-                */
-
                 if (Entry is Operation operation)
                 {
                     operation.TransactDate = operation.TransactDate.AddMinutes(Minutes - operation.TransactDate.Minute);
                     operation.TransactDate = operation.TransactDate.AddHours(Hours - operation.TransactDate.Hour);
-
                 }
 
                 if (Entry?.ID != 0)
@@ -114,61 +96,7 @@ namespace Bruh.VM
 
                 close?.Invoke();
             },
-
             () => Entry?.AllFieldsAreCorrect ?? false);
-            /*
-            {
-                
-                switch (Entry)
-                {
-                    case Operation operation:
-                        if (operation.Category != null && !string.IsNullOrEmpty(operation.Title) && operation.Cost > 0 && operation.Account != null) //&& operation.Income != null)
-                            return true;
-                        break;
-
-                    case Account account:
-                        if (!string.IsNullOrEmpty(account.Title) && account.Currency != null)
-                            return true;
-                        break;
-
-                    case Debt debt:
-                        if ( debt.DateOfPick < debt.DateOfReturn && debt.Currency != null && debt.Summ > 0)
-                            return true;
-                        break;
-
-                    case Deposit deposit:
-                    if (deposit.Currency != null && deposit.Type != null && deposit.Bank != null && deposit.CloseDate > deposit.OpenDate && deposit.PeriodicityOfPayment != null && !string.IsNullOrEmpty(deposit.Title) && deposit.InitalSumm > 0 && deposit.InterestRate > 0)
-                            return true;
-                        break;
-
-                    case Category category:
-                        if (!string.IsNullOrEmpty(category.Title))
-                            return true;
-                        break;
-
-                    case Bank bank:
-                        if (!string.IsNullOrEmpty(bank.Title))
-                            return true;
-                        break;
-
-                    // Зачем? я же не собирался добавлять, вроде.....
-                    //
-                    //case Periodicity:
-                    //    if (!string.IsNullOrEmpty(((Periodicity)Entry).Name))
-                    //        return true;
-                    //    break;
-                    //
-
-                    case Currency currency:
-                        if (!string.IsNullOrEmpty(currency.Title) && !char.IsWhiteSpace(currency.Symbol))
-                            return true;
-                        break;
-
-                }
-                
-                return false;
-            });
-            */
             Cancel = new CommandVM(() => close?.Invoke(), () => true);
             ChangeDurationType = new CommandVM(() =>
             {
@@ -216,22 +144,12 @@ namespace Bruh.VM
                 _ => throw new NotImplementedException()
             };
         }
-        public void Set(IModel obj, Action close)
+        public void Set(IModel? obj, Action close)
         {
             Entry = obj;
             this.close = close;
             switch (Entry)
             {
-                /*
-                 * Currencies
-                 * Banks
-                 * Accounts
-                 * Categories
-                 * Debts
-                 * Periodicities
-                 * PerOfPayment
-                 * TypeOfDeposit
-                 */
                 case Account account:
                     Banks.Insert(0 ,new Bank { ID = 0, Title = "Без привязки к банку" });
                     if (account.ID == 0)
@@ -269,8 +187,11 @@ namespace Bruh.VM
                     deposit.Currency = Currencies.First(c => c.ID == deposit.CurrencyID);
                     break;
 
-                //default:
-                //    break;
+                case null:
+                    MessageBox.Show("Как так-то");
+                    close();
+                    break;
+
             }
         }
     }

@@ -21,7 +21,6 @@ namespace Bruh.VM
         private string search;
         private string titleOfList = "";
         private byte codeOper;
-        private byte incomesCode;
         private IModel? selectedEntry;
         private List<Category>? categories;
         private Category? filterCategory;
@@ -91,6 +90,7 @@ namespace Bruh.VM
             {
                 accounts = value;
                 Signal();
+                UpdateListsForFilter();
             }
         }
 
@@ -105,7 +105,6 @@ namespace Bruh.VM
             }
         }
         private List<string> Filter = [];
-        //private byte expensesCode;
         private bool isSalaryNeededForNDFL;
         private string incomesMode;
         private string expensesMode;
@@ -255,7 +254,17 @@ namespace Bruh.VM
                 UpdateLists(codeOper);
             }
         }
-        public List<string> Ranges { get; set; } = ["Предыдущий месяц", "Предыдущий год", "Предыдущию неделю", "Предыдущий квартал", "Текущий месяц", "Текущую неделю", "Текущий год", "Текущий квартал"];
+        public List<string> Ranges { get; set; } =
+        [
+            "Предыдущий месяц",
+            "Предыдущий год",
+            "Предыдущию неделю",
+            "Предыдущий квартал",
+            "Текущий месяц",
+            "Текущую неделю",
+            "Текущий год",
+            "Текущий квартал"
+        ];
         public decimal AllIncomes => GetSumm(true);
         public decimal AllExpenses => GetSumm(false);
         public bool IsSalaryNeededForNDFL
@@ -560,12 +569,12 @@ namespace Bruh.VM
             PlotModel incomesPlot = new()
             {
                 EdgeRenderingMode = EdgeRenderingMode.PreferSpeed,
-                Title = "Категории расходов"
+                Title = "Категории доходов"
             };
             PlotModel expensesPlot = new()
             {
                 EdgeRenderingMode = EdgeRenderingMode.PreferSpeed,
-                Title = "Категории доходов"
+                Title = "Категории расходов"
             };
 
 
@@ -978,10 +987,6 @@ namespace Bruh.VM
         {
             int accountId = FilterAccount?.ID ?? 0;
             int categoryId = FilterCategory?.ID ?? 0;
-            //filterAccount = null;
-            //filterCategory = null;
-            //AccountsForFilter?.Clear();
-            //Categories?.Clear();
             AccountsForFilter = [..DB.GetDb(typeof(AccountsDB)).GetEntries("", []).Select(a => (Account)a)];
             Categories = [.. DB.GetDb(typeof(CategoriesDB)).GetEntries("", []).Select(c => (Category)c)];
             filterAccount = AccountsForFilter.FirstOrDefault(acc => acc.ID == accountId);

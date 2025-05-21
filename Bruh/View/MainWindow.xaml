@@ -307,18 +307,18 @@
                 
                 <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
                     <TextBlock Text="Все доходы за "/>
-                    <ComboBox ItemsSource="{Binding Ranges}" SelectedItem="{Binding IncomesMode}"/>
+                    <ComboBox ItemsSource="{Binding Ranges}" SelectedItem="{Binding IncomesMode}" VerticalAlignment="Top"/>
                 </StackPanel>
                 <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
                     <TextBlock Text="Все расходы за "/>
-                    <ComboBox ItemsSource="{Binding Ranges}" SelectedItem="{Binding ExpensesMode}"/>
+                    <ComboBox ItemsSource="{Binding Ranges}" SelectedItem="{Binding ExpensesMode}" VerticalAlignment="Top"/>
                 </StackPanel>
                 <TextBlock Grid.Row="2" Grid.Column="0" Text="{Binding AllIncomes, StringFormat=Всего {0} рублей}"/>
                 <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding AllExpenses, StringFormat=Всего {0} рублей}"/>
                 
 
-                <oxy:PlotView Grid.Row="3" Grid.Column="1" Model="{Binding CategoriesIncomesPlot}"/>
-                <oxy:PlotView Grid.Column="0" Grid.Row="3" Model="{Binding CategoriesExpensesPlot}"/>
+                <oxy:PlotView Grid.Row="3" Grid.Column="0" Model="{Binding CategoriesIncomesPlot}"/>
+                <oxy:PlotView Grid.Column="1" Grid.Row="3" Model="{Binding CategoriesExpensesPlot}"/>
             </Grid>
         </Grid>
     </Grid>
