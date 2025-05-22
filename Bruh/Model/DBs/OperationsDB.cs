@@ -26,7 +26,7 @@ namespace Bruh.Model.DBs
                     filter = $"{filter} AND {f}";
             });
 
-            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID`, `Title`, `Cost`, `TransactDate`, `DateOfCreate`, `Income`, `Description`, `PeriodicityID`, `CategoryID`, `DebtID`, `AccountID` FROM `Operations` WHERE (`Title` LIKE @search OR `Cost` LIKE @search OR `Description` LIKE @search OR `TransactDate` LIKE @search) {filter}"))
+            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID`, `Title`, `Cost`, `TransactDate`, `DateOfCreate`, `Income`, `CategoryID`, `DebtID`, `AccountID` FROM `Operations` WHERE (`Title` LIKE @search OR `Cost` LIKE @search OR `TransactDate` LIKE @search) {filter}"))
             {
                 cmd.Parameters.Add(new MySqlParameter("search", $"%{search}%"));
 
@@ -45,8 +45,6 @@ namespace Bruh.Model.DBs
                                 TransactDate = dr.GetDateTime("TransactDate"),
                                 DateOfCreate = dr.GetDateTime("DateOfCreate"),
                                 Income = dr.GetBoolean("Income"),
-                                Description = dr.IsDBNull("Description") ? null : dr.GetString("Description"),
-                                PeriodicityID = dr.IsDBNull("PeriodicityID") ? null : dr.GetInt32("PeriodicityID"),
                                 CategoryID = dr.GetInt32("CategoryID"),
                                 DebtID = dr.IsDBNull("DebtID") ? null : dr.GetInt32("DebtID"),
                                 AccountID = dr.GetInt32("AccountID")
@@ -64,7 +62,6 @@ namespace Bruh.Model.DBs
                 operation.Account = (Account)DB.GetDb(typeof(AccountsDB)).GetSingleEntry(operation.AccountID);
                 operation.Debt = operation.DebtID == null ? null : (Debt)DB.GetDb(typeof(DebtsDB)).GetSingleEntry((int)operation.DebtID);
                 operation.Category = (Category)DB.GetDb(typeof(CategoriesDB)).GetSingleEntry(operation.CategoryID);
-                operation.Periodicity = operation.PeriodicityID == null ? null : (Periodicity)DB.GetDb(typeof(PeriodicitiesDB)).GetSingleEntry((int)operation.PeriodicityID);
             });
                 return operations;
         }
@@ -75,7 +72,7 @@ namespace Bruh.Model.DBs
             if (DbConnection.GetDbConnection() == null)
                 return operation;
 
-            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID`, `Title`, `Cost`, `TransactDate`, `DateOfCreate`, `Income`, `Description`, `PeriodicityID`, `CategoryID`, `DebtID`, `AccountID` FROM `Operations` WHERE `ID` = {id}"))
+            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID`, `Title`, `Cost`, `TransactDate`, `DateOfCreate`, `Income`, `CategoryID`, `DebtID`, `AccountID` FROM `Operations` WHERE `ID` = {id}"))
             {
                 DbConnection.GetDbConnection().OpenConnection();
                 using (var dr = cmd.ExecuteReader())
@@ -92,8 +89,6 @@ namespace Bruh.Model.DBs
                             operation.TransactDate = dr.GetDateTime("TransactDate");
                             operation.DateOfCreate = dr.GetDateTime("DateOfCreate");
                             operation.Income = dr.GetBoolean("Income");
-                            operation.Description = dr.IsDBNull("Description") ? null : dr.GetString("Description");
-                            operation.PeriodicityID = dr.IsDBNull("PeriodicityID") ? null : dr.GetInt32("PeriodicityID");
                             operation.CategoryID = dr.GetInt32("CategoryID");
                             operation.DebtID = dr.IsDBNull("DebtID") ? null : dr.GetInt32("DebtID");
                             operation.AccountID = dr.GetInt32("AccountID");
@@ -101,7 +96,6 @@ namespace Bruh.Model.DBs
                             operation.Account = (Account)DB.GetDb(typeof(AccountsDB)).GetSingleEntry(operation.AccountID);
                             operation.Debt = operation.DebtID == null ? null : (Debt)DB.GetDb(typeof(DebtsDB)).GetSingleEntry((int)operation.DebtID);
                             operation.Category = (Category)DB.GetDb(typeof(CategoriesDB)).GetSingleEntry(operation.CategoryID);
-                            operation.Periodicity = operation.PeriodicityID == null ? null : (Periodicity)DB.GetDb(typeof(PeriodicitiesDB)).GetSingleEntry((int)operation.PeriodicityID);
                         }    
                     }                
                 }
@@ -118,30 +112,26 @@ namespace Bruh.Model.DBs
                 return result;
 
             operation.DebtID = operation.Debt?.ID;
-            operation.PeriodicityID = operation.Periodicity?.ID;
             operation.AccountID = operation.Account.ID;
             operation.CategoryID = operation.Category.ID;
-            using (MySqlCommand cmd = DbConnection.GetDbConnection().CreateCommand("INSERT INTO `Operations` VALUES(0, @title, @cost, @transactDate, @DateOfCreate, @income, @description,  @periodicityId, @categotyId, @debtId, @accountId); SELECT LAST_INSERT_ID();"))
+            using (MySqlCommand cmd = DbConnection.GetDbConnection().CreateCommand("INSERT INTO `Operations` VALUES(0, @title, @cost, @transactDate, @DateOfCreate, @income, @categotyId, @debtId, @accountId); SELECT LAST_INSERT_ID();"))
             {
                 cmd.Parameters.Add(new MySqlParameter("title", operation.Title));
                 cmd.Parameters.Add(new MySqlParameter("cost", operation.Cost));
                 cmd.Parameters.Add(new MySqlParameter("transactDate", operation.TransactDate));
                 cmd.Parameters.Add(new MySqlParameter("DateOfCreate", operation.DateOfCreate));
                 cmd.Parameters.Add(new MySqlParameter("income", operation.Income));
-                cmd.Parameters.Add(new MySqlParameter("description", operation.Description));
-                cmd.Parameters.Add(new MySqlParameter("periodicityId", operation.PeriodicityID));
                 cmd.Parameters.Add(new MySqlParameter("categotyId", operation.CategoryID));
                 cmd.Parameters.Add(new MySqlParameter("debtId", operation.DebtID));
                 cmd.Parameters.Add(new MySqlParameter("accountId", operation.AccountID));
-                //cmd.Parameters.Add(new MySqlParameter("accountBalance", operation.AccountBalance));
 
                 DbConnection.GetDbConnection().OpenConnection();
                 ExeptionHandler.Try(() =>
                 {
-                    int id = (int)(ulong)cmd.ExecuteScalar();
+                    int? id = (int?)(ulong?)cmd.ExecuteScalar();
                     if (id > 0)
                     {
-                        operation.ID = id;
+                        operation.ID = (int)id;
                         result = true;
                     }
                     else
@@ -155,36 +145,7 @@ namespace Bruh.Model.DBs
             if (changeCorrespondingEntries)
             {
                 ChangeSummOnAccount(operation, operation.Income ? operation.Cost : operation.Cost * -1);
-                /*
-                 * Забыл что сумма долга уже рассчитывается (долг не имеет выплаченной суммы в db)
-                if (operation.Debt != null)
-                {
-                    using (var cmd3 = DbConnection.GetDbConnection().CreateCommand(""))
-                    {
-                        
-                    }
-                }
-                */
             }
-
-            /*
-            //Хз что это
-            //using (var cmd2 = DbConnection.GetDbConnection().CreateCommand($"SELECT `Balance` FROM `Accounts` WHERE `ID` = {operation.AccountID}"))
-            //{
-            //    DbConnection.GetDbConnection().OpenConnection();
-            //    ExeptionHandler.Try(() =>
-            //    {
-            //        decimal balance = (decimal)cmd2.ExecuteScalar();
-            //        using (var cmd3 = DbConnection.GetDbConnection().CreateCommand($"UPDATE `Accounts` set `Balance`={balance+operation.Cost} WHERE `ID`={operation.AccountID};"))
-            //        {                    
-            //            cmd3.ExecuteNonQuery();
-            //            operation.AccountBalance = balance + operation.Cost;
-            //            result = true;
-            //        }
-            //    });
-            //    DbConnection.GetDbConnection().CloseConnection();
-            //}
-            */
             return result;
         }
 
@@ -220,31 +181,28 @@ namespace Bruh.Model.DBs
                 return result;
 
             operation.DebtID = operation.Debt?.ID == 0 ? null : operation.Debt?.ID;
-            operation.PeriodicityID = operation.Periodicity?.ID == 0 ? null : operation.Periodicity?.ID;
             operation.AccountID = operation.Account.ID;
             operation.CategoryID = operation.Category.ID;
             if (changeCorrespondingEntries)
             {
-                decimal cost = 0;
+                decimal? cost = 0;
                 using (var cmd2 = DbConnection.GetDbConnection().CreateCommand("SELECT `Cost` FROM `Operations` WHERE `ID`=@id"))
                 {
                     cmd2.Parameters.Add(new MySqlParameter("id", operation.ID));
                     DbConnection.GetDbConnection().OpenConnection();
-                    ExeptionHandler.Try(() => cost = (decimal)cmd2.ExecuteScalar());
+                    ExeptionHandler.Try(() => cost = (decimal?)cmd2.ExecuteScalar());
                     DbConnection.GetDbConnection().CloseConnection();
                 }
-                ChangeSummOnAccount(operation, /*operation.Cost - cost);*/ operation.Cost != cost ? operation.Cost - cost : operation.Cost);
+                ChangeSummOnAccount(operation, operation.Cost != (decimal)cost ? operation.Cost - (decimal)cost : operation.Cost);
             }
 
-            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"UPDATE `Operations` set `Title`=@title, `Cost`=@cost, `TransactDate`=@transactDate, `DateOfCreate`=@dateOfCreate, `Income`=@income, `Description`=@description, `PeriodicityID`=@periodicityId, `CategoryID`=@categoryId, `DebtID`=@debtId, `AccountID`=@AccountId WHERE `ID`={operation.ID} ;"))
+            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"UPDATE `Operations` set `Title`=@title, `Cost`=@cost, `TransactDate`=@transactDate, `DateOfCreate`=@dateOfCreate, `Income`=@income, `CategoryID`=@categoryId, `DebtID`=@debtId, `AccountID`=@AccountId WHERE `ID`={operation.ID} ;"))
             {
                 cmd.Parameters.Add(new MySqlParameter("title", operation.Title));
                 cmd.Parameters.Add(new MySqlParameter("cost", operation.Cost));
                 cmd.Parameters.Add(new MySqlParameter("transactDate", operation.TransactDate));
                 cmd.Parameters.Add(new MySqlParameter("DateOfCreate", operation.DateOfCreate));
                 cmd.Parameters.Add(new MySqlParameter("income", operation.Income));
-                cmd.Parameters.Add(new MySqlParameter("description", operation.Description));
-                cmd.Parameters.Add(new MySqlParameter("periodicityId", operation.PeriodicityID));
                 cmd.Parameters.Add(new MySqlParameter("categoryId", operation.CategoryID));
                 cmd.Parameters.Add(new MySqlParameter("debtId", operation.DebtID));
                 cmd.Parameters.Add(new MySqlParameter("AccountId", operation.AccountID));
@@ -265,19 +223,19 @@ namespace Bruh.Model.DBs
             if (summ == 0)
                 return;
 
-            decimal balance = 0;
+            decimal? balance = 0;
 
             using (var cmd = DbConnection.GetDbConnection().CreateCommand("SELECT `Balance` FROM `Accounts` WHERE `ID`=@idAccount"))
             {
                 cmd.Parameters.Add(new MySqlParameter("idAccount", operation.AccountID));
                 DbConnection.GetDbConnection().OpenConnection();
-                ExeptionHandler.Try(() => balance = (decimal)(decimal?)cmd.ExecuteScalar());
+                ExeptionHandler.Try(() => balance = (decimal?)cmd.ExecuteScalar());
                 DbConnection.GetDbConnection().CloseConnection();
             }
 
             using (var cmd2 = DbConnection.GetDbConnection().CreateCommand("UPDATE `Accounts` set `Balance`=@balance WHERE `ID`=@id"))
             {
-                cmd2.Parameters.Add(new MySqlParameter("balance", operation.Income ? balance + summ : balance - summ));
+                cmd2.Parameters.Add(new MySqlParameter("balance", operation.Income ? (decimal)balance + summ : (decimal)balance - summ));
                 cmd2.Parameters.Add(new MySqlParameter("id", operation.AccountID));
                 DbConnection.GetDbConnection().OpenConnection();
                 if (!ExeptionHandler.Try(() => cmd2.ExecuteNonQuery()))

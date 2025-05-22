@@ -21,7 +21,7 @@ namespace Bruh.Model.Models
         private decimal initalSumm;
         /**/
         public int ID { get; set; }
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
         public decimal InitalSumm
         {
             get => initalSumm;
@@ -74,12 +74,10 @@ namespace Bruh.Model.Models
         }
         public int PeriodicityOfPaymentID { get; set; }
         public int BankID { get; set; }
-        public int TypeOfDepositID { get; set; }
         public int CurrencyID { get; set; }
 
         //
         public Bank Bank { get; set; }
-        public TypeOfDeposit Type { get; set; }
         public Currency Currency { get; set; }
         public PeriodicityOfPayment PeriodicityOfPayment { get; set; }
         //
@@ -115,7 +113,7 @@ namespace Bruh.Model.Models
         public string GetCurrentSumm => GetProbableSumm(OpenDate, DateTime.Today, Capitalization);
         public string GetProbSumm => GetProbableSumm(OpenDate, CloseDate, Capitalization);
 
-        public bool AllFieldsAreCorrect => !(Currency == null || Type == null || Bank == null || CloseDate <= OpenDate || PeriodicityOfPayment == null || string.IsNullOrWhiteSpace(Title) || InitalSumm <= 0 || InterestRate <= 0);
+        public bool AllFieldsAreCorrect => !(Currency == null || Bank == null || CloseDate <= OpenDate || PeriodicityOfPayment == null || string.IsNullOrWhiteSpace(Title) || InitalSumm <= 0 || InterestRate <= 0);
 
         public void ChangeCloseDate(int duration, int code)
         {

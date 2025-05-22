@@ -289,15 +289,15 @@
                 </StackPanel>
             </StackPanel>
 
-            <Grid Grid.RowSpan="2" Visibility="{Binding MainSp}">
+            <Grid Margin="5" Grid.RowSpan="2" Visibility="{Binding MainSp}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition MinWidth="220"/>
                     <ColumnDefinition MinWidth="220"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition Height="50"/>
-                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="80"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 <StackPanel Grid.ColumnSpan="2">
@@ -313,7 +313,11 @@
                     <TextBlock Text="Все расходы за "/>
                     <ComboBox ItemsSource="{Binding Ranges}" SelectedItem="{Binding ExpensesMode}" VerticalAlignment="Top"/>
                 </StackPanel>
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="{Binding AllIncomes, StringFormat=Всего {0} рублей}"/>
+                <StackPanel Grid.Row="2" Grid.Column="0">
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{Binding AllIncomes, StringFormat=Всего {0} рублей}"/>
+                    <TextBlock Text="{Binding AllIncomesFromDeposits}"/>
+                </StackPanel>
+                
                 <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding AllExpenses, StringFormat=Всего {0} рублей}"/>
                 
 

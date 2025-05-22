@@ -11,7 +11,7 @@ namespace Bruh.Model.Models
     public class PeriodicityOfPayment : IModel
     {
         public int ID { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         public bool AllFieldsAreCorrect => !string.IsNullOrWhiteSpace(Name);
     }

@@ -11,7 +11,7 @@ namespace Bruh.Model.Models
     public class Category : IModel
     {
         public int ID { get; set; }
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
         public bool AllFieldsAreCorrect => !string.IsNullOrWhiteSpace(Title);
     }

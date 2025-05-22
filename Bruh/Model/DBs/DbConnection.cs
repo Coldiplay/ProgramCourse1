@@ -56,7 +56,7 @@ namespace Bruh.Model.DBs
             if (_connection == null)
                 Config();
 
-            if (_connection.State == System.Data.ConnectionState.Open)
+            if (_connection?.State == System.Data.ConnectionState.Open)
                 return true;
             return ExeptionHandler.Try(_connection.Open);
         }

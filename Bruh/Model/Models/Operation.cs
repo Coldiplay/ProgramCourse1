@@ -10,7 +10,7 @@ namespace Bruh.Model.Models
         private DateTime transactDate;
 
         public int ID { get; set; }
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
         public decimal Cost { get; set; }
         public DateTime TransactDate
         {
@@ -32,16 +32,11 @@ namespace Bruh.Model.Models
         }
         public int CategoryID { get; set; }
         public int AccountID { get; set; }
-        // Потом либо сделать баланс на момент операции через пересчёт всех операций до этой, либо бросить это дело (очевидно, второе)
-        //public decimal AccountBalance { get; set; }
-        public string? Description { get; set; }
         public int? DebtID { get; set; }
-        public int? PeriodicityID { get; set; }
 
         public Category Category { get; set; }
         public Account Account { get; set; }
         public Debt? Debt { get; set; }
-        public Periodicity? Periodicity { get; set; }
 
         public bool IsExpense
         {
@@ -69,16 +64,6 @@ namespace Bruh.Model.Models
                 if (Income)
                     return "Доход";
                 return "Расход";
-            }
-        }
-        public string GetPeriodicity
-        {
-            get
-            {
-                if (Periodicity == null)
-                    return "";
-                else
-                    return Periodicity.Name;
             }
         }
 

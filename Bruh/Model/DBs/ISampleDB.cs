@@ -26,23 +26,6 @@ namespace Bruh.Model.DBs
         public IModel GetSingleEntry(int id);
     }
 
-    /*
-    //public class DB<T> where T : ISampleDB, new()
-    //{
-    //    static List<ISampleDB> sampleDBs = new List<ISampleDB>();
-
-    //    public static ISampleDB GetDb()
-    //    {
-    //        ISampleDB db = sampleDBs.FirstOrDefault(s => s.GetType() == typeof(T));
-    //        if (db == null)
-    //        {
-    //            db = new T();
-    //            sampleDBs.Add(db);
-    //        }
-    //        return db;
-    //    }
-    //}
-    */
     public class DB
     {
         static List<ISampleDB> sampleDBs = new List<ISampleDB>();

@@ -71,9 +71,7 @@ namespace Bruh.VM
         public List<Account> Accounts { get; set; } = [.. DB.GetDb(typeof(AccountsDB)).GetEntries("", []).Select(a => (Account)a)];
         public List<Category> Categories { get; set; } = [.. DB.GetDb(typeof(CategoriesDB)).GetEntries("", []).Select(c => (Category)c)];
         public List<Debt> Debts { get; set; } = [.. DB.GetDb(typeof(DebtsDB)).GetEntries("", []).Select(d => (Debt)d)];
-        public List<Periodicity> Periodicities { get; set; } = [.. DB.GetDb(typeof(PeriodicitiesDB)).GetEntries("", []).Select(p => (Periodicity)p)];
         public List<PeriodicityOfPayment> PeriodicitiesOfPayment { get; set; } = [.. DB.GetDb(typeof(PeriodicitiesOfPaymentDB)).GetEntries("", []).Select(c => (PeriodicityOfPayment)c)];
-        public List<TypeOfDeposit> TypesOfDeposits { get; set; } = [.. DB.GetDb(typeof(TypesOfDepositDB)).GetEntries("", []).Select(t => (TypeOfDeposit)t)];
 
         public ICommand Save { get; set; }
         public ICommand Cancel { get; set; }
@@ -160,13 +158,11 @@ namespace Bruh.VM
 
                 case Operation operation:
                     Debts.Insert(0, new Debt { ID = 0, Title = "Нет" });
-                    Periodicities.Insert(0, new Periodicity { ID = 0, Name = "Нет"});
                     if (operation.ID == 0)
                         break;
                     operation.Account = Accounts.First(a => a.ID == operation.AccountID);
                     operation.Category = Categories.First(c => c.ID == operation.CategoryID);
                     operation.Debt = Debts.FirstOrDefault(d => d.ID == operation.DebtID);
-                    operation.Periodicity = Periodicities.FirstOrDefault(p => p.ID == operation.PeriodicityID);
                     Minutes = (byte)operation.TransactDate.Minute;
                     Hours = (byte)operation.TransactDate.Hour;
                     break;
@@ -183,7 +179,6 @@ namespace Bruh.VM
 
                     deposit.Bank = Banks.First(b => b.ID == deposit.BankID);
                     deposit.PeriodicityOfPayment = PeriodicitiesOfPayment.First(p => p.ID == deposit.PeriodicityOfPaymentID);
-                    deposit.Type = TypesOfDeposits.First(t => t.ID == deposit.TypeOfDepositID);
                     deposit.Currency = Currencies.First(c => c.ID == deposit.CurrencyID);
                     break;
 

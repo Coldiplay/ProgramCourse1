@@ -223,6 +223,7 @@ namespace Bruh.VM
                 incomesMode = value;
                 Signal();
                 Signal(nameof(AllIncomes));
+                Signal(nameof(AllIncomesFromDeposits));
                 ChangePlotModels();
             }
         }
@@ -293,7 +294,6 @@ namespace Bruh.VM
                         DateTime date = DateTime.Today.AddMonths(-1);
                         return $"Подоходный налог за ближайший отчетный период \n(С {date:23.MM.yyyy} по {date.ToString($"{DateTime.DaysInMonth(date.Year, date.Month)}.MM.yyyy")})\nсоставляет {case2} Рублей";
                 }
-                return "Что-то пошло не так, проверб условия";
             }
         }
         private decimal GetSumm(bool income)
@@ -353,15 +353,26 @@ namespace Bruh.VM
             for (int i = 0; i < Deposits?.Count; i++)
             {
                 Deposit deposit = Deposits[i];
+
                 try
-                {
-                     summ += decimal.Parse(deposit.GetProbSumm) - decimal.Parse(deposit.GetProbableSumm(lowerDate, upperDate, deposit.Capitalization));
+                {//decimal.Parse(deposit.GetProbableSumm(lowerDate, upperDate, deposit.Capitalization));
+                    decimal dep1 = decimal.Parse(deposit.GetCurrentSumm);
+                    decimal dep2 = decimal.Parse(deposit.GetProbSumm);
+                     summ += dep2 - dep1;
                 }
                 catch (Exception)
                 {
                 }
             }
             return summ;
+        }
+        public decimal AllIncomesFromDeposits 
+        {
+            get 
+            {
+                GetRange(Ranges.IndexOf(IncomesMode), out var lowerDate, out var upperDate);
+                return IncomeFromDeposits(lowerDate, upperDate);
+            }
         }
         private void GetRange(int oper ,out DateTime lowerDate, out DateTime upperDate)
         {
@@ -531,6 +542,7 @@ namespace Bruh.VM
                 expensesCategories.Slices.Add(slice);
             }
 
+
             incomesPlot.Series.Add(incomesCategories);
             expensesPlot.Series.Add(expensesCategories);
 
@@ -558,6 +570,9 @@ namespace Bruh.VM
 
         public MainVM()
         {
+            IncomesMode = Ranges[4];
+            ExpensesMode = Ranges[4];
+
             UpdateListsForFilter();
             CodeOper = 6;
 
@@ -825,11 +840,8 @@ namespace Bruh.VM
                 case 6:
                     EntriesSp = Visibility.Collapsed;
                     MainSp = Visibility.Visible;
-                    if (Operations == null || Deposits == null)
-                    {
-                        Operations = [.. DB.GetDb(typeof(OperationsDB)).GetEntries(Search, Filter).Select(s => (Operation)s).OrderByDescending(oper => oper.TransactDate)];
-                        Deposits = [.. DB.GetDb(typeof(DepositsDB)).GetEntries(Search, Filter).Select(d => (Deposit)d).OrderByDescending(d => d.OpenDate)];
-                    }
+                    Operations = [.. DB.GetDb(typeof(OperationsDB)).GetEntries("", []).Select(o => (Operation)o).OrderByDescending(o => o.TransactDate)];
+                    Deposits = [.. DB.GetDb(typeof(DepositsDB)).GetEntries(Search, Filter).Select(d => (Deposit)d).OrderByDescending(d => d.OpenDate)];
                     ChangePlotModels();
                     TitleOfList = "Главная";
                     break;

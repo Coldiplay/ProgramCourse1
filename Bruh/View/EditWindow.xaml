@@ -45,10 +45,6 @@
                 </StackPanel>
                 <TextBlock Text="Счёт списания/зачисления"/>
                 <ComboBox ItemsSource="{Binding DataContext.Accounts, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" SelectedItem="{Binding Account, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Title"/>
-                <TextBlock Text="Описание"/>
-                <TextBox Text="{Binding Description}"/>
-                <!--<TextBlock Text="Периодичность операции (опционально)"/>
-                <ComboBox ItemsSource="{Binding DataContext.Periodicities, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" SelectedItem="{Binding Periodicity, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name"/>-->
                 <TextBlock Text="Погашаемый долг (опционально)"/>
                 <ComboBox ItemsSource="{Binding DataContext.Debts, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" SelectedItem="{Binding Debt, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Title"/>
                 <CheckBox Content="Изменить баланс на счету в соответствии с суммой операции" IsChecked="{Binding DataContext.ChangeCorrespondingEntries, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
@@ -128,12 +124,12 @@
         </DataTemplate>
     </Window.Resources>
 
-    <Grid>
+    <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition Height="0.2*"/>
         </Grid.RowDefinitions>
-        <ContentControl Grid.Row="0" Content="{Binding Entry}"/>
+        <ContentControl Grid.Row="0" Content="{Binding Entry}" Width="Auto"/>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1">
             <Button Content="Сохранить" Margin="5" Command="{Binding Save}"/>
             <Button Content="Отмена" Margin="5" Command="{Binding Cancel}"/>

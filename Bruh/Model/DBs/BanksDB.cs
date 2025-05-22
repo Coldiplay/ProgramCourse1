@@ -80,10 +80,10 @@ namespace Bruh.Model.DBs
                 DbConnection.GetDbConnection().OpenConnection();
                 ExeptionHandler.Try(() =>
                 {
-                    int id = (int)(ulong)cmd.ExecuteScalar();
+                    int? id = (int?)(ulong?)cmd.ExecuteScalar();
                     if (id > 0)
                     {
-                        bank.ID = id;
+                        bank.ID = (int)id;
                         result = true;
                     }
                     else
