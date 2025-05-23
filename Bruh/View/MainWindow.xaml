@@ -9,7 +9,7 @@
         xmlns:oxy="http://oxyplot.org/wpf"
         mc:Ignorable="d"
         DataContext="{DynamicResource vm}"
-        Title="Bruhgalter" Height="480" Width="560"
+        Title="Bruhgalter" Height="480" Width="660"
         SizeToContent="Width"
         WindowStartupLocation="CenterScreen">
     
@@ -119,11 +119,12 @@
                 <StackPanel.Resources>
                     <Style TargetType="ListView">
                         <Setter Property="MinHeight" Value="220"/>
+                        <!--<Setter Property="Grid.Column" Value="1"/>-->
                     </Style>
                 </StackPanel.Resources>
                 <TextBlock Text="{Binding TitleOfList}" FontSize="20" FontWeight="SemiBold"/>
 
-                <StackPanel Visibility="{Binding OperationsSP}" Grid.Column="1">
+                <StackPanel Visibility="{Binding OperationsSP}">
                     <ListView ItemsSource="{Binding Operations}" SelectedItem="{Binding SelectedEntry}">
                         <ListView.View>
                             <GridView>
@@ -133,12 +134,11 @@
                                 <GridViewColumn Header="Сумма" DisplayMemberBinding="{Binding GetCost}"/>
                                 <GridViewColumn Header="Дата операции" DisplayMemberBinding="{Binding TransactDate, StringFormat={}dd.MM.yyyy HH:mm}"/>
                                 <GridViewColumn Header="Счёт" DisplayMemberBinding="{Binding Account.Title}"/>
-                                <!--<GridViewColumn Header="Периодичность" DisplayMemberBinding="{Binding Periodicity.Value}"/>-->
                             </GridView>
                         </ListView.View>
                     </ListView>
                 </StackPanel>
-                <StackPanel Visibility="{Binding IncomesSP}" Grid.Column="1">
+                <StackPanel Visibility="{Binding IncomesSP}">
                     <ListView ItemsSource="{Binding Operations}" SelectedItem="{Binding SelectedEntry}">
                         <ListView.View>
                             <GridView>
@@ -147,12 +147,11 @@
                                 <GridViewColumn Header="Сумма" DisplayMemberBinding="{Binding GetCost}"/>
                                 <GridViewColumn Header="Дата операции" DisplayMemberBinding="{Binding TransactDate, StringFormat={}dd.MM.yyyy HH:mm}"/>
                                 <GridViewColumn Header="Счёт" DisplayMemberBinding="{Binding Account.Title}"/>
-                                <!--<GridViewColumn Header="Периодичность" DisplayMemberBinding="{Binding Periodicity.Value}"/>-->
                             </GridView>
                         </ListView.View>
                     </ListView>
                 </StackPanel>
-                <StackPanel Visibility="{Binding ExpensesSP}" Grid.Column="1">
+                <StackPanel Visibility="{Binding ExpensesSP}">
                     <ListView ItemsSource="{Binding Operations}" SelectedItem="{Binding SelectedEntry}">
                         <ListView.View>
                             <GridView>
@@ -161,12 +160,11 @@
                                 <GridViewColumn Header="Сумма" DisplayMemberBinding="{Binding GetCost}"/>
                                 <GridViewColumn Header="Дата операции" DisplayMemberBinding="{Binding TransactDate, StringFormat={}dd.MM.yyyy HH:mm}"/>
                                 <GridViewColumn Header="Счёт" DisplayMemberBinding="{Binding Account.Title}"/>
-                                <!--<GridViewColumn Header="Периодичность" DisplayMemberBinding="{Binding Periodicity.Value}"/>-->
                             </GridView>
                         </ListView.View>
                     </ListView>
                 </StackPanel>
-                <StackPanel Visibility="{Binding DebtsSP}" Grid.Column="1">
+                <StackPanel Visibility="{Binding DebtsSP}">
                     <ListView ItemsSource="{Binding Debts}" SelectedItem="{Binding SelectedEntry}">
                         <ListView.View>
                             <GridView >
@@ -180,7 +178,7 @@
                         </ListView.View>
                     </ListView>
                 </StackPanel>
-                <StackPanel Visibility="{Binding DepositsSP}" Grid.Column="1">
+                <StackPanel Visibility="{Binding DepositsSP}">
                     <ListView ItemsSource="{Binding Deposits}" SelectedItem="{Binding SelectedEntry}">
                         <ListView.View>
                             <GridView>
@@ -202,7 +200,7 @@
                         </ListView.View>
                     </ListView>
                 </StackPanel>
-                <StackPanel Visibility="{Binding AccountsSP}" Grid.Column="1">
+                <StackPanel Visibility="{Binding AccountsSP}">
                     <ListView ItemsSource="{Binding Accounts}" SelectedItem="{Binding SelectedEntry}">
                         <ListView.View>
                             <GridView>
@@ -213,7 +211,6 @@
                         </ListView.View>
                     </ListView>
                 </StackPanel>
-
             </StackPanel>
             
             <StackPanel Visibility="{Binding MiscSP}" Grid.Row="1" VerticalAlignment="Bottom">
@@ -291,8 +288,8 @@
 
             <Grid Margin="5" Grid.RowSpan="2" Visibility="{Binding MainSp}">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition MinWidth="220"/>
-                    <ColumnDefinition MinWidth="220"/>
+                    <ColumnDefinition MinWidth="240"/>
+                    <ColumnDefinition MinWidth="240"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="80"/>
@@ -315,7 +312,7 @@
                 </StackPanel>
                 <StackPanel Grid.Row="2" Grid.Column="0">
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="{Binding AllIncomes, StringFormat=Всего {0} рублей}"/>
-                    <TextBlock Text="{Binding AllIncomesFromDeposits}"/>
+                    <TextBlock Text="{Binding AllIncomesFromDeposits, StringFormat=Из них за вклады {0} рублей}"/>
                 </StackPanel>
                 
                 <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding AllExpenses, StringFormat=Всего {0} рублей}"/>

@@ -7,6 +7,7 @@ using Bruh.Model.Models;
 using Bruh.View;
 using Bruh.VMTools;
 using OxyPlot;
+using OxyPlot.Legends;
 using OxyPlot.Series;
 
 namespace Bruh.VM
@@ -298,7 +299,7 @@ namespace Bruh.VM
         }
         private decimal GetSumm(bool income)
         {
-            GetRange(income ? Ranges.IndexOf(IncomesMode) : Ranges.IndexOf(ExpensesMode), out var lowerDate, out var upperDate);
+            GetRange(income ? (byte)Ranges.IndexOf(IncomesMode) : (byte)Ranges.IndexOf(ExpensesMode), out var lowerDate, out var upperDate);
             return GetSumm(lowerDate, upperDate, income);
         }
         private decimal GetSumm(DateTime lowerDate, DateTime upperDate, bool income)
@@ -353,12 +354,11 @@ namespace Bruh.VM
             for (int i = 0; i < Deposits?.Count; i++)
             {
                 Deposit deposit = Deposits[i];
-
                 try
-                {//decimal.Parse(deposit.GetProbableSumm(lowerDate, upperDate, deposit.Capitalization));
-                    decimal dep1 = decimal.Parse(deposit.GetCurrentSumm);
-                    decimal dep2 = decimal.Parse(deposit.GetProbSumm);
-                     summ += dep2 - dep1;
+                {
+                    decimal dep1 = decimal.Parse(deposit.GetProbableSumm(deposit.OpenDate, lowerDate, deposit.Capitalization));
+                    decimal dep2 = decimal.Parse(deposit.GetProbableSumm(deposit.OpenDate, upperDate, deposit.Capitalization));
+                    summ += dep2 - dep1;
                 }
                 catch (Exception)
                 {
@@ -370,11 +370,11 @@ namespace Bruh.VM
         {
             get 
             {
-                GetRange(Ranges.IndexOf(IncomesMode), out var lowerDate, out var upperDate);
+                GetRange((byte)Ranges.IndexOf(IncomesMode), out var lowerDate, out var upperDate);
                 return IncomeFromDeposits(lowerDate, upperDate);
             }
         }
-        private void GetRange(int oper ,out DateTime lowerDate, out DateTime upperDate)
+        private void GetRange(byte oper ,out DateTime lowerDate, out DateTime upperDate)
         {
             /*  За
              * 0 - Предыдущий месяц
@@ -400,10 +400,13 @@ namespace Bruh.VM
                     lowerDate = new(lowerDate.Year,1,1);
                     upperDate = new(lowerDate.Year,12,31);
                     break;
+
                 case 2:
                     lowerDate = today.DayOfWeek != DayOfWeek.Sunday ? today.AddDays((((int)today.DayOfWeek - 1) * -1) - 7) : today.AddDays(-13);
-                    upperDate = today.AddDays(6);
+                    upperDate = lowerDate.AddDays(6);
                     break;
+                
+                //Оставить также или заменить на вариант подобный case 7?
                 case 3:
                     upperDate = today;
                     while (upperDate.Month % 3 != 0)
@@ -411,7 +414,7 @@ namespace Bruh.VM
 
                     upperDate = upperDate.AddMonths(-5);
                     lowerDate = new(upperDate.Year, upperDate.Month, 1);
-                    upperDate = lowerDate.AddMonths(3);
+                    upperDate = lowerDate.AddMonths(2);
                     upperDate = new(upperDate.Year, upperDate.Month, DateTime.DaysInMonth(upperDate.Year, upperDate.Month));
                     break;
 
@@ -431,34 +434,33 @@ namespace Bruh.VM
                     break;
 
                 case 7:
-                    if (today.Month <= 3)
-                        lowerDate = new(today.Year, 1, 1);
-                    else if (today.Month <= 6)
-                        lowerDate = new(today.Year, 4, 1);
-                    else if (today.Month <= 9)
-                        lowerDate = new(today.Year, 7, 1);
-                    else
-                        lowerDate = new(today.Year, 10, 1);
-
+                    lowerDate = today.Month switch
+                    {
+                        <= 3 => new(today.Year, 1, 1),
+                        <= 6 => new(today.Year, 4, 1),
+                        <= 9 => new(today.Year, 7, 1),
+                        _ => new(today.Year, 10, 1)
+                    };
                     upperDate = today;
                     break;
+
                 default:
                     upperDate = new(1,1,1);
                     lowerDate = upperDate;
                     break;
             }
         }
-        private void GetCategories(out List<Cat> incomesCats, out List<Cat> expensesCats)
+        private void GetCategories(out List<Categor> incomesCats, out List<Categor> expensesCats)
         {
             incomesCats = [];
             expensesCats = [];
-            GetRange(Ranges.IndexOf(IncomesMode), out var lowerIncomes, out var upperIncomes);
-            GetRange(Ranges.IndexOf(ExpensesMode), out var lowerExpenses, out var upperExpenses);
+            GetRange((byte)Ranges.IndexOf(IncomesMode), out var lowerIncomes, out var upperIncomes);
+            GetRange((byte)Ranges.IndexOf(ExpensesMode), out var lowerExpenses, out var upperExpenses);
             for (int i = 0; i < Operations?.Count; i++)
             {
                 Operation oper = Operations[i];
 
-                List<Cat> list;
+                List<Categor> list;
                 DateTime lowerDate;
                 DateTime upperDate;
                 if (oper.Income)
@@ -481,7 +483,7 @@ namespace Bruh.VM
                 var cat = list.FirstOrDefault(c => c.Link?.ID == oper.Category.ID);
                 if (cat == null)
                 {
-                    list.Add(new Cat { Link = oper.Category, TotalAmount = oper.Cost });
+                    list.Add(new Categor { Link = oper.Category, TotalAmount = oper.Cost });
                 }
                 else
                 {
@@ -489,7 +491,7 @@ namespace Bruh.VM
                 }
             }
         }
-        private class Cat 
+        private class Categor 
         {
             public Category? Link { get; set; }
             public decimal TotalAmount { get; set; }
@@ -528,23 +530,40 @@ namespace Bruh.VM
 
             PieSeries incomesCategories = new();
             PieSeries expensesCategories = new();
-            GetCategories(out List<Cat> incomesCats, out List<Cat> expensesCats);
+            GetCategories(out List<Categor> incomesCats, out List<Categor> expensesCats);
             for (int i = 0; i < incomesCats.Count; i++)
             {
-                Cat? item = incomesCats[i];
-                var slice = new PieSlice($"{item.Link?.Title} ({item.TotalAmount})", (double)item.TotalAmount);
+                Categor? item = incomesCats[i];
+                var slice = new PieSlice($"{item.Link?.Title}", (double)item.TotalAmount);
                 incomesCategories.Slices.Add(slice);
             }
             for (int i = 0; i < expensesCats.Count; i++)
             {
-                Cat? item = expensesCats[i];
-                var slice = new PieSlice($"{item.Link?.Title} ({item.TotalAmount})", (double)item.TotalAmount);
+                Categor? item = expensesCats[i];
+                var slice = new PieSlice($"{item.Link?.Title}", (double)item.TotalAmount);
                 expensesCategories.Slices.Add(slice);
             }
+            if (AllIncomesFromDeposits > 0)
+                incomesCategories.Slices.Add(new PieSlice($"Вклады", (double)AllIncomesFromDeposits));
 
-
+            //incomesCategories.InsideLabelFormat = "{1}\n({0:F2})";
+            incomesCategories.TickDistance = -30;
+            incomesCategories.TickHorizontalLength = 0;
+            incomesCategories.TickRadialLength = 0;
+            incomesCategories.TickLabelDistance = 1;
+            incomesCategories.StrokeThickness = 0;
+            //expensesCategories.InsideLabelFormat = incomesCategories.InsideLabelFormat;
+            expensesCategories.TickDistance = -30;
+            expensesCategories.TickRadialLength = 0;
+            expensesCategories.TickLabelDistance = 1;
+            expensesCategories.StrokeThickness = 0;
+            //incomesCategories.OutsideLabelFormat = "{2}%";
+            //incomesCategories.LegendFormat;
             incomesPlot.Series.Add(incomesCategories);
             expensesPlot.Series.Add(expensesCategories);
+
+
+            incomesPlot.Legends.Add(new Legend() {LegendBackground = OxyColor.FromArgb(200, 255, 255, 255), LegendBorder = OxyColors.Black });
 
             CategoriesIncomesPlot = incomesPlot;
             CategoriesExpensesPlot = expensesPlot;

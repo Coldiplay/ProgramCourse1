@@ -40,16 +40,6 @@ namespace Bruh.Model.Models
             {
                 closeDate = value;
                 Signal();
-                /*
-                duration = Code switch
-                {
-                    0 => (CloseDate - OpenDate).Days,
-                    1 => ((CloseDate.Year - OpenDate.Year) * 12) + (CloseDate.Month - OpenDate.Month) - (CloseDate.Day < OpenDate.Day ? 1 : 0),
-                    2 => (((CloseDate.Year - OpenDate.Year) * 12) + (CloseDate.Month - OpenDate.Month) - (CloseDate.Day < OpenDate.Day ? 1 : 0))/12,
-                    _ => throw new NotImplementedException()
-                };
-                Signal(nameof(Duration));
-                */
             }
         }
         public bool Capitalization

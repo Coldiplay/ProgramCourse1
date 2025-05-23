@@ -30,7 +30,7 @@ namespace Bruh.Model.DBs
             //sb.Server = "95.154.107.102";
             sb.Database = "Bruhgalter";
             sb.CharacterSet = "utf8mb4";
-            sb.ConnectionTimeout = 3;
+            sb.ConnectionTimeout = 2;
 
             _connection = new MySqlConnection(sb.ToString());
 
