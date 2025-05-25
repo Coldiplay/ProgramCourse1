@@ -7,6 +7,7 @@ using Bruh.Model.Models;
 using Bruh.View;
 using Bruh.VMTools;
 using OxyPlot;
+using OxyPlot.Axes;
 using OxyPlot.Legends;
 using OxyPlot.Series;
 
@@ -527,8 +528,7 @@ namespace Bruh.VM
                 Title = "Категории расходов"
             };
 
-
-            PieSeries incomesCategories = new();
+            FixedPieSeries incomesCategories = new();
             PieSeries expensesCategories = new();
             GetCategories(out List<Categor> incomesCats, out List<Categor> expensesCats);
             for (int i = 0; i < incomesCats.Count; i++)
@@ -546,24 +546,23 @@ namespace Bruh.VM
             if (AllIncomesFromDeposits > 0)
                 incomesCategories.Slices.Add(new PieSlice($"Вклады", (double)AllIncomesFromDeposits));
 
-            //incomesCategories.InsideLabelFormat = "{1}\n({0:F2})";
-            incomesCategories.TickDistance = -30;
+            incomesCategories.TickDistance = -32;
             incomesCategories.TickHorizontalLength = 0;
             incomesCategories.TickRadialLength = 0;
             incomesCategories.TickLabelDistance = 1;
             incomesCategories.StrokeThickness = 0;
-            //expensesCategories.InsideLabelFormat = incomesCategories.InsideLabelFormat;
-            expensesCategories.TickDistance = -30;
+
+            expensesCategories.TickDistance = -32;
+            expensesCategories.TickHorizontalLength = 0;
             expensesCategories.TickRadialLength = 0;
             expensesCategories.TickLabelDistance = 1;
             expensesCategories.StrokeThickness = 0;
-            //incomesCategories.OutsideLabelFormat = "{2}%";
-            //incomesCategories.LegendFormat;
+
+            //incomesCategories.InsideLabelColor = OxyColors.White;
+            incomesCategories.TextColor = OxyColors.White;
+            expensesCategories.TextColor = OxyColors.White;
             incomesPlot.Series.Add(incomesCategories);
             expensesPlot.Series.Add(expensesCategories);
-
-
-            incomesPlot.Legends.Add(new Legend() {LegendBackground = OxyColor.FromArgb(200, 255, 255, 255), LegendBorder = OxyColors.Black });
 
             CategoriesIncomesPlot = incomesPlot;
             CategoriesExpensesPlot = expensesPlot;
@@ -951,9 +950,6 @@ namespace Bruh.VM
         {
             int accountId = FilterAccount?.ID ?? 0;
             int categoryId = FilterCategory?.ID ?? 0;
-            //filterCategory = null;
-            //AccountsForFilter?.Clear();
-            //Categories?.Clear();
             AccountsForFilter = [..DB.GetDb(typeof(AccountsDB)).GetEntries("", []).Select(a => (Account)a)];
             categories = [.. DB.GetDb(typeof(CategoriesDB)).GetEntries("", []).Select(c => (Category)c)];
             Signal(nameof(Categories));

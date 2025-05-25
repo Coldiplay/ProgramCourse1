@@ -18,10 +18,7 @@ namespace Bruh.Model.Models
         public Currency Currency { get; set; }
         public Bank? Bank { get; set; }
 
-        public string GetBalance
-        {
-            get => Currency == null || char.IsWhiteSpace(Currency.Symbol) ? $"{Balance} " : $"{Balance} {Currency.Symbol}";
-        }
+        public string GetBalance => $"{Balance} {Currency?.Symbol}";
 
         public bool AllFieldsAreCorrect => !(string.IsNullOrWhiteSpace(Title) || Currency == null);
     }

@@ -11,7 +11,7 @@ namespace Bruh.VM
     {
         private Action? close;
         private IModel? entry;
-        private string durationType = "Месяцы";
+        private string durationType = "";
         private byte hours;
         private byte minutes;
         private bool changeCorrespondingEntries;
@@ -23,10 +23,10 @@ namespace Bruh.VM
             {
                 entry = value;
                 Signal();
-                if (Entry is Deposit deposit)
-                    SetDurationType(deposit);
+                //if (Entry is Deposit deposit)
+                //    SetDurationType(deposit.Code);
                 //else if (Entry is Debt debt)
-                //  SetDurationType(debt);
+                //    SetDurationType(debt.Code);
             }
         }
         public bool ChangeCorrespondingEntries
@@ -107,7 +107,7 @@ namespace Bruh.VM
                         2 => 0,
                         _ => throw new NotImplementedException()
                     };
-                    SetDurationType(deposit);
+                    SetDurationType(deposit.Code);
                 }
                 else if (Entry is Debt debt)
                 {
@@ -118,29 +118,20 @@ namespace Bruh.VM
                         2 => 0,
                         _ => throw new NotImplementedException()
                     };
-                    SetDurationType(debt);
+                    SetDurationType(debt.Code);
                 }
             }, () => true);
+            
         }
-        private void SetDurationType(Deposit deposit)
+        private void SetDurationType(byte i)
         {
-            DurationType = deposit.Code switch
+            DurationType = i switch
             {
                 0 => "Дни",
                 1 => "Месяцы",
                 2 => "Года",
                 _ => throw new NotImplementedException()
                 };
-        }
-        private void SetDurationType(Debt debt)
-        {
-            DurationType = debt.Code switch
-            {
-                0 => "Дни",
-                1 => "Месяцы",
-                2 => "Года",
-                _ => throw new NotImplementedException()
-            };
         }
         public void Set(IModel? obj, Action close)
         {
@@ -168,15 +159,16 @@ namespace Bruh.VM
                     break;
 
                 case Debt debt:
+                    SetDurationType(debt.Code);
                     if (debt.ID == 0)
                         break;
                     debt.Currency = Currencies.First(c => c.ID == debt.CurrencyID);
                     break;
 
                 case Deposit deposit:
+                    SetDurationType(deposit.Code);
                     if (deposit.ID == 0)
                         break;
-
                     deposit.Bank = Banks.First(b => b.ID == deposit.BankID);
                     deposit.PeriodicityOfPayment = PeriodicitiesOfPayment.First(p => p.ID == deposit.PeriodicityOfPaymentID);
                     deposit.Currency = Currencies.First(c => c.ID == deposit.CurrencyID);

@@ -12,6 +12,7 @@ namespace Bruh.Model.Models
         private byte code;
         private decimal summ;
         private short annualInterest;
+        private DateTime dateOfPick = DateTime.Today;
 
         public int ID { get; set; }
         public decimal Summ
@@ -36,8 +37,18 @@ namespace Bruh.Model.Models
         }
         public int CurrencyID { get; set; }
         public string? Title { get; set; }
-        public DateTime DateOfPick { get; set; }
-        public DateTime DateOfReturn { get; set; }
+        public DateTime DateOfPick
+        {
+            get => dateOfPick;
+            set
+            {
+                dateOfPick = value;
+                Signal();
+                ChangeCloseDate(Duration, Code);
+                SignalAll();
+            }
+        }
+        public DateTime DateOfReturn { get; set; } = DateTime.Today.AddDays(1);
 
         //
         public Currency Currency { get; set; }
@@ -76,9 +87,6 @@ namespace Bruh.Model.Models
             get
             {
                 decimal approximateMonthlyPayment;
-                //if (ID < 0)
-                //{
-
                 try
                 {
                     if (DateOfReturn < DateOfPick)
@@ -86,29 +94,23 @@ namespace Bruh.Model.Models
                     decimal rate = (decimal)AnnualInterest / 12 / 100;
                     decimal help = (decimal)(Math.Pow(1 + (double)rate, GetMonths) - (double)1);
                     if (help <= 0)
-                        return $"0 {Currency.Symbol}";
+                        return $"0 {Currency?.Symbol}";
                     rate += rate / help;
                     approximateMonthlyPayment = Summ * rate;
-                    return $"{Math.Round(approximateMonthlyPayment, MidpointRounding.ToEven)} {Currency.Symbol}";
+                    return $"{Math.Round(approximateMonthlyPayment, MidpointRounding.ToEven)} {Currency?.Symbol}";
                 }
                 catch (OverflowException)
                 {
-                    //MessageBox.Show("Ошибка, попробуйте ввести данные заново");
                 }
                 catch (DivideByZeroException)
                 {
-                    //MessageBox.Show("Ошибка, попробуйте ввести данные заново");
                 }
                 return "Ошибка в вычислениях";
-                
-
-                //}
-                //return "Ошибка";
             }
         }
-        public string GetApproximateFullSumm => decimal.TryParse(GetApproximateMonthlyPayment.Remove(GetApproximateMonthlyPayment.Length - 1), out decimal result) ? $"{result * GetMonths} {Currency.Symbol}" : "Ошибка в вычислениях";
-        public string GetSumm => $"{Summ} {Currency.Symbol}";
-        public string GetPaidSumm => $"{PaidSumm} {Currency.Symbol}";
+        public string GetApproximateFullSumm => decimal.TryParse(GetApproximateMonthlyPayment[..^1], out decimal result) ? $"{result * GetMonths} {Currency?.Symbol}" : "Ошибка в вычислениях";
+        public string GetSumm => $"{Summ} {Currency?.Symbol}";
+        public string GetPaidSumm => $"{PaidSumm} {Currency?.Symbol}";
 
         private int GetMonths => ((DateOfReturn.Year - DateOfPick.Year) * 12) + (DateOfReturn.Month - DateOfPick.Month) - (DateOfReturn.Day < DateOfPick.Day ? 1 : 0);
 

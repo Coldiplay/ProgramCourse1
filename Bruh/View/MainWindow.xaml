@@ -88,6 +88,20 @@
             </Setter>
             <Setter Property="Margin" Value="3"/>
         </Style>
+
+        <Style TargetType="oxy:PlotView">
+            <Setter Property="DefaultTrackerTemplate">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <oxy:TrackerControl Position="{Binding Position}" HorizontalLineVisibility="Collapsed" VerticalLineVisibility="Collapsed">
+                            <oxy:TrackerControl.Content>
+                                <TextBlock Text="{Binding}" Margin="7"/>
+                            </oxy:TrackerControl.Content>
+                        </oxy:TrackerControl>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
     
     <Grid Margin="5">
@@ -316,7 +330,7 @@
                 </StackPanel>
                 
                 <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding AllExpenses, StringFormat=Всего {0} рублей}"/>
-                
+
 
                 <oxy:PlotView Grid.Row="3" Grid.Column="0" Model="{Binding CategoriesIncomesPlot}"/>
                 <oxy:PlotView Grid.Column="1" Grid.Row="3" Model="{Binding CategoriesExpensesPlot}"/>

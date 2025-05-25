@@ -11,14 +11,10 @@ namespace Bruh.Model.Models
     public class Currency : IModel
     {
         public int ID { get; set; }
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
         public char Symbol { get; set; }
 
-        public string GetCurrency
-        {
-            get => $"{Title} ({Symbol})";
-        }
-
+        public string GetCurrency => $"{Title} ({Symbol})";
         public bool AllFieldsAreCorrect => !(string.IsNullOrEmpty(Title) || char.IsWhiteSpace(Symbol));
     }
 }

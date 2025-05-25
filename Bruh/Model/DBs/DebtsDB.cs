@@ -75,7 +75,7 @@ namespace Bruh.Model.DBs
 
         public IModel GetSingleEntry(int id)
         {
-            Debt debt = new Debt();
+            Debt debt = new();
             if (DbConnection.GetDbConnection() == null)
                 return debt;
 

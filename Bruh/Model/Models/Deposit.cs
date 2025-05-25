@@ -14,11 +14,13 @@ namespace Bruh.Model.Models
     public class Deposit : BaseVM, IModel
     {
         private int duration;
-        private int code;
-        private DateTime closeDate;
+        private byte code;
+        private DateTime closeDate = DateTime.Today.AddDays(1);
         private bool capitalization;
         private decimal interestRate;
         private decimal initalSumm;
+        private DateTime openDate = DateTime.Today;
+
         /**/
         public int ID { get; set; }
         public string Title { get; set; } = string.Empty;
@@ -32,7 +34,15 @@ namespace Bruh.Model.Models
                 Signal(nameof(GetProbSumm));
             }
         }
-        public DateTime OpenDate { get; set; }
+        public DateTime OpenDate
+        {
+            get => openDate;
+            set
+            {
+                openDate = value;
+                ChangeCloseDate(Duration, Code);
+            }
+        }
         public DateTime CloseDate
         {
             get => closeDate;
@@ -71,7 +81,7 @@ namespace Bruh.Model.Models
         public Currency Currency { get; set; }
         public PeriodicityOfPayment PeriodicityOfPayment { get; set; }
         //
-        public int Code
+        public byte Code
         {
             get => code;
             set
@@ -99,13 +109,12 @@ namespace Bruh.Model.Models
         }
         //
 
-        // Придумай сам
         public string GetCurrentSumm => GetProbableSumm(OpenDate, DateTime.Today, Capitalization);
         public string GetProbSumm => GetProbableSumm(OpenDate, CloseDate, Capitalization);
 
         public bool AllFieldsAreCorrect => !(Currency == null || Bank == null || CloseDate <= OpenDate || PeriodicityOfPayment == null || string.IsNullOrWhiteSpace(Title) || InitalSumm <= 0 || InterestRate <= 0);
 
-        public void ChangeCloseDate(int duration, int code)
+        public void ChangeCloseDate(int duration, byte code)
         {
             try 
             {

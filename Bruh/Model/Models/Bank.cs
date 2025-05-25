@@ -14,10 +14,5 @@ namespace Bruh.Model.Models
         public string Title { get; set; } = string.Empty;
 
         public bool AllFieldsAreCorrect => !string.IsNullOrWhiteSpace(Title);
-
-        //public override bool Equals(object? obj)
-        //{
-        //    return obj != null && this.ID == (obj as Bank).ID;
-        //}
     }
 }

@@ -7,7 +7,7 @@ namespace Bruh.Model.Models
     public class Operation : BaseVM, IModel
     {
         private bool income;
-        private DateTime transactDate;
+        private DateTime transactDate = DateTime.Today;
 
         public int ID { get; set; }
         public string Title { get; set; } = string.Empty;
@@ -46,26 +46,8 @@ namespace Bruh.Model.Models
                 Income = !value;
             }
         }
-        public string GetCost 
-        {
-            get
-            {
-                if (Account != null && Account.Currency != null)
-                    return $"{Cost} {Account.Currency.Symbol}";
-                else
-                    return $"{Cost}";
-
-            }
-        }
-        public string IsIncome
-        {
-            get
-            {
-                if (Income)
-                    return "Доход";
-                return "Расход";
-            }
-        }
+        public string GetCost => $"{Cost} {Account?.Currency?.Symbol}";
+        public string IsIncome => Income ? "Доход" : "Расход";
 
         public bool AllFieldsAreCorrect => !(Category == null || string.IsNullOrWhiteSpace(Title) || Cost <= 0 || Account == null);
     }
