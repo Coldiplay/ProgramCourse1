@@ -7,7 +7,7 @@ using System.Windows.Input;
 
 namespace Bruh.VM
 {
-    public class EditWindowVM : BaseVM
+    internal class EditWindowVM : BaseVM
     {
         private Action? close;
         private IModel? entry;
@@ -19,20 +19,16 @@ namespace Bruh.VM
         public IModel? Entry
         {
             get => entry;
-            set
+            private set
             {
                 entry = value;
                 Signal();
-                //if (Entry is Deposit deposit)
-                //    SetDurationType(deposit.Code);
-                //else if (Entry is Debt debt)
-                //    SetDurationType(debt.Code);
             }
         }
         public bool ChangeCorrespondingEntries
         {
             get => changeCorrespondingEntries;
-            set
+            internal set
             {
                 changeCorrespondingEntries = value;
                 Signal();
@@ -41,13 +37,13 @@ namespace Bruh.VM
         public string DurationType
         {
             get => durationType;
-            set
+            private set
             {
                 durationType = value;
                 Signal();
             }
         }
-        public byte Hours
+        internal byte Hours
         {
             get => hours;
             set
@@ -56,7 +52,7 @@ namespace Bruh.VM
                 Signal();
             }
         }
-        public byte Minutes
+        internal byte Minutes
         {
             get => minutes;
             set
@@ -66,18 +62,18 @@ namespace Bruh.VM
             }
         }
 
-        public List<Currency> Currencies { get; set; } = [.. DB.GetDb(typeof(CurrencyDB)).GetEntries("", []).Select(c => (Currency)c)];
-        public List<Bank> Banks { get; set; } = [.. DB.GetDb(typeof(BanksDB)).GetEntries("", []).Select(b => (Bank)b)];
-        public List<Account> Accounts { get; set; } = [.. DB.GetDb(typeof(AccountsDB)).GetEntries("", []).Select(a => (Account)a)];
-        public List<Category> Categories { get; set; } = [.. DB.GetDb(typeof(CategoriesDB)).GetEntries("", []).Select(c => (Category)c)];
-        public List<Debt> Debts { get; set; } = [.. DB.GetDb(typeof(DebtsDB)).GetEntries("", []).Select(d => (Debt)d)];
-        public List<PeriodicityOfPayment> PeriodicitiesOfPayment { get; set; } = [.. DB.GetDb(typeof(PeriodicitiesOfPaymentDB)).GetEntries("", []).Select(c => (PeriodicityOfPayment)c)];
+        public List<Currency> Currencies { get; private set; } = [.. DB.GetDb(typeof(CurrencyDB)).GetEntries("", []).Select(c => (Currency)c)];
+        public List<Bank> Banks { get; private set; } = [.. DB.GetDb(typeof(BanksDB)).GetEntries("", []).Select(b => (Bank)b)];
+        public List<Account> Accounts { get; private set; } = [.. DB.GetDb(typeof(AccountsDB)).GetEntries("", []).Select(a => (Account)a)];
+        public List<Category> Categories { get; private set; } = [.. DB.GetDb(typeof(CategoriesDB)).GetEntries("", []).Select(c => (Category)c)];
+        public List<Debt> Debts { get; private set; } = [.. DB.GetDb(typeof(DebtsDB)).GetEntries("", []).Select(d => (Debt)d)];
+        public List<PeriodicityOfPayment> PeriodicitiesOfPayment { get; private set; } = [.. DB.GetDb(typeof(PeriodicitiesOfPaymentDB)).GetEntries("", []).Select(c => (PeriodicityOfPayment)c)];
 
-        public ICommand Save { get; set; }
-        public ICommand Cancel { get; set; }
-        public ICommand ChangeDurationType { get; set; }
+        internal ICommand Save { get; private set; }
+        internal ICommand Cancel { get; private set; }
+        internal ICommand ChangeDurationType { get; private set; }
 
-        public EditWindowVM()
+        internal EditWindowVM()
         {
             Save = new CommandVM(() =>
             {
@@ -133,7 +129,7 @@ namespace Bruh.VM
                 _ => throw new NotImplementedException()
                 };
         }
-        public void Set(IModel? obj, Action close)
+        internal void Set(IModel? obj, Action close)
         {
             Entry = obj;
             this.close = close;

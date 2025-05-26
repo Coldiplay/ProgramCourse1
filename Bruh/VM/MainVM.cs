@@ -13,7 +13,7 @@ using OxyPlot.Series;
 
 namespace Bruh.VM
 {
-    public class MainVM : BaseVM
+    internal class MainVM : BaseVM
     {
         private ObservableCollection<Operation>? operations;
         private ObservableCollection<Debt> debts;
@@ -51,7 +51,7 @@ namespace Bruh.VM
         public IModel? SelectedEntry
         {
             get => selectedEntry;
-            set
+            internal set
             {
                 selectedEntry = value;
                 Signal();
@@ -61,7 +61,7 @@ namespace Bruh.VM
         public ObservableCollection<Operation>? Operations
         {
             get => operations;
-            set
+            private set
             {
                 operations = value;
                 Signal();
@@ -70,7 +70,7 @@ namespace Bruh.VM
         public ObservableCollection<Debt> Debts
         {
             get => debts;
-            set
+            private set
             {
                 debts = value;
                 Signal();
@@ -79,7 +79,7 @@ namespace Bruh.VM
         public ObservableCollection<Deposit>? Deposits
         {
             get => deposits;
-            set
+            private set
             {
                 deposits = value;
                 Signal();
@@ -88,7 +88,7 @@ namespace Bruh.VM
         public ObservableCollection<Account> Accounts
         {
             get => accounts;
-            set
+            private set
             {
                 accounts = value;
                 Signal();
@@ -98,7 +98,7 @@ namespace Bruh.VM
         public string Search
         {
             get => search;
-            set
+            internal set
             {
                 search = value;
                 Signal();
@@ -116,7 +116,7 @@ namespace Bruh.VM
         public DateTime? FilterUpperDate
         {
             get => filterUpperDate;
-            set
+            internal set
             {
                 filterUpperDate = value;
                 Signal();
@@ -126,7 +126,7 @@ namespace Bruh.VM
         public DateTime? FilterLowerDate
         {
             get => filterLowerDate;
-            set
+            internal set
             {
                 filterLowerDate = value;
                 Signal();
@@ -136,7 +136,7 @@ namespace Bruh.VM
         public decimal? FilterMaxAmount
         {
             get => filterMaxAmount;
-            set
+            internal set
             {
                 filterMaxAmount = value;
                 Signal();
@@ -146,7 +146,7 @@ namespace Bruh.VM
         public decimal? FilterMinAmount
         {
             get => filterMinAmount;
-            set
+            internal set
             {
                 filterMinAmount = value;
                 Signal();
@@ -156,7 +156,7 @@ namespace Bruh.VM
         public List<Category>? Categories
         {
             get => categories;
-            set
+            private set
             {
                 categories = value;
                 Signal();
@@ -165,17 +165,17 @@ namespace Bruh.VM
         public List<Account>? AccountsForFilter
         {
             get => accountsForFilter;
-            set
+            private set
             {
                 accountsForFilter = value;
                 Signal();
             }
         }
-        public string[] FilterModes { get; set; } = ["Дата открытия", "Дата закрытия"];
+        public string[] FilterModes { get; private set; } = ["Дата открытия", "Дата закрытия"];
         public string SelectedMode
         {
             get => selectedMode;
-            set
+            internal set
             {
                 selectedMode = value;
                 Signal();
@@ -185,7 +185,7 @@ namespace Bruh.VM
         public Category? FilterCategory
         {
             get => filterCategory;
-            set
+            internal set
             {
                 if (value == filterCategory)
                     return;
@@ -197,7 +197,7 @@ namespace Bruh.VM
         public Account? FilterAccount
         {
             get => filterAccount;
-            set
+            internal set
             {
                 if (value == filterAccount)
                     return;
@@ -211,7 +211,7 @@ namespace Bruh.VM
         public string TitleOfList
         {
             get => titleOfList;
-            set
+            private set
             {
                 titleOfList = value;
                 Signal();
@@ -220,7 +220,7 @@ namespace Bruh.VM
         public string IncomesMode
         {
             get => incomesMode;
-            set
+            internal set
             {
                 incomesMode = value;
                 Signal();
@@ -232,7 +232,7 @@ namespace Bruh.VM
         public string ExpensesMode
         {
             get => expensesMode;
-            set
+            internal set
             {
                 expensesMode = value;
                 Signal();
@@ -260,7 +260,7 @@ namespace Bruh.VM
                 UpdateLists(codeOper);
             }
         }
-        public List<string> Ranges { get; set; } =
+        public List<string> Ranges { get; private set; } =
         [
             "Предыдущий месяц",
             "Предыдущий год",
@@ -276,7 +276,7 @@ namespace Bruh.VM
         public bool IsSalaryNeededForNDFL
         {
             get => isSalaryNeededForNDFL;
-            set
+            internal set
             {
                 isSalaryNeededForNDFL = value;
                 Signal();
@@ -554,8 +554,8 @@ namespace Bruh.VM
         }
         private class Categor 
         {
-            public Category? Link { get; set; }
-            public decimal TotalAmount { get; set; }
+            internal Category? Link { get; set; }
+            internal decimal TotalAmount { get; set; }
         }
         public PlotModel CategoriesIncomesPlot
         {
@@ -630,23 +630,23 @@ namespace Bruh.VM
             GC.Collect();
         }
 
-        public ICommand AddEntry { get; set; }
-        public ICommand EditEntry { get; set; }
-        public ICommand RemoveEntry { get; set; }
-        public ICommand OpenCategories { get; set; }
-        public ICommand OpenBanks { get; set; }
-        public ICommand OpenCurrencies { get; set; }
-        public ICommand ClearFilterCMD { get; set; }
+        public ICommand AddEntry { get; private set; }
+        public ICommand EditEntry { get; private set; }
+        public ICommand RemoveEntry { get; private set; }
+        public ICommand OpenCategories { get; private set; }
+        public ICommand OpenBanks { get; private set; }
+        public ICommand OpenCurrencies { get; private set; }
+        public ICommand ClearFilterCMD { get; private set; }
 
-        public ICommand SetIncomes { get; set; }
-        public ICommand SetExpenses { get; set; }
-        public ICommand SetOperations { get; set; }
-        public ICommand SetDebts { get; set; }
-        public ICommand SetDeposits { get; set; }
-        public ICommand SetAccounts { get; set; }
-        public ICommand SetToMain { get; set; }
+        public ICommand SetIncomes { get; private set; }
+        public ICommand SetExpenses { get; private set; }
+        public ICommand SetOperations { get; private set; }
+        public ICommand SetDebts { get; private set; }
+        public ICommand SetDeposits { get; private set; }
+        public ICommand SetAccounts { get; private set; }
+        public ICommand SetToMain { get; private set; }
 
-        public MainVM()
+        internal MainVM()
         {
             IncomesMode = Ranges[4];
             ExpensesMode = Ranges[4];
@@ -720,25 +720,25 @@ namespace Bruh.VM
         }
 
 
-        public Visibility FilterSP 
+        internal Visibility FilterSP 
         { 
             get => filterSP; 
-            set 
+            private set 
             { 
                 filterSP = value;
                 Signal(); 
             } 
         }
-        public Visibility FilterModeSP
+        internal Visibility FilterModeSP
         {
             get => filterModeSP;
-            set
+            private set
             {
                 filterModeSP = value;
                 Signal();
             }
         }
-        public Visibility FilterAmountSP
+        internal Visibility FilterAmountSP
         {
             get => filterAmountSP;
             set
@@ -747,109 +747,109 @@ namespace Bruh.VM
                 Signal();
             }
         }
-        public Visibility FilterDatesSP
+        internal Visibility FilterDatesSP
         {
             get => filterDatesSP;
-            set
+            private set
             {
                 filterDatesSP = value;
                 Signal();
             }
         }
-        public Visibility FilterAccountSP
+        internal Visibility FilterAccountSP
         {
             get => filterAccountSP;
-            set
+            private set
             {
                 filterAccountSP = value;
                 Signal();
             }
         }
-        public Visibility FilterCategorySP
+        internal Visibility FilterCategorySP
         {
             get => filterCategorySP;
-            set
+            private set
             {
                 filterCategorySP = value;
                 Signal();
             }
         }
-        public Visibility MiscSP
+        internal Visibility MiscSP
         {
             get => miscSP;
-            set
+            private set
             {
                 miscSP = value;
                 Signal();
             }
         }
-        public Visibility MainSp
+        internal Visibility MainSp
         {
             get => mainSp;
-            set
+            private set
             {
                 mainSp = value;
                 Signal();
             }
         }
-        public Visibility EntriesSp
+        internal Visibility EntriesSp
         {
             get => entriesSp;
-            set
+            private set
             {
                 entriesSp = value;
                 Signal();
             }
         }
-        public Visibility OperationsSP
+        internal Visibility OperationsSP
         {
             get => operationsSP;
-            set
+            private set
             {
                 operationsSP = value;
                 Signal();
             }
         }
-        public Visibility DebtsSP
+        internal Visibility DebtsSP
         {
             get => debtsSP;
-            set
+            private set
             {
                 debtsSP = value;
                 Signal();
             }
         }
-        public Visibility IncomesSP
+        internal Visibility IncomesSP
         {
             get => incomesSP;
-            set
+            private set
             {
                 incomesSP = value;
                 Signal();
             }
         }
-        public Visibility ExpensesSP
+        internal Visibility ExpensesSP
         {
             get => expensesSP;
-            set
+            private set
             {
                 expensesSP = value;
                 Signal();
             }
         }
-        public Visibility DepositsSP
+        internal Visibility DepositsSP
         {
             get => depositsSP;
-            set
+            private set
             {
                 depositsSP = value;
                 Signal();
             }
         }
-        public Visibility AccountsSP
+        internal Visibility AccountsSP
         {
             get => accountsSP;
-            set
+            private set
             {
                 accountsSP = value;
                 Signal();
