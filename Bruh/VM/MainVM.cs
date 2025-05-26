@@ -331,23 +331,83 @@ namespace Bruh.VM
         }
         private void GetAllIncomesForNDFL(out string result1, out string result2)
         {
-            // Для НДФЛ с 1 по 22, Для НДФЛ с 22 по 5
+            // Для НДФЛ с 1 по 22, Для НДФЛ с 23 по 31/30/28/29
             decimal summ1 = 0, summ2 = 0;
             DateTime today = DateTime.Today;
             DateTime date1lower = new(today.Year, today.Month, 1);
-            DateTime date1upper = date1lower.AddDays(21);
+            DateTime date1upper = new(today.Year, today.Month, 22);
             DateTime date2lower = today.AddMonths(-1);
             date2lower = new DateTime(date2lower.Year, date2lower.Month, 23);
             DateTime date2upper = new(date2lower.Year, date2lower.Month, DateTime.DaysInMonth(date2lower.Year, date2lower.Month));
 
-            summ1 += GetSummForNDFL(date1lower, date1upper, IsSalaryNeededForNDFL) + IncomeFromDeposits(date1lower, date1upper);
-            summ2 += GetSummForNDFL(date2lower, date2upper, IsSalaryNeededForNDFL) + IncomeFromDeposits(date2lower, date2upper);
+            summ1 += GetSummForNDFL(date1lower, date1upper, IsSalaryNeededForNDFL);
+            summ2 += GetSummForNDFL(date2lower, date2upper, IsSalaryNeededForNDFL);
 
-            result1 = Math.Round(summ1 * 0.13M, 2).ToString();
-            result2 = Math.Round(summ2 * 0.13M, 2).ToString();
+            result1 = Math.Round(GetNdflForSumm(summ1), 2).ToString();
+            result2 = Math.Round(GetNdflForSumm(summ2), 2).ToString();
 
             GC.Collect();
             return;
+        }
+        private decimal GetNdflForSumm(decimal summ)
+        {
+            decimal tax = 0;
+            bool _continue = true;
+            byte count = 1;
+            while (_continue)
+            {
+                switch (count)
+                {
+                    case 1:
+                        if (summ >= 2400000)
+                        {
+                            tax += 3120000;
+                            count++;
+                        }
+                        else
+                        {
+                            tax = summ * 0.13M;
+                            _continue = false;
+                        }
+                        break;
+                    case 2:
+                        if (summ >= 5000000)
+                        {
+                            tax += 390000;
+                            count++;
+                        }
+                        else
+                        {
+                            tax += (summ - 2400000) * 0.15M;
+                            _continue = false;
+                        }
+                        break;
+                    case 3:
+                        if (summ >= 20000000)
+                        {
+                            tax += 2700000;
+                            count++;
+                        }
+                        else
+                        {
+                            tax += (summ - 5000000) * 0.18M;
+                            _continue = false;
+                        }
+                        break;
+                    case 4:
+                        if (summ >= 50000000)
+                        {
+                            tax += 6000000 + (summ - 50000000) * 0.22M;
+                        }
+                        else
+                        {
+                            tax += (summ - 20000000) * 0.2M;
+                        }
+                        _continue = false;
+                        break;
+                }                
+            }
+            return tax;
         }
         private decimal IncomeFromDeposits(DateTime lowerDate, DateTime upperDate)
         {
