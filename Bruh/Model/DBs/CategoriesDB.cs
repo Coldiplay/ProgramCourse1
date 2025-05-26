@@ -1,17 +1,12 @@
 ﻿using Bruh.Model.Models;
 using Bruh.VMTools;
 using MySqlConnector;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace Bruh.Model.DBs
 {
-    public class CategoriesDB : ISampleDB
+    internal class CategoriesDB : ISampleDB
     {
         public List<IModel> GetEntries(string search, List<string> filter)
         {

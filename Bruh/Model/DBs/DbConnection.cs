@@ -3,7 +3,7 @@ using MySqlConnector;
 
 namespace Bruh.Model.DBs
 {
-    public class DbConnection
+    internal class DbConnection
     {
         MySqlConnection _connection;
 
@@ -12,7 +12,7 @@ namespace Bruh.Model.DBs
         {
             Config();
         }
-        public static DbConnection GetDbConnection()
+        internal static DbConnection GetDbConnection()
         {
             if (dbConnection == null)
             {
@@ -21,7 +21,7 @@ namespace Bruh.Model.DBs
             return dbConnection;
         }
 
-        public void Config()
+        internal void Config()
         {
             MySqlConnectionStringBuilder sb = new MySqlConnectionStringBuilder();
             sb.UserID = "student";
@@ -51,7 +51,7 @@ namespace Bruh.Model.DBs
 
         }
 
-        public bool OpenConnection()
+        internal bool OpenConnection()
         {
             if (_connection == null)
                 Config();

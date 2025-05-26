@@ -1,10 +1,5 @@
 ﻿using Bruh.Model.DBs;
 using Bruh.VMTools;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace Bruh.Model.Models
@@ -15,7 +10,7 @@ namespace Bruh.Model.Models
     {
         private int duration;
         private byte code;
-        private DateTime closeDate = DateTime.Today.AddDays(1);
+        private DateTime closeDate = DateTime.Today;
         private bool capitalization;
         private decimal interestRate;
         private decimal initalSumm;
@@ -84,7 +79,7 @@ namespace Bruh.Model.Models
         public byte Code
         {
             get => code;
-            set
+            internal set
             {
                 code = value;
                 Duration = code switch
@@ -114,7 +109,7 @@ namespace Bruh.Model.Models
 
         public bool AllFieldsAreCorrect => !(Currency == null || Bank == null || CloseDate <= OpenDate || PeriodicityOfPayment == null || string.IsNullOrWhiteSpace(Title) || InitalSumm <= 0 || InterestRate <= 0);
 
-        public void ChangeCloseDate(int duration, byte code)
+        internal void ChangeCloseDate(int duration, byte code)
         {
             try 
             {
@@ -133,7 +128,7 @@ namespace Bruh.Model.Models
                 Duration = 0;
             }
         }
-        public void SetCodeForChangeInPeriodicity()
+        internal void SetCodeForChangeInPeriodicity()
         {
             DateTime help = CloseDate;
             switch (PeriodicityOfPayment.Name)
@@ -159,7 +154,7 @@ namespace Bruh.Model.Models
                     break;
             }
         }
-        public string GetProbableSumm(DateTime startTime, DateTime endTime, bool capitilize)        
+        internal string GetProbableSumm(DateTime startTime, DateTime endTime, bool capitilize)        
         {
             if (PeriodicityOfPayment == null)
                 return "Не все нужные поля веденны";

@@ -133,7 +133,6 @@
                 <StackPanel.Resources>
                     <Style TargetType="ListView">
                         <Setter Property="MinHeight" Value="220"/>
-                        <!--<Setter Property="Grid.Column" Value="1"/>-->
                     </Style>
                 </StackPanel.Resources>
                 <TextBlock Text="{Binding TitleOfList}" FontSize="20" FontWeight="SemiBold"/>
@@ -277,7 +276,7 @@
                     </StackPanel>
 
                     <StackPanel Grid.Row="1" Orientation="Horizontal">
-                        <StackPanel Visibility="{Binding FilterAmountSP}" Orientation="Horizontal" Grid.Column="1" Margin="10 0 0 0">
+                        <StackPanel Visibility="{Binding FilterAmountSP}" Orientation="Horizontal" Grid.Column="1">
                             <TextBlock Text="Больше"/>
                             <TextBox Text="{Binding FilterMinAmount, UpdateSourceTrigger=PropertyChanged}" Width="50"/>
                             <TextBlock Text="Меньше"/>

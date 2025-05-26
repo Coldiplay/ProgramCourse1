@@ -2,25 +2,30 @@
 using Bruh.Model.Models;
 using Bruh.View;
 using Bruh.VMTools;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
 namespace Bruh.VM
 {
-    public class CategoriesWindowVM : BaseVM
+    internal class CategoriesWindowVM : BaseVM
     {
-        public ObservableCollection<Category> Categories { get; set; } = new(DB.GetDb(typeof(CategoriesDB)).GetEntries("", []).Select(c => (Category)c));
-        public Category? SelectedCategory { get; set; }
+        private Category? selectedCategory;
 
-        public ICommand AddCategory { get; set; }
-        public ICommand DeleteCategory { get; set; }
-        public ICommand EditCategory { get; set; }
+        public ObservableCollection<Category> Categories { get; private set; } = new(DB.GetDb(typeof(CategoriesDB)).GetEntries("", []).Select(c => (Category)c));
+        public Category? SelectedCategory
+        {
+            get => selectedCategory;
+            set
+            {
+                selectedCategory = value;
+                Signal();
+            }
+        }
+
+        public ICommand AddCategory { get; private set; }
+        public ICommand DeleteCategory { get; private set; }
+        public ICommand EditCategory { get; private set; }
 
         public CategoriesWindowVM()
         { 
@@ -51,7 +56,7 @@ namespace Bruh.VM
             }, () => SelectedCategory != null);
         }
 
-        public void UpdateList()
+        private void UpdateList()
         {
             Categories = new(DB.GetDb(typeof(CategoriesDB)).GetEntries("", []).Select(c => (Category)c));
             Signal(nameof(Categories));

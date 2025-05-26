@@ -1,15 +1,13 @@
-﻿using System.Collections.ObjectModel;
-using System.Reflection;
-using System.Windows;
-using System.Windows.Input;
-using Bruh.Model.DBs;
+﻿using Bruh.Model.DBs;
 using Bruh.Model.Models;
 using Bruh.View;
 using Bruh.VMTools;
 using OxyPlot;
-using OxyPlot.Axes;
-using OxyPlot.Legends;
 using OxyPlot.Series;
+using System.Collections.ObjectModel;
+using System.Reflection;
+using System.Windows;
+using System.Windows.Input;
 
 namespace Bruh.VM
 {
@@ -51,7 +49,7 @@ namespace Bruh.VM
         public IModel? SelectedEntry
         {
             get => selectedEntry;
-            internal set
+            set
             {
                 selectedEntry = value;
                 Signal();
@@ -98,7 +96,7 @@ namespace Bruh.VM
         public string Search
         {
             get => search;
-            internal set
+            set
             {
                 search = value;
                 Signal();
@@ -116,7 +114,7 @@ namespace Bruh.VM
         public DateTime? FilterUpperDate
         {
             get => filterUpperDate;
-            internal set
+            set
             {
                 filterUpperDate = value;
                 Signal();
@@ -126,7 +124,7 @@ namespace Bruh.VM
         public DateTime? FilterLowerDate
         {
             get => filterLowerDate;
-            internal set
+            set
             {
                 filterLowerDate = value;
                 Signal();
@@ -136,7 +134,7 @@ namespace Bruh.VM
         public decimal? FilterMaxAmount
         {
             get => filterMaxAmount;
-            internal set
+            set
             {
                 filterMaxAmount = value;
                 Signal();
@@ -146,7 +144,7 @@ namespace Bruh.VM
         public decimal? FilterMinAmount
         {
             get => filterMinAmount;
-            internal set
+            set
             {
                 filterMinAmount = value;
                 Signal();
@@ -175,7 +173,7 @@ namespace Bruh.VM
         public string SelectedMode
         {
             get => selectedMode;
-            internal set
+            set
             {
                 selectedMode = value;
                 Signal();
@@ -185,7 +183,7 @@ namespace Bruh.VM
         public Category? FilterCategory
         {
             get => filterCategory;
-            internal set
+            set
             {
                 if (value == filterCategory)
                     return;
@@ -197,7 +195,7 @@ namespace Bruh.VM
         public Account? FilterAccount
         {
             get => filterAccount;
-            internal set
+            set
             {
                 if (value == filterAccount)
                     return;
@@ -220,7 +218,7 @@ namespace Bruh.VM
         public string IncomesMode
         {
             get => incomesMode;
-            internal set
+            set
             {
                 incomesMode = value;
                 Signal();
@@ -232,7 +230,7 @@ namespace Bruh.VM
         public string ExpensesMode
         {
             get => expensesMode;
-            internal set
+            set
             {
                 expensesMode = value;
                 Signal();
@@ -276,7 +274,7 @@ namespace Bruh.VM
         public bool IsSalaryNeededForNDFL
         {
             get => isSalaryNeededForNDFL;
-            internal set
+            set
             {
                 isSalaryNeededForNDFL = value;
                 Signal();
@@ -646,13 +644,13 @@ namespace Bruh.VM
         public ICommand SetAccounts { get; private set; }
         public ICommand SetToMain { get; private set; }
 
-        internal MainVM()
+        public MainVM()
         {
             IncomesMode = Ranges[4];
             ExpensesMode = Ranges[4];
 
             UpdateListsForFilter();
-            CodeOper = 6;
+            CodeOper = 5;
 
             SetOperations = new CommandVM(() => CodeOper = 0, () => true);
             SetIncomes = new CommandVM(() => CodeOper = 1, () => true);
@@ -720,7 +718,7 @@ namespace Bruh.VM
         }
 
 
-        internal Visibility FilterSP 
+        public Visibility FilterSP 
         { 
             get => filterSP; 
             private set 
@@ -729,7 +727,7 @@ namespace Bruh.VM
                 Signal(); 
             } 
         }
-        internal Visibility FilterModeSP
+        public Visibility FilterModeSP
         {
             get => filterModeSP;
             private set
@@ -738,7 +736,7 @@ namespace Bruh.VM
                 Signal();
             }
         }
-        internal Visibility FilterAmountSP
+        public Visibility FilterAmountSP
         {
             get => filterAmountSP;
             set
@@ -747,7 +745,7 @@ namespace Bruh.VM
                 Signal();
             }
         }
-        internal Visibility FilterDatesSP
+        public Visibility FilterDatesSP
         {
             get => filterDatesSP;
             private set
@@ -756,7 +754,7 @@ namespace Bruh.VM
                 Signal();
             }
         }
-        internal Visibility FilterAccountSP
+        public Visibility FilterAccountSP
         {
             get => filterAccountSP;
             private set
@@ -765,7 +763,7 @@ namespace Bruh.VM
                 Signal();
             }
         }
-        internal Visibility FilterCategorySP
+        public Visibility FilterCategorySP
         {
             get => filterCategorySP;
             private set
@@ -774,7 +772,7 @@ namespace Bruh.VM
                 Signal();
             }
         }
-        internal Visibility MiscSP
+        public Visibility MiscSP
         {
             get => miscSP;
             private set
@@ -783,7 +781,7 @@ namespace Bruh.VM
                 Signal();
             }
         }
-        internal Visibility MainSp
+        public Visibility MainSp
         {
             get => mainSp;
             private set
@@ -792,7 +790,7 @@ namespace Bruh.VM
                 Signal();
             }
         }
-        internal Visibility EntriesSp
+        public Visibility EntriesSp
         {
             get => entriesSp;
             private set
@@ -801,7 +799,7 @@ namespace Bruh.VM
                 Signal();
             }
         }
-        internal Visibility OperationsSP
+        public Visibility OperationsSP
         {
             get => operationsSP;
             private set
@@ -810,7 +808,7 @@ namespace Bruh.VM
                 Signal();
             }
         }
-        internal Visibility DebtsSP
+        public Visibility DebtsSP
         {
             get => debtsSP;
             private set
@@ -819,7 +817,7 @@ namespace Bruh.VM
                 Signal();
             }
         }
-        internal Visibility IncomesSP
+        public Visibility IncomesSP
         {
             get => incomesSP;
             private set
@@ -828,7 +826,7 @@ namespace Bruh.VM
                 Signal();
             }
         }
-        internal Visibility ExpensesSP
+        public Visibility ExpensesSP
         {
             get => expensesSP;
             private set
@@ -837,7 +835,7 @@ namespace Bruh.VM
                 Signal();
             }
         }
-        internal Visibility DepositsSP
+        public Visibility DepositsSP
         {
             get => depositsSP;
             private set
@@ -846,7 +844,7 @@ namespace Bruh.VM
                 Signal();
             }
         }
-        internal Visibility AccountsSP
+        public Visibility AccountsSP
         {
             get => accountsSP;
             private set
@@ -898,6 +896,7 @@ namespace Bruh.VM
                 case 4:
                     DepositsSP = Visibility.Visible;
                     MiscSP = Visibility.Visible;
+                    FilterSP = Visibility.Visible;
                     FilterAmountSP = Visibility.Visible;
                     FilterDatesSP = Visibility.Visible;
                     FilterModeSP = Visibility.Visible;
@@ -906,9 +905,9 @@ namespace Bruh.VM
                     break;
 
                 case 5:
-                    ClearFilter();
                     MiscSP = Visibility.Visible;
                     AccountsSP = Visibility.Visible;
+                    FilterSP = Visibility.Visible;
                     FilterAmountSP = Visibility.Visible;
                     TitleOfList = "Счета";
                     Accounts = new(DB.GetDb(typeof(AccountsDB)).GetEntries(Search, Filter).Select(a => (Account)a).OrderByDescending(a => a.Title));
@@ -970,13 +969,18 @@ namespace Bruh.VM
         {
             Filter.Clear();
             filterLowerDate = null;
-            
+            Signal(nameof(FilterLowerDate));
             filterUpperDate = null;
+            Signal(nameof(FilterUpperDate));
             filterMinAmount = null;
+            Signal(nameof(FilterMinAmount));
             filterMaxAmount = null;
+            Signal(nameof(FilterMaxAmount));
             filterCategory = null;
-            filterAccount = null;
             Signal(nameof(FilterCategory));
+            filterAccount = null;
+            Signal(nameof(FilterAccount));
+            UpdateFilter();
         }
         private void HideAllSps()
         {

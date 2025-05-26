@@ -48,7 +48,7 @@ namespace Bruh.Model.Models
                 SignalAll();
             }
         }
-        public DateTime DateOfReturn { get; set; } = DateTime.Today.AddDays(1);
+        public DateTime DateOfReturn { get; set; } = DateTime.Today;
 
         //
         public Currency Currency { get; set; }
@@ -68,7 +68,7 @@ namespace Bruh.Model.Models
         public byte Code
         {
             get => code;
-            set
+            internal set
             {
                 code = value;
                 Duration = code switch
@@ -121,7 +121,7 @@ namespace Bruh.Model.Models
             Signal(nameof(GetMonths));
             Signal(nameof(DateOfReturn));
         }
-        public void ChangeCloseDate(int duration, byte code)
+        internal void ChangeCloseDate(int duration, byte code)
         {
             try
             {
@@ -140,7 +140,7 @@ namespace Bruh.Model.Models
                 Duration = 0;
             }
         }
-        public void SetCode()
+        internal void SetCode()
         {
             DateTime help = DateOfReturn;
             Code = 1;

@@ -15,6 +15,7 @@ namespace Bruh.VM
         private byte hours;
         private byte minutes;
         private bool changeCorrespondingEntries;
+        private Visibility forExpense;
 
         public IModel? Entry
         {
@@ -28,7 +29,7 @@ namespace Bruh.VM
         public bool ChangeCorrespondingEntries
         {
             get => changeCorrespondingEntries;
-            internal set
+            set
             {
                 changeCorrespondingEntries = value;
                 Signal();
@@ -43,7 +44,7 @@ namespace Bruh.VM
                 Signal();
             }
         }
-        internal byte Hours
+        public byte Hours
         {
             get => hours;
             set
@@ -52,7 +53,7 @@ namespace Bruh.VM
                 Signal();
             }
         }
-        internal byte Minutes
+        public byte Minutes
         {
             get => minutes;
             set
@@ -69,11 +70,21 @@ namespace Bruh.VM
         public List<Debt> Debts { get; private set; } = [.. DB.GetDb(typeof(DebtsDB)).GetEntries("", []).Select(d => (Debt)d)];
         public List<PeriodicityOfPayment> PeriodicitiesOfPayment { get; private set; } = [.. DB.GetDb(typeof(PeriodicitiesOfPaymentDB)).GetEntries("", []).Select(c => (PeriodicityOfPayment)c)];
 
-        internal ICommand Save { get; private set; }
-        internal ICommand Cancel { get; private set; }
-        internal ICommand ChangeDurationType { get; private set; }
+        public ICommand Save { get; private set; }
+        public ICommand Cancel { get; private set; }
+        public ICommand ChangeDurationType { get; private set; }
 
-        internal EditWindowVM()
+        public Visibility ForIncome
+        {
+            get => forExpense;
+            private set
+            {
+                forExpense = value;
+                Signal();
+            }
+        }
+
+        public EditWindowVM()
         {
             Save = new CommandVM(() =>
             {
@@ -145,13 +156,14 @@ namespace Bruh.VM
 
                 case Operation operation:
                     Debts.Insert(0, new Debt { ID = 0, Title = "Нет" });
+                    ForIncome = operation.Income ? Visibility.Visible : Visibility.Collapsed;
+                    Minutes = (byte)operation.TransactDate.Minute;
+                    Hours = (byte)operation.TransactDate.Hour;
                     if (operation.ID == 0)
                         break;
                     operation.Account = Accounts.First(a => a.ID == operation.AccountID);
                     operation.Category = Categories.First(c => c.ID == operation.CategoryID);
                     operation.Debt = Debts.FirstOrDefault(d => d.ID == operation.DebtID);
-                    Minutes = (byte)operation.TransactDate.Minute;
-                    Hours = (byte)operation.TransactDate.Hour;
                     break;
 
                 case Debt debt:

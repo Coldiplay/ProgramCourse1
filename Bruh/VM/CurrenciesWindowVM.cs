@@ -8,11 +8,11 @@ using System.Windows.Input;
 
 namespace Bruh.VM
 {
-    public class CurrenciesWindowVM : BaseVM
+    internal class CurrenciesWindowVM : BaseVM
     {
         private Currency? selectedCurrency;
 
-        public ObservableCollection<Currency> Currencies { get; set; } = new(DB.GetDb(typeof(CurrencyDB)).GetEntries("", []).Select(c => (Currency)c));
+        public ObservableCollection<Currency> Currencies { get; private set; } = new(DB.GetDb(typeof(CurrencyDB)).GetEntries("", []).Select(c => (Currency)c));
         public Currency? SelectedCurrency
         {
             get => selectedCurrency;
@@ -23,9 +23,9 @@ namespace Bruh.VM
             }
         }
 
-        public ICommand AddCurrency { get; set; }
-        public ICommand DeleteCurrency { get; set; }
-        public ICommand EditCurrency { get; set; }
+        public ICommand AddCurrency { get; private set; }
+        public ICommand DeleteCurrency { get; private set; }
+        public ICommand EditCurrency { get; private set; }
 
         public CurrenciesWindowVM()
         {
@@ -55,7 +55,7 @@ namespace Bruh.VM
             }, () => SelectedCurrency != null);
         }
 
-        public void UpdateList()
+        private void UpdateList()
         {
             Currencies = new(DB.GetDb(typeof(CurrencyDB)).GetEntries("", []).Select(c => (Currency)c));
             Signal(nameof(Currencies));

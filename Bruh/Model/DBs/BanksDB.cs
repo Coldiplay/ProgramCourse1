@@ -6,7 +6,7 @@ using System.Windows;
 
 namespace Bruh.Model.DBs
 {
-    public class BanksDB : ISampleDB
+    internal class BanksDB : ISampleDB
     {
         public List<IModel> GetEntries(string search, List<string> filter)
         {

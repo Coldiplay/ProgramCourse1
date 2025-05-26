@@ -2,22 +2,17 @@
 using Bruh.Model.Models;
 using Bruh.View;
 using Bruh.VMTools;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
 using System.Windows;
+using System.Windows.Input;
 
 namespace Bruh.VM
 {
-    public class BanksWindowVM : BaseVM
+    internal class BanksWindowVM : BaseVM
     {
         private Bank? selectedBank;
 
-        public ObservableCollection<Bank> Banks { get; set; } = new(DB.GetDb(typeof(BanksDB)).GetEntries("", []).Select(b => (Bank)b));
+        public ObservableCollection<Bank> Banks { get; private set; } = new(DB.GetDb(typeof(BanksDB)).GetEntries("", []).Select(b => (Bank)b));
         public Bank? SelectedBank
         {
             get => selectedBank;
@@ -28,9 +23,9 @@ namespace Bruh.VM
             }
         }
 
-        public ICommand AddBank { get; set; }
-        public ICommand DeleteBank { get; set; }
-        public ICommand EditBank { get; set; }
+        public ICommand AddBank { get; private set; }
+        public ICommand DeleteBank { get; private set; }
+        public ICommand EditBank { get; private set; }
 
         public BanksWindowVM()
         {
@@ -60,7 +55,7 @@ namespace Bruh.VM
             }, () => SelectedBank != null);
         }
 
-        public void UpdateList()
+        private void UpdateList()
         {
             Banks = new(DB.GetDb(typeof(BanksDB)).GetEntries("", []).Select(b => (Bank)b));
             Signal(nameof(Banks));

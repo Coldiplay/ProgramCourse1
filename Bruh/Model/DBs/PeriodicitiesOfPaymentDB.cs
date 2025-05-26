@@ -1,14 +1,9 @@
 ﻿using Bruh.Model.Models;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Bruh.Model.DBs
 {
-    public class PeriodicitiesOfPaymentDB : ISampleDB
+    internal class PeriodicitiesOfPaymentDB : ISampleDB
     {
         public List<IModel> GetEntries(string search, List<string> filter)
         {
