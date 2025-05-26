@@ -26,6 +26,25 @@ namespace Bruh.VM
                 Signal();
             }
         }
+        public bool Income
+        {
+            get => (Entry as Operation).Income;
+            set
+            {
+                ((Operation?)Entry).Income = value;
+                ForIncome = ((Operation)Entry).Income ? Visibility.Visible : Visibility.Collapsed;
+                Signal();
+            }
+        }
+        public bool Expense 
+        {
+            get => !Income;
+            set
+            {
+                Income = !value;
+                Signal();
+            }
+        }
         public bool ChangeCorrespondingEntries
         {
             get => changeCorrespondingEntries;
@@ -156,9 +175,9 @@ namespace Bruh.VM
 
                 case Operation operation:
                     Debts.Insert(0, new Debt { ID = 0, Title = "Нет" });
-                    ForIncome = operation.Income ? Visibility.Visible : Visibility.Collapsed;
                     Minutes = (byte)operation.TransactDate.Minute;
                     Hours = (byte)operation.TransactDate.Hour;
+                    ForIncome = operation.Income ? Visibility.Visible : Visibility.Collapsed;
                     if (operation.ID == 0)
                         break;
                     operation.Account = Accounts.First(a => a.ID == operation.AccountID);

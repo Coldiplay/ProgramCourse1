@@ -31,8 +31,8 @@
                 <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBlock Text="Категория"/>
                 <ComboBox ItemsSource="{Binding DataContext.Categories, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" SelectedItem="{Binding Category, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Title"/>
-                <RadioButton IsChecked="{Binding Income, UpdateSourceTrigger=PropertyChanged}" Content="Доход"/>
-                <RadioButton Content="Расход" IsChecked="{Binding IsExpense}"/>
+                <RadioButton IsChecked="{Binding DataContext.Income, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, UpdateSourceTrigger=PropertyChanged}" Content="Доход"/>
+                <RadioButton Content="Расход" IsChecked="{Binding DataContext.Expense, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
                 <TextBlock Text="Сумма операции"/>
                 <TextBox Text="{Binding Cost, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBlock Text="Дата выполнения операции"/>
