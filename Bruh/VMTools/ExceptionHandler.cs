@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 
 namespace Bruh.VMTools
 {
-    public static class ExeptionHandler
+    public static class ExceptionHandler
     {
         public static bool Try(Action action)
         {

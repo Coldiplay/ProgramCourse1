@@ -58,7 +58,7 @@ namespace Bruh.Model.DBs
 
             if (_connection?.State == System.Data.ConnectionState.Open)
                 return true;
-            return ExeptionHandler.Try(_connection.Open);
+            return ExceptionHandler.Try(_connection.Open);
         }
 
         internal void CloseConnection()
@@ -66,7 +66,7 @@ namespace Bruh.Model.DBs
             if (_connection == null || _connection.State == System.Data.ConnectionState.Closed)
                 return;
 
-            ExeptionHandler.Try(_connection.Close);
+            ExceptionHandler.Try(_connection.Close);
         }
 
         internal MySqlCommand CreateCommand(string sql)

@@ -25,7 +25,7 @@ namespace Bruh.Model.DBs
                 cmd.Parameters.Add(new MySqlParameter("search", $"%{search}%"));
 
                 DbConnection.GetDbConnection().OpenConnection();
-                ExeptionHandler.Try(() =>
+                ExceptionHandler.Try(() =>
                 {
                     using (MySqlDataReader dr = cmd.ExecuteReader())
                     {
@@ -53,7 +53,7 @@ namespace Bruh.Model.DBs
                 using (var cmd2 = DbConnection.GetDbConnection().CreateCommand($"SELECT `Cost` FROM `Operations` WHERE `DebtID`={debt.ID} AND `Income`=0;"))
                 {
                     DbConnection.GetDbConnection().OpenConnection();
-                    ExeptionHandler.Try(() =>
+                    ExceptionHandler.Try(() =>
                     {
                         using (var dr = cmd2.ExecuteReader())
                         {
@@ -107,7 +107,7 @@ namespace Bruh.Model.DBs
             using (var cmd2 = DbConnection.GetDbConnection().CreateCommand($"SELECT `Cost` FROM `Operations` WHERE `DebtID`={debt.ID} AND `Income`=0;"))
             {
                 DbConnection.GetDbConnection().OpenConnection();
-                ExeptionHandler.Try(() =>
+                ExceptionHandler.Try(() =>
                 {
                     using (var dr = cmd2.ExecuteReader())
                     {
@@ -144,7 +144,7 @@ namespace Bruh.Model.DBs
                 cmd.Parameters.Add(new MySqlParameter("currencyId", debt.CurrencyID));
 
                 DbConnection.GetDbConnection().OpenConnection();
-                ExeptionHandler.Try(() =>
+                ExceptionHandler.Try(() =>
                 {
                     int? id = (int?)(ulong?)cmd.ExecuteScalar();
                     if (id > 0)
@@ -173,7 +173,7 @@ namespace Bruh.Model.DBs
             using (var cmd = DbConnection.GetDbConnection().CreateCommand($"DELETE FROM `Debts` WHERE ID = {debt.ID}"))
             {
                 DbConnection.GetDbConnection().OpenConnection();
-                ExeptionHandler.Try(() =>
+                ExceptionHandler.Try(() =>
                 {
                     cmd.ExecuteNonQuery();
                     result = true;
@@ -202,7 +202,7 @@ namespace Bruh.Model.DBs
                 cmd.Parameters.Add(new MySqlParameter("currencyId", debt.CurrencyID));
 
                 DbConnection.GetDbConnection().OpenConnection();
-                ExeptionHandler.Try(() =>
+                ExceptionHandler.Try(() =>
                 {
                     cmd.ExecuteNonQuery();
                     result = true;

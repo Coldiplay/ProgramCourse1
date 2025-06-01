@@ -17,7 +17,7 @@ namespace Bruh.Model.DBs
             using (var cmd = DbConnection.GetDbConnection().CreateCommand("SELECT `ID`, `Title` FROM `Categories`;"))
             {
                 DbConnection.GetDbConnection().OpenConnection();
-                ExeptionHandler.Try(() =>
+                ExceptionHandler.Try(() =>
                 {
                     using (MySqlDataReader dr = cmd.ExecuteReader())
                     {
@@ -75,7 +75,7 @@ namespace Bruh.Model.DBs
                 cmd.Parameters.Add(new MySqlParameter("title", category.Title));
 
                 DbConnection.GetDbConnection().OpenConnection();
-                ExeptionHandler.Try(() =>
+                ExceptionHandler.Try(() =>
                 {
                     int? id = (int?)(ulong?)cmd.ExecuteScalar();
                     if (id > 0)
@@ -106,7 +106,7 @@ namespace Bruh.Model.DBs
             using (var cmd1 = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID` FROM `Operations` WHERE `CategoryID` = {category.ID}"))
             {
                 DbConnection.GetDbConnection().OpenConnection();
-                ExeptionHandler.Try(() => IsBad = (int?)cmd1.ExecuteScalar() != null);
+                ExceptionHandler.Try(() => IsBad = (int?)cmd1.ExecuteScalar() != null);
                 DbConnection.GetDbConnection().CloseConnection();
             }
             if (IsBad)
@@ -119,7 +119,7 @@ namespace Bruh.Model.DBs
             using (var cmd3 = DbConnection.GetDbConnection().CreateCommand($"DELETE FROM `Categories` WHERE ID = {category.ID}"))
             {
                 DbConnection.GetDbConnection().OpenConnection();
-                ExeptionHandler.Try(() =>
+                ExceptionHandler.Try(() =>
                 {
                     cmd3.ExecuteNonQuery();
                     result = true;
@@ -141,7 +141,7 @@ namespace Bruh.Model.DBs
                 cmd.Parameters.Add(new MySqlParameter("title", category.Title));
 
                 DbConnection.GetDbConnection().OpenConnection();
-                ExeptionHandler.Try(() =>
+                ExceptionHandler.Try(() =>
                 {
                     cmd.ExecuteNonQuery();
                     result = true;

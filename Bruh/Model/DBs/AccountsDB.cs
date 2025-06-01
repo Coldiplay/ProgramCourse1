@@ -26,7 +26,7 @@ namespace Bruh.Model.DBs
                     cmd.Parameters.Add(new MySqlParameter("search", $"%{search}%"));
 
                 DbConnection.GetDbConnection().OpenConnection();
-                ExeptionHandler.Try(() =>
+                ExceptionHandler.Try(() =>
                 {
                     using (MySqlDataReader dr = cmd.ExecuteReader())
                     {
@@ -107,7 +107,7 @@ namespace Bruh.Model.DBs
                 cmd.Parameters.Add(new MySqlParameter("bankId", account.BankID));
 
                 DbConnection.GetDbConnection().OpenConnection();
-                ExeptionHandler.Try(() =>
+                ExceptionHandler.Try(() =>
                 {
                     int? id = (int?)(ulong?)cmd.ExecuteScalar();
                     if (id > 0)
@@ -135,7 +135,7 @@ namespace Bruh.Model.DBs
             using (var cmd = DbConnection.GetDbConnection().CreateCommand($"DELETE FROM `Accounts` WHERE ID = {account.ID}"))
             {
                 DbConnection.GetDbConnection().OpenConnection();
-                ExeptionHandler.Try(() =>
+                ExceptionHandler.Try(() =>
                 {
                     cmd.ExecuteNonQuery();
                     result = true;
@@ -163,7 +163,7 @@ namespace Bruh.Model.DBs
                 cmd.Parameters.Add(new MySqlParameter("bankID", account.BankID));
 
                 DbConnection.GetDbConnection().OpenConnection();
-                ExeptionHandler.Try(() =>
+                ExceptionHandler.Try(() =>
                 {
                     cmd.ExecuteNonQuery();
                     result = true;
