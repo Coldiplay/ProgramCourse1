@@ -82,7 +82,6 @@ namespace Bruh.VM
             }
         }
 
-        public List<Currency> Currencies { get; private set; } = [.. DB.GetDb(typeof(CurrencyDB)).GetEntries("", []).Select(c => (Currency)c)];
         public List<Bank> Banks { get; private set; } = [.. DB.GetDb(typeof(BanksDB)).GetEntries("", []).Select(b => (Bank)b)];
         public List<Account> Accounts { get; private set; } = [.. DB.GetDb(typeof(AccountsDB)).GetEntries("", []).Select(a => (Account)a)];
         public List<Category> Categories { get; private set; } = [.. DB.GetDb(typeof(CategoriesDB)).GetEntries("", []).Select(c => (Category)c)];
@@ -169,8 +168,6 @@ namespace Bruh.VM
                     Banks.Insert(0 ,new Bank { ID = 0, Title = "Без привязки к банку" });
                     if (account.ID == 0)
                         break;
-                    account.Currency = Currencies.First(c => c.ID == account.CurrencyID);
-                    account.Bank = Banks.First(b => b.ID == account.CurrencyID);
                     break;
 
                 case Operation operation:
@@ -189,7 +186,6 @@ namespace Bruh.VM
                     SetDurationType(debt.Code);
                     if (debt.ID == 0)
                         break;
-                    debt.Currency = Currencies.First(c => c.ID == debt.CurrencyID);
                     break;
 
                 case Deposit deposit:
@@ -198,7 +194,6 @@ namespace Bruh.VM
                         break;
                     deposit.Bank = Banks.First(b => b.ID == deposit.BankID);
                     deposit.PeriodicityOfPayment = PeriodicitiesOfPayment.First(p => p.ID == deposit.PeriodicityOfPaymentID);
-                    deposit.Currency = Currencies.First(c => c.ID == deposit.CurrencyID);
                     break;
 
                 case null:

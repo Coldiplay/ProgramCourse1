@@ -1,5 +1,4 @@
-﻿
-namespace Bruh.Model.Models
+﻿namespace Bruh.Model.Models
 {
     internal class DBContextAttribute : Attribute
     {

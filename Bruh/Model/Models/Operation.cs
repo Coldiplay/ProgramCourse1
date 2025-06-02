@@ -46,7 +46,7 @@ namespace Bruh.Model.Models
                 Income = !value;
             }
         }
-        public string GetCost => $"{Cost} {Account?.Currency?.Symbol}";
+        public string GetCost => $"{Cost} ₽";
         public string IsIncome => Income ? "Доход" : "Расход";
 
         public bool AllFieldsAreCorrect => !(Category == null || string.IsNullOrWhiteSpace(Title) || Cost <= 0 || Account == null);

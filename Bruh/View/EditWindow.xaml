@@ -64,14 +64,6 @@
                 <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"/>
             </StackPanel>
         </DataTemplate>
-        <DataTemplate DataType="{x:Type model:Currency}">
-            <StackPanel>
-                <TextBlock Text="Название валюты"/>
-                <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"/>
-                <TextBlock Text="Знак валюты"/>
-                <TextBox Text="{Binding Symbol, UpdateSourceTrigger=PropertyChanged}" MaxLength="1"/>
-                </StackPanel>
-        </DataTemplate>
         <DataTemplate DataType="{x:Type model:Debt}">
             <StackPanel>
                 <TextBlock Text="Название долга"/>

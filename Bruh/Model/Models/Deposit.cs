@@ -69,11 +69,9 @@ namespace Bruh.Model.Models
         }
         public int PeriodicityOfPaymentID { get; set; }
         public int BankID { get; set; }
-        public int CurrencyID { get; set; }
 
         //
         public Bank Bank { get; set; }
-        public Currency Currency { get; set; }
         public PeriodicityOfPayment PeriodicityOfPayment { get; set; }
         //
         public byte Code
@@ -107,7 +105,7 @@ namespace Bruh.Model.Models
         public string GetCurrentSumm => GetProbableSumm(OpenDate, DateTime.Today, Capitalization);
         public string GetProbSumm => GetProbableSumm(OpenDate, CloseDate, Capitalization);
 
-        public bool AllFieldsAreCorrect => !(Currency == null || Bank == null || CloseDate <= OpenDate || PeriodicityOfPayment == null || string.IsNullOrWhiteSpace(Title) || InitalSumm <= 0 || InterestRate <= 0);
+        public bool AllFieldsAreCorrect => !(Bank == null || CloseDate <= OpenDate || PeriodicityOfPayment == null || string.IsNullOrWhiteSpace(Title) || InitalSumm <= 0 || InterestRate <= 0);
 
         internal void ChangeCloseDate(int duration, byte code)
         {

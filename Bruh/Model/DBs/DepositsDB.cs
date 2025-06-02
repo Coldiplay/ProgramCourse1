@@ -20,7 +20,7 @@ namespace Bruh.Model.DBs
                 if (!string.IsNullOrEmpty(f))
                     filter = $"{filter} AND {f}";
             });
-            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID`, `Title`, `InitalSumm`, `DateOfOpening`, `DateOfClosing`, `Capitalization`, `InterestRate`, `PeriodicityOfPaymentID`, `BankID`, `CurrencyID` FROM `Deposits` WHERE (`Title` LIKE @search OR `InitalSumm` LIKE @search OR `DateOfOpening` LIKE @search OR `DateOfClosing` LIKE @search) {filter}"))
+            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID`, `Title`, `InitalSumm`, `DateOfOpening`, `DateOfClosing`, `Capitalization`, `InterestRate`, `PeriodicityOfPaymentID`, `BankID` FROM `Deposits` WHERE (`Title` LIKE @search OR `InitalSumm` LIKE @search OR `DateOfOpening` LIKE @search OR `DateOfClosing` LIKE @search) {filter}"))
             {
                 cmd.Parameters.Add(new MySqlParameter("search", $"%{search}%"));
 
@@ -41,8 +41,7 @@ namespace Bruh.Model.DBs
                                 Capitalization = dr.GetBoolean("Capitalization"),
                                 InterestRate = dr.GetInt32("InterestRate"),
                                 PeriodicityOfPaymentID = dr.GetInt32("PeriodicityOfPaymentID"),
-                                BankID = dr.GetInt32("BankID"),
-                                CurrencyID = dr.GetInt32("CurrencyID")
+                                BankID = dr.GetInt32("BankID")
                             });
                         }
                     }
@@ -53,7 +52,6 @@ namespace Bruh.Model.DBs
             {
                 Deposit deposit = (Deposit)depos;
                 deposit.Bank = (Bank)DB.GetDb(typeof(BanksDB)).GetSingleEntry(deposit.BankID);
-                deposit.Currency = (Currency)DB.GetDb(typeof(CurrencyDB)).GetSingleEntry(deposit.CurrencyID);
                 deposit.PeriodicityOfPayment = (PeriodicityOfPayment)DB.GetDb(typeof(PeriodicitiesOfPaymentDB)).GetSingleEntry(deposit.PeriodicityOfPaymentID);
 
                 deposit.SetCodeForChangeInPeriodicity();
@@ -67,7 +65,7 @@ namespace Bruh.Model.DBs
             if (DbConnection.GetDbConnection() == null)
                 return deposit;
 
-            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID`, `Title`, `InitalSumm`, `DateOfOpening`, `DateOfClosing`, `Capitalization`, `InterestRate`, `PeriodicityOfPaymentID`, `BankID`, `CurrencyID` FROM `Deposits` WHERE `ID` = {id}"))
+            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID`, `Title`, `InitalSumm`, `DateOfOpening`, `DateOfClosing`, `Capitalization`, `InterestRate`, `PeriodicityOfPaymentID`, `BankID` FROM `Deposits` WHERE `ID` = {id}"))
             {
                 DbConnection.GetDbConnection().OpenConnection();
                 using (var dr = cmd.ExecuteReader())
@@ -87,7 +85,6 @@ namespace Bruh.Model.DBs
                             deposit.InterestRate = dr.GetInt32("InterestRate");
                             deposit.PeriodicityOfPaymentID = dr.GetInt32("PeriodicityOfPaymentID");
                             deposit.BankID = dr.GetInt32("BankID");
-                            deposit.CurrencyID = dr.GetInt32("CurrencyID");
                         }    
                     }
                 }
@@ -95,7 +92,6 @@ namespace Bruh.Model.DBs
             }
 
             deposit.Bank = (Bank)DB.GetDb(typeof(BanksDB)).GetSingleEntry(deposit.BankID);
-            deposit.Currency = (Currency)DB.GetDb(typeof(CurrencyDB)).GetSingleEntry(deposit.CurrencyID);
             deposit.PeriodicityOfPayment = (PeriodicityOfPayment)DB.GetDb(typeof(PeriodicitiesOfPaymentDB)).GetSingleEntry(deposit.PeriodicityOfPaymentID);
             deposit.SetCodeForChangeInPeriodicity();
             return deposit;
@@ -108,10 +104,9 @@ namespace Bruh.Model.DBs
             if (DbConnection.GetDbConnection() == null)
                 return result;
 
-            deposit.CurrencyID = deposit.Currency.ID;
             deposit.BankID = deposit.Bank.ID;
             deposit.PeriodicityOfPaymentID = deposit.PeriodicityOfPayment.ID;
-            using (MySqlCommand cmd = DbConnection.GetDbConnection().CreateCommand("INSERT INTO `Deposits` VALUES(0, @title, @initalSumm, @dateOfOpening, @dateOfClosing, @capitalization, @interestRate, @periodicityOfPaymentId, @bankID, @currencyId); SELECT LAST_INSERT_ID();"))
+            using (MySqlCommand cmd = DbConnection.GetDbConnection().CreateCommand("INSERT INTO `Deposits` VALUES(0, @title, @initalSumm, @dateOfOpening, @dateOfClosing, @capitalization, @interestRate, @periodicityOfPaymentId, @bankID); SELECT LAST_INSERT_ID();"))
             {
                 cmd.Parameters.Add(new MySqlParameter("title", deposit.Title));
                 cmd.Parameters.Add(new MySqlParameter("initalSumm", deposit.InitalSumm));
@@ -121,7 +116,6 @@ namespace Bruh.Model.DBs
                 cmd.Parameters.Add(new MySqlParameter("interestRate", deposit.InterestRate));
                 cmd.Parameters.Add(new MySqlParameter("periodicityOfPaymentId", deposit.PeriodicityOfPaymentID));
                 cmd.Parameters.Add(new MySqlParameter("bankID", deposit.BankID));
-                cmd.Parameters.Add(new MySqlParameter("currencyId", deposit.CurrencyID));
 
                 DbConnection.GetDbConnection().OpenConnection();
                 ExceptionHandler.Try(() =>
@@ -170,10 +164,9 @@ namespace Bruh.Model.DBs
             if (DbConnection.GetDbConnection() == null)
                 return result;
 
-            deposit.CurrencyID = deposit.Currency.ID;
             deposit.BankID = deposit.Bank.ID;
             deposit.PeriodicityOfPaymentID = deposit.PeriodicityOfPayment.ID;
-            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"UPDATE `Deposits` set `Title`=@title, `InitalSumm`=@initalSumm, `DateOfOpening`=@dateOfOpening, `DateOfClosing`=@dateOfClosing, `Capitalization`=@capitalization, `InterestRate`=@interestRate, `PeriodicityOfPaymentID`=@periodicityOfPaymentId, `BankID`=@bankId, `CurrencyID`=@currencyId WHERE `ID`={deposit.ID};"))
+            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"UPDATE `Deposits` set `Title`=@title, `InitalSumm`=@initalSumm, `DateOfOpening`=@dateOfOpening, `DateOfClosing`=@dateOfClosing, `Capitalization`=@capitalization, `InterestRate`=@interestRate, `PeriodicityOfPaymentID`=@periodicityOfPaymentId, `BankID`=@bankId, WHERE `ID`={deposit.ID};"))
             {
                 cmd.Parameters.Add(new MySqlParameter("title", deposit.Title));
                 cmd.Parameters.Add(new MySqlParameter("initalSumm", deposit.InitalSumm));
@@ -183,7 +176,6 @@ namespace Bruh.Model.DBs
                 cmd.Parameters.Add(new MySqlParameter("interestRate", deposit.InterestRate));
                 cmd.Parameters.Add(new MySqlParameter("periodicityOfPaymentId", deposit.PeriodicityOfPaymentID));
                 cmd.Parameters.Add(new MySqlParameter("bankID", deposit.BankID));
-                cmd.Parameters.Add(new MySqlParameter("currencyId", deposit.CurrencyID));
 
                 DbConnection.GetDbConnection().OpenConnection();
                 ExceptionHandler.Try(() =>

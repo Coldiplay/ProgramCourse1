@@ -120,7 +120,6 @@
             <Button Content="Счета" Style="{DynamicResource MainMenuButton}" Command="{Binding SetAccounts}"/>
             <Button Content="Категории" Style="{DynamicResource MainMenuButton}" Command="{Binding OpenCategories}"/>
             <Button Content="Банки" Style="{DynamicResource MainMenuButton}" Command="{Binding OpenBanks}"/>
-            <Button Content="Валюты" Style="{DynamicResource MainMenuButton}" Command="{Binding OpenCurrencies}"/>
         </StackPanel>
 
         <Grid Grid.Column="1">
@@ -196,8 +195,8 @@
                         <ListView.View>
                             <GridView>
                                 <GridViewColumn Header="Название" DisplayMemberBinding="{Binding Title}"/>
-                                <GridViewColumn Header="Сумма вклада" DisplayMemberBinding="{Binding InitalSumm}"/>
-                                <GridViewColumn Header="Сумма на данный момент" DisplayMemberBinding="{Binding GetCurrentSumm}"/>
+                                <GridViewColumn Header="Сумма вклада" DisplayMemberBinding="{Binding InitalSumm, StringFormat={}{0} ₽}"/>
+                                <GridViewColumn Header="Сумма на данный момент" DisplayMemberBinding="{Binding GetCurrentSumm, StringFormat={}{0} ₽}"/>
                                 <GridViewColumn Header="Ставка" DisplayMemberBinding="{Binding InterestRate, StringFormat={}{0}%}"/>
                                 <GridViewColumn Header="Периодичность выплат" DisplayMemberBinding="{Binding PeriodicityOfPayment.Name}"/>
                                 <GridViewColumn Header="Капитализация">
@@ -218,7 +217,7 @@
                         <ListView.View>
                             <GridView>
                                 <GridViewColumn Header="Название" DisplayMemberBinding="{Binding Title}"/>
-                                <GridViewColumn Header="Баланс" DisplayMemberBinding="{Binding Balance}"/>
+                                <GridViewColumn Header="Баланс" DisplayMemberBinding="{Binding Balance, StringFormat={}{0} ₽}"/>
                                 <GridViewColumn Header="Банк" DisplayMemberBinding="{Binding Bank.Title}"/>
                             </GridView>
                         </ListView.View>

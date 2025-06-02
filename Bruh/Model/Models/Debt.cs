@@ -35,7 +35,6 @@ namespace Bruh.Model.Models
                 SignalAll();
             }
         }
-        public int CurrencyID { get; set; }
         public string? Title { get; set; }
         public DateTime DateOfPick
         {
@@ -50,8 +49,6 @@ namespace Bruh.Model.Models
         }
         public DateTime DateOfReturn { get; set; } = DateTime.Today;
 
-        //
-        public Currency Currency { get; set; }
         //
         public decimal PaidSumm { get; set; }
         public int Duration
@@ -94,10 +91,10 @@ namespace Bruh.Model.Models
                     decimal rate = (decimal)AnnualInterest / 12 / 100;
                     decimal help = (decimal)(Math.Pow(1 + (double)rate, GetMonths) - (double)1);
                     if (help <= 0)
-                        return $"0 {Currency?.Symbol}";
+                        return $"0 ₽";
                     rate += rate / help;
                     approximateMonthlyPayment = Summ * rate;
-                    return $"{Math.Round(approximateMonthlyPayment, MidpointRounding.ToEven)} {Currency?.Symbol}";
+                    return $"{Math.Round(approximateMonthlyPayment, MidpointRounding.ToEven)} ₽";
                 }
                 catch (OverflowException)
                 {
@@ -108,9 +105,9 @@ namespace Bruh.Model.Models
                 return "Ошибка в вычислениях";
             }
         }
-        public string GetApproximateFullSumm => decimal.TryParse(GetApproximateMonthlyPayment[..^1], out decimal result) ? $"{result * GetMonths} {Currency?.Symbol}" : "Ошибка в вычислениях";
-        public string GetSumm => $"{Summ} {Currency?.Symbol}";
-        public string GetPaidSumm => $"{PaidSumm} {Currency?.Symbol}";
+        public string GetApproximateFullSumm => decimal.TryParse(GetApproximateMonthlyPayment[..^1], out decimal result) ? $"{result * GetMonths} ₽" : "Ошибка в вычислениях";
+        public string GetSumm => $"{Summ} ₽";
+        public string GetPaidSumm => $"{PaidSumm} ₽";
 
         private int GetMonths => ((DateOfReturn.Year - DateOfPick.Year) * 12) + (DateOfReturn.Month - DateOfPick.Month) - (DateOfReturn.Day < DateOfPick.Day ? 1 : 0);
 
@@ -148,6 +145,6 @@ namespace Bruh.Model.Models
             DateOfReturn = help;
         }
 
-        public bool AllFieldsAreCorrect => !(DateOfPick >= DateOfReturn || Currency == null || Summ <= 0);
+        public bool AllFieldsAreCorrect => !(DateOfPick >= DateOfReturn || Summ <= 0);
     }
 }

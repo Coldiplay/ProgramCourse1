@@ -114,7 +114,7 @@ namespace Bruh.Model.DBs
             // Проверка на наличие нужной суммы на счету при добавлении расхода
             if (changeCorrespondingEntries && !operation.Income && GetBalance(operation.AccountID) < operation.Cost)
             {
-                MessageBox.Show("На счету недостаточно средств для операции", "", MessageBoxButton.OK);
+                MessageBox.Show("На счету недостаточно средств для осуществления операции", "", MessageBoxButton.OK);
                 return true;
             }
 
@@ -148,7 +148,7 @@ namespace Bruh.Model.DBs
 
             if (changeCorrespondingEntries)
             {
-                ChangeSummOnAccount(operation.AccountID, operation.Income , 0, operation.Cost);
+                ChangeSummOnAccount(operation.AccountID, operation.Income, operation.Income, 0, operation.Cost);
             }
             return result;
         }
@@ -173,10 +173,10 @@ namespace Bruh.Model.DBs
 
             if (changeCorrespondingEntries)
             {
-                if (operation.Income && GetBalance(operation.AccountID) - operation.Cost < 0)
+                if (operation.Income && GetBalance(operation.AccountID) < operation.Cost)
                     MessageBox.Show("На счету недостаточно средств для изменения баланса. Баланс счёта останется не тронутым", "", MessageBoxButton.OK);
                 else
-                    ChangeSummOnAccount(operation.AccountID, operation.Income, operation.Cost, 0);
+                    ChangeSummOnAccount(operation.AccountID, operation.Income, operation.Income, operation.Cost, 0);
             }
 
             return result;
@@ -193,6 +193,7 @@ namespace Bruh.Model.DBs
             {
                 decimal cost = 0;
                 bool income = operation.Income;
+                bool _continue = true;
                 using (var cmd2 = DbConnection.GetDbConnection().CreateCommand("SELECT `Cost`, `Income` FROM `Operations` WHERE `ID`=@id"))
                 {
                     cmd2.Parameters.Add(new MySqlParameter("id", operation.ID));
@@ -208,9 +209,12 @@ namespace Bruh.Model.DBs
                     DbConnection.GetDbConnection().CloseConnection();
                 }
                 if (operation.Account.ID > 0 && operation.AccountID != operation.Account.ID)
-                    ChangeSummOnAccount(operation.AccountID, operation.Account.ID, operation.Income, cost , income == operation.Income ? operation.Cost : -operation.Cost);
+                    _continue = ChangeSummOnAccount(operation.AccountID, operation.Account.ID, income, operation.Income, cost, operation.Cost);
                 else
-                    ChangeSummOnAccount(operation.AccountID, operation.Income, cost, operation.Cost);
+                    _continue = ChangeSummOnAccount(operation.AccountID, income, operation.Income, cost, operation.Cost);
+
+                if (!_continue)
+                    return true;
             }
 
             operation.DebtID = operation.Debt?.ID == 0 ? null : operation.Debt?.ID;
@@ -240,59 +244,81 @@ namespace Bruh.Model.DBs
         }
 
         // Только при изменении счёта у операции
-        private static bool ChangeSummOnAccount(int prevAccId, int currAccId, bool isIncome ,decimal prevSumm, decimal curSumm)
+        private static bool ChangeSummOnAccount(int prevAccId, int currAccId, bool prevIncome, bool isIncome ,decimal prevSumm, decimal curSumm)
         {
             decimal? balance = 0;
             decimal? balance2 = 0;
 
             balance = GetBalance(prevAccId);
             balance2 = GetBalance(currAccId);
-            decimal summForChangeAcc1;
-            decimal summForChangeAcc2;
+
+            if (prevIncome)
+                balance -= prevSumm;
+            else
+                balance += prevSumm;
 
             if (isIncome)
+                balance2 += curSumm;
+            else
+                balance2 -= curSumm;
+
+            if (balance < 0)
             {
-                summForChangeAcc1 = -prevSumm;
-                summForChangeAcc2 = curSumm;
-                if (balance - summForChangeAcc1 < 0)
+                //Это если какой-то вообще капец произойдёт
+                if (balance2 < 0)
                 {
-                    switch (MessageBox.Show("Внимание! На старом счету недостаточно средств для изменения привязки операции к счёту.\nПри отмене операции изменения не будут внесены.\nПродолжить изменение балансов счетов? (Баланс старого счёта будет равен 0)", "", MessageBoxButton.YesNoCancel))
-                    {
-                        case MessageBoxResult.Yes:
-                            summForChangeAcc1 = -(decimal)balance;
-                            break;
-                        case MessageBoxResult.No:
-                            return true;
-                        case MessageBoxResult.Cancel:
-                            return false;
-                    }
+                    MessageBox.Show("Да как так-то");
+                    return false;
+                }
+
+                switch (MessageBox.Show("Для изменения операции на старом счету недостаточно средств. Продолжить действие?" +
+                    "\n\"Да\" - Изменения операции сохранятся,баланс старого счёта станет равным 0 и баланс нового счёта изменится" +
+                    "\n\"Нет\" - Изменения операции сохранятся, балансы счетов будут нетронуты" +
+                    "\n\"Отмена\" - Изменения операции не сохранятся", "", MessageBoxButton.YesNoCancel))
+                {
+                    // Изменяем баланс в 0 и изменяем операцию
+                    case MessageBoxResult.Yes:
+                        balance = 0;
+                        break;
+
+                    // Не изменяем баланс но изменяем операцию
+                    case MessageBoxResult.No:
+                        return true;
+
+                    // Ничего не изменяем
+                    case MessageBoxResult.Cancel:
+                        return false;
                 }
             }
-            else
+
+            if (balance2 < 0)
             {
-                summForChangeAcc1 = prevSumm;
-                summForChangeAcc2 = -curSumm;
-                if (balance2 - summForChangeAcc2 < 0)
+                switch (MessageBox.Show("Для изменения операции на новом счету недостаточно средств. Продолжить действие?" +
+                    "\n\"Да\" - Изменения операции сохранятся, баланс старого счёта изменится и баланс нового счёта станет равен 0" +
+                    "\n\"Нет\" - Изменения операции сохранятся и счета не будет тронуты" +
+                    "\n\"Отмена\" - Изменения операции не сохранятся", "", MessageBoxButton.YesNoCancel))
                 {
-                    switch (MessageBox.Show("Внимание! На новом счету недостаточно средств для изменения привязки операции к счёту.\nПри отмене операции изменения не будут внесены.\nПродолжить изменение балансов счетов? (Баланс нового счёта будет равен 0)", "", MessageBoxButton.YesNoCancel))
-                    {
-                        case MessageBoxResult.Yes:
-                            summForChangeAcc2 = -(decimal)balance2;
-                            break;
-                        case MessageBoxResult.No:
-                            return true;
-                        case MessageBoxResult.Cancel:
-                            return false;
-                    }
+                    // Изменяем баланс в 0 и изменяем операцию
+                    case MessageBoxResult.Yes:
+                        balance2 = 0;
+                        break;
+
+                    // Не изменяем балансы но изменяем операцию
+                    case MessageBoxResult.No:
+                        return true;
+
+                    // Ничего не изменяем
+                    case MessageBoxResult.Cancel:
+                        return false;
                 }
             }
 
             using (var cmd3 = DbConnection.GetDbConnection().CreateCommand("UPDATE `Accounts` set `Balance`=@acc1balance WHERE `ID`=@prevAccId ; UPDATE `Accounts` set `Balance`=@acc2balance WHERE `ID`=@currAccId"))
             {
-                cmd3.Parameters.Add(new MySqlParameter("acc1balance", balance + summForChangeAcc1));
+                cmd3.Parameters.Add(new MySqlParameter("acc1balance", balance));
                 cmd3.Parameters.Add(new MySqlParameter("prevAccId", prevAccId));
                 cmd3.Parameters.Add(new("currAccId", currAccId));
-                cmd3.Parameters.Add(new("acc2balance", balance2 + summForChangeAcc2));
+                cmd3.Parameters.Add(new("acc2balance", balance2));
                 DbConnection.GetDbConnection().OpenConnection();
                 if (!ExceptionHandler.Try(() => cmd3.ExecuteNonQuery()))
                     MessageBox.Show("Внимание! Не удалось изменить счета");
@@ -301,19 +327,80 @@ namespace Bruh.Model.DBs
 
             return true;
         }
-        private static void ChangeSummOnAccount(int accountId, bool isIncome, decimal prevSumm, decimal curSumm)
+
+        /// <summary>
+        /// Меняет балансы счёта на котором происходила операция
+        /// </summary>
+        /// <param name="accountId">ID счёта</param>
+        /// <param name="isIncome">Является ли операция доходом</param>
+        /// <param name="prevIncome">ЯвляЛАСЬ ли операция доходом</param>
+        /// <param name="prevSumm">Предыдущая сумма операции</param>
+        /// <param name="curSumm">Текущая сумма операции</param>
+        /// <returns>bool, надо ли не продолжать изменение операции</returns>
+        private static bool ChangeSummOnAccount(int accountId, bool prevIncome, bool isIncome, decimal prevSumm, decimal curSumm)
         {
+            //Получаем баланс счёта
             decimal balance = GetBalance(accountId);
-            decimal changedBalance = isIncome ? balance + (curSumm - prevSumm) : balance - (curSumm - prevSumm);
+
+            if (isIncome == prevIncome)
+            {
+                if (isIncome)
+                {
+                    //Если операция - Доход, то отнимаем предыдущий доход и добавляем текущий
+                    balance -= prevSumm;
+                    balance += curSumm;
+                }
+                else
+                {
+                    // Иначе операция - расхож и мы прибавляем предыдущий расход и отнимаем текущий
+                    balance += prevSumm;
+                    balance -= curSumm;
+                }
+            }
+            else
+            {
+                if (prevIncome)
+                    //Если операция была доходом (а в следствии операция стала расходом), то отнимаем доход(которого не стало) и расход (который появился)
+                    balance -= (prevSumm + curSumm);
+                else
+                    //Иначе операция была расходом (а стала доходом) и мы прибавляем расход(он исчез) и добавляем дохож(он появился)
+                    balance += prevSumm + curSumm;
+            }
+
+            // Проверяем, не улетел ли баланс в минус
+            if (balance < 0)
+            {
+                switch (MessageBox.Show("Для изменения операции на счету недостаточно средств. Продолжить действие?" +
+                    "\n\"Да\" - Изменения операции сохранятся и баланс счёта будет 0" +
+                    "\n\"Нет\" - Изменения операции сохранятся и счёт не будет тронут" +
+                    "\n\"Отмена\" - Изменения операции не сохранятся", "", MessageBoxButton.YesNoCancel))
+                {
+                    // Изменяем баланс в 0 и изменяем операцию
+                    case MessageBoxResult.Yes:
+                        balance = 0;
+                        break;
+
+                    // Не изменяем баланс но изменяем операцию
+                    case MessageBoxResult.No:
+                        return true;
+
+                    // Ничего не изменяем
+                    case MessageBoxResult.Cancel:
+                        return false;
+                }
+            }
+
             using (var cmd2 = DbConnection.GetDbConnection().CreateCommand("UPDATE `Accounts` set `Balance`=@balance WHERE `ID`=@id"))
             {
-                cmd2.Parameters.Add(new MySqlParameter("balance", changedBalance));
+                cmd2.Parameters.Add(new MySqlParameter("balance", balance));
                 cmd2.Parameters.Add(new MySqlParameter("id", accountId));
                 DbConnection.GetDbConnection().OpenConnection();
                 if (!ExceptionHandler.Try(() => cmd2.ExecuteNonQuery()))
                     MessageBox.Show("Внимание! Не удалось изменить соответствующий счёт");
                 DbConnection.GetDbConnection().CloseConnection();
             }
+
+            return true;
         }
         private static decimal GetBalance(int accountId)
         {

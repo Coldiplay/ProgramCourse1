@@ -20,7 +20,7 @@ namespace Bruh.Model.DBs
                 if (!string.IsNullOrEmpty(f))
                     filter = $"{filter} AND {f}";
             });
-            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID`, `Title`, `Summ`, `AnnualInterest`, `DateOfPick`, `DateOfReturn`, `CurrencyID` FROM `Debts` WHERE (`Title` LIKE @search OR `Summ` LIKE @search OR `DateOfPick` LIKE @search OR `DateOfReturn` LIKE @search OR `AnnualInterest` LIKE @search) {filter}"))
+            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID`, `Title`, `Summ`, `AnnualInterest`, `DateOfPick`, `DateOfReturn` FROM `Debts` WHERE (`Title` LIKE @search OR `Summ` LIKE @search OR `DateOfPick` LIKE @search OR `DateOfReturn` LIKE @search OR `AnnualInterest` LIKE @search) {filter}"))
             {
                 cmd.Parameters.Add(new MySqlParameter("search", $"%{search}%"));
 
@@ -38,8 +38,7 @@ namespace Bruh.Model.DBs
                                 Summ = dr.GetDecimal("Summ"),
                                 AnnualInterest = dr.GetInt16("AnnualInterest"),
                                 DateOfPick = dr.GetDateOnly("DateOfPick").ToDateTime(new TimeOnly()),
-                                DateOfReturn = dr.GetDateOnly("DateOfReturn").ToDateTime(new TimeOnly()),
-                                CurrencyID = dr.GetInt32("CurrencyID")
+                                DateOfReturn = dr.GetDateOnly("DateOfReturn").ToDateTime(new TimeOnly())
                             });
                         }
                     }
@@ -49,7 +48,6 @@ namespace Bruh.Model.DBs
             debts.ForEach(deb =>
             {
                 Debt debt = (Debt)deb;
-                debt.Currency = (Currency)DB.GetDb(typeof(CurrencyDB)).GetSingleEntry(debt.CurrencyID);
                 using (var cmd2 = DbConnection.GetDbConnection().CreateCommand($"SELECT `Cost` FROM `Operations` WHERE `DebtID`={debt.ID} AND `Income`=0;"))
                 {
                     DbConnection.GetDbConnection().OpenConnection();
@@ -79,7 +77,7 @@ namespace Bruh.Model.DBs
             if (DbConnection.GetDbConnection() == null)
                 return debt;
 
-            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID`, `Title`, `Summ`, `AnnualInterest`, `DateOfPick`, `DateOfReturn`, `CurrencyID` FROM `Debts` WHERE `ID` = {id}"))
+            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID`, `Title`, `Summ`, `AnnualInterest`, `DateOfPick`, `DateOfReturn` FROM `Debts` WHERE `ID` = {id}"))
             {
                 DbConnection.GetDbConnection().OpenConnection();
                 using (var dr = cmd.ExecuteReader())
@@ -96,14 +94,11 @@ namespace Bruh.Model.DBs
                             debt.AnnualInterest = dr.GetInt16("AnnualInterest");
                             debt.DateOfPick = dr.GetDateOnly("DateOfPick").ToDateTime(new TimeOnly());
                             debt.DateOfReturn = dr.GetDateOnly("DateOfReturn").ToDateTime(new TimeOnly());
-                            debt.CurrencyID = dr.GetInt32("CurrencyID");
                         }
                     }
                 }
                 DbConnection.GetDbConnection().OpenConnection();
             }
-            debt.Currency = (Currency)DB.GetDb(typeof(CurrencyDB)).GetSingleEntry(debt.CurrencyID);
-
             using (var cmd2 = DbConnection.GetDbConnection().CreateCommand($"SELECT `Cost` FROM `Operations` WHERE `DebtID`={debt.ID} AND `Income`=0;"))
             {
                 DbConnection.GetDbConnection().OpenConnection();
@@ -132,16 +127,13 @@ namespace Bruh.Model.DBs
             if (DbConnection.GetDbConnection() == null)
                 return result;
 
-            debt.CurrencyID = debt.Currency.ID;
-
-            using (MySqlCommand cmd = DbConnection.GetDbConnection().CreateCommand("INSERT INTO `Debts` VALUES(0, @title, @summ, @annualInterest, @dateOfPick, @dateOfReturn,  @currencyId); SELECT LAST_INSERT_ID();"))
+            using (MySqlCommand cmd = DbConnection.GetDbConnection().CreateCommand("INSERT INTO `Debts` VALUES(0, @title, @summ, @annualInterest, @dateOfPick, @dateOfReturn); SELECT LAST_INSERT_ID();"))
             {
                 cmd.Parameters.Add(new MySqlParameter("title", debt.Title));
                 cmd.Parameters.Add(new MySqlParameter("summ", debt.Summ));
                 cmd.Parameters.Add(new MySqlParameter("annualInterest", debt.AnnualInterest));
                 cmd.Parameters.Add(new MySqlParameter("dateOfPick", debt.DateOfPick));
                 cmd.Parameters.Add(new MySqlParameter("dateOfReturn", debt.DateOfReturn));
-                cmd.Parameters.Add(new MySqlParameter("currencyId", debt.CurrencyID));
 
                 DbConnection.GetDbConnection().OpenConnection();
                 ExceptionHandler.Try(() =>
@@ -190,16 +182,13 @@ namespace Bruh.Model.DBs
             if (DbConnection.GetDbConnection() == null)
                 return result;
 
-            debt.CurrencyID = debt.Currency.ID;
-
-            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"UPDATE `Debts` set `Title`=@title, `Summ`=@summ, `AnnualInterest`=@annualInterest, `DateOfPick`=@dateOfPick, `DateOfReturn`=@dateOfReturn, `CurrencyID`=@currencyId WHERE `ID` = {debt.ID} ;"))
+            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"UPDATE `Debts` set `Title`=@title, `Summ`=@summ, `AnnualInterest`=@annualInterest, `DateOfPick`=@dateOfPick, `DateOfReturn`=@dateOfReturn WHERE `ID` = {debt.ID} ;"))
             {
                 cmd.Parameters.Add(new MySqlParameter("title", debt.Title));
                 cmd.Parameters.Add(new MySqlParameter("summ", debt.Summ));
                 cmd.Parameters.Add(new MySqlParameter("AnnualInterest", debt.AnnualInterest));
                 cmd.Parameters.Add(new MySqlParameter("DateOfPick", debt.DateOfPick));
                 cmd.Parameters.Add(new MySqlParameter("DateOfReturn", debt.DateOfReturn));
-                cmd.Parameters.Add(new MySqlParameter("currencyId", debt.CurrencyID));
 
                 DbConnection.GetDbConnection().OpenConnection();
                 ExceptionHandler.Try(() =>

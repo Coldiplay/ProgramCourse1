@@ -21,7 +21,7 @@ namespace Bruh.Model.DBs
                     filter = $"{filter} AND {f}";
             });
 
-            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"SELECT a.`ID`, a.`Title`, a.`Balance`, a.`BankID`, a.`CurrencyID` FROM `Accounts` a LEFT JOIN `Banks` b ON a.`BankID` = b.`ID` WHERE (`a`.`Title` LIKE @search OR `a`.`Balance` LIKE @search OR `b`.`Title` LIKE @search) {filter};"))
+            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"SELECT a.`ID`, a.`Title`, a.`Balance`, a.`BankID` FROM `Accounts` a LEFT JOIN `Banks` b ON a.`BankID` = b.`ID` WHERE (`a`.`Title` LIKE @search OR `a`.`Balance` LIKE @search OR `b`.`Title` LIKE @search) {filter};"))
             {
                     cmd.Parameters.Add(new MySqlParameter("search", $"%{search}%"));
 
@@ -35,9 +35,8 @@ namespace Bruh.Model.DBs
                             var account = new Account
                             {
                                 ID = dr.GetInt32("ID"),
-                                Title = dr.GetString("Title"), //dr.IsDBNull("Name") ? null : dr.GetString("Name"),
+                                Title = dr.GetString("Title"),
                                 Balance = dr.GetDecimal("Balance"),
-                                CurrencyID = dr.GetInt32("CurrencyID"),
                                 BankID = dr.IsDBNull("BankID") ? null : dr.GetInt32("BankID")
                             };
                             accounts.Add(account);
@@ -51,7 +50,6 @@ namespace Bruh.Model.DBs
             {
                 Account account = (Account)acc;
                 account.Bank = account.BankID == null ? null : (Bank)DB.GetDb(typeof(BanksDB)).GetSingleEntry((int)account.BankID);
-                account.Currency = (Currency)DB.GetDb(typeof(CurrencyDB)).GetSingleEntry(account.CurrencyID);
             });
 
             return accounts;
@@ -63,7 +61,7 @@ namespace Bruh.Model.DBs
             if (DbConnection.GetDbConnection() == null)
                 return account;
 
-            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID`, `Title`, `Balance`, `CurrencyID`, `BankID` FROM `Accounts` WHERE `ID` = {id}"))
+            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID`, `Title`, `Balance`, `BankID` FROM `Accounts` WHERE `ID` = {id}"))
             {
                 DbConnection.GetDbConnection().OpenConnection();
                 using (var dr = cmd.ExecuteReader())
@@ -76,7 +74,6 @@ namespace Bruh.Model.DBs
                         account.ID = dr.GetInt32("ID");
                         account.Title = dr.GetString("Title");
                         account.Balance = dr.GetDecimal("Balance");
-                        account.CurrencyID = dr.GetInt32("CurrencyID");
                         account.BankID = dr.IsDBNull("BankID") ? null : dr.GetInt32("BankID");
                     }
                 }
@@ -84,7 +81,6 @@ namespace Bruh.Model.DBs
             }
 
             account.Bank = account.BankID == null ? null : (Bank)DB.GetDb(typeof(BanksDB)).GetSingleEntry((int)account.BankID);
-            account.Currency = (Currency)DB.GetDb(typeof(CurrencyDB)).GetSingleEntry(account.CurrencyID);
 
             return account;
         }
@@ -96,14 +92,12 @@ namespace Bruh.Model.DBs
             if (DbConnection.GetDbConnection() == null)
                 return result;
 
-            account.CurrencyID = account.Currency.ID;
             account.BankID = account.Bank?.ID == 0 ? null : account.Bank?.ID;
 
-            using (MySqlCommand cmd = DbConnection.GetDbConnection().CreateCommand("INSERT INTO `Accounts` VALUES(0, @title, @balance, @currencyId, @bankId); SELECT LAST_INSERT_ID();"))
+            using (MySqlCommand cmd = DbConnection.GetDbConnection().CreateCommand("INSERT INTO `Accounts` VALUES(0, @title, @balance, @bankId); SELECT LAST_INSERT_ID();"))
             {
                 cmd.Parameters.Add(new MySqlParameter("title", account.Title));
                 cmd.Parameters.Add(new MySqlParameter("balance", account.Balance));
-                cmd.Parameters.Add(new MySqlParameter("currencyId", account.CurrencyID));
                 cmd.Parameters.Add(new MySqlParameter("bankId", account.BankID));
 
                 DbConnection.GetDbConnection().OpenConnection();
@@ -152,14 +146,12 @@ namespace Bruh.Model.DBs
             if (DbConnection.GetDbConnection() == null)
                 return result;
 
-            account.CurrencyID = account.Currency.ID;
             account.BankID = account.Bank?.ID;
 
-            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"UPDATE `Accounts` set `Title`=@title, `Balance`=@balance, `CurrencyID`=@currencyId, `BankID`=@bankId WHERE `ID` = {account.ID};"))
+            using (var cmd = DbConnection.GetDbConnection().CreateCommand($"UPDATE `Accounts` set `Title`=@title, `Balance`=@balance, `BankID`=@bankId WHERE `ID` = {account.ID};"))
             {
                 cmd.Parameters.Add(new MySqlParameter("title", account.Title));
                 cmd.Parameters.Add(new MySqlParameter("balance", account.Balance));
-                cmd.Parameters.Add(new MySqlParameter("currencyId", account.CurrencyID));
                 cmd.Parameters.Add(new MySqlParameter("bankID", account.BankID));
 
                 DbConnection.GetDbConnection().OpenConnection();

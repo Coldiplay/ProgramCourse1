@@ -633,7 +633,6 @@ namespace Bruh.VM
         public ICommand RemoveEntry { get; private set; }
         public ICommand OpenCategories { get; private set; }
         public ICommand OpenBanks { get; private set; }
-        public ICommand OpenCurrencies { get; private set; }
         public ICommand ClearFilterCMD { get; private set; }
 
         public ICommand SetIncomes { get; private set; }
@@ -709,11 +708,6 @@ namespace Bruh.VM
                 new BanksWindow().ShowDialog();
                 UpdateLists(CodeOper);
             }, () => true);
-            OpenCurrencies = new CommandVM(() =>
-                {
-                    new CurrenciesWindow().ShowDialog();
-                    UpdateLists(CodeOper);
-                }, () => true);
             ClearFilterCMD = new CommandVM(ClearFilter, () => true);
         }
 
