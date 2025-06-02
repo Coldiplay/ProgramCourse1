@@ -191,18 +191,26 @@ namespace Bruh.Model.DBs
 
             if (changeCorrespondingEntries)
             {
-                decimal? cost = 0;
-                using (var cmd2 = DbConnection.GetDbConnection().CreateCommand("SELECT `Cost` FROM `Operations` WHERE `ID`=@id"))
+                decimal cost = 0;
+                bool income = operation.Income;
+                using (var cmd2 = DbConnection.GetDbConnection().CreateCommand("SELECT `Cost`, `Income` FROM `Operations` WHERE `ID`=@id"))
                 {
                     cmd2.Parameters.Add(new MySqlParameter("id", operation.ID));
                     DbConnection.GetDbConnection().OpenConnection();
-                    ExceptionHandler.Try(() => cost = (decimal?)cmd2.ExecuteScalar());
+                    using (var dr = cmd2.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            cost = dr.IsDBNull("Cost") ? 0 : dr.GetDecimal("Cost");
+                            income = dr.IsDBNull("Income") ? income : dr.GetBoolean("Income");
+                        }
+                    }
                     DbConnection.GetDbConnection().CloseConnection();
                 }
                 if (operation.Account.ID > 0 && operation.AccountID != operation.Account.ID)
-                    ChangeSummOnAccount(operation.AccountID, operation.Account.ID, operation.Income, (decimal)cost , operation.Cost);
+                    ChangeSummOnAccount(operation.AccountID, operation.Account.ID, operation.Income, cost , income == operation.Income ? operation.Cost : -operation.Cost);
                 else
-                    ChangeSummOnAccount(operation.AccountID, operation.Income, (decimal)cost, operation.Cost);
+                    ChangeSummOnAccount(operation.AccountID, operation.Income, cost, operation.Cost);
             }
 
             operation.DebtID = operation.Debt?.ID == 0 ? null : operation.Debt?.ID;
