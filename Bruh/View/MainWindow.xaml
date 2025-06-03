@@ -181,7 +181,7 @@
                         <ListView.View>
                             <GridView >
                                 <GridViewColumn Header="Название" DisplayMemberBinding="{Binding Title}"/>
-                                <GridViewColumn Header="Сумма" DisplayMemberBinding="{Binding GetSumm}"/>
+                                <GridViewColumn Header="Сумма всего долга" DisplayMemberBinding="{Binding GetApproximateFullSumm}"/>
                                 <GridViewColumn Header="Ставка" DisplayMemberBinding="{Binding AnnualInterest, StringFormat={}{0}%}"/>
                                 <GridViewColumn Header="Выплачено" DisplayMemberBinding="{Binding GetPaidSumm}"/>
                                 <GridViewColumn Header="Дата взятия" DisplayMemberBinding="{Binding DateOfPick, StringFormat=dd.MM.yyyy}"/>
@@ -323,8 +323,9 @@
                     <ComboBox ItemsSource="{Binding Ranges}" SelectedItem="{Binding ExpensesMode}" VerticalAlignment="Top"/>
                 </StackPanel>
                 <StackPanel Grid.Row="2" Grid.Column="0">
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{Binding AllIncomes, StringFormat=Всего {0} рублей}"/>
-                    <TextBlock Text="{Binding AllIncomesFromDeposits, StringFormat=Из них за вклады {0} рублей}"/>
+                    <CheckBox Content="Учитывать вклады" IsChecked="{Binding CalcDepositsIncomes}"/>
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{Binding AllIncomesSumm, StringFormat=Всего {0} рублей}"/>
+                    <!--<TextBlock Text="{Binding AllIncomesFromDeposits, StringFormat=Всего за вклады {0} рублей}"/>-->
                 </StackPanel>
                 
                 <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding AllExpenses, StringFormat=Всего {0} рублей}"/>

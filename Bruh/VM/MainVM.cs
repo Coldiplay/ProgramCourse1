@@ -110,6 +110,7 @@ namespace Bruh.VM
         private Visibility miscSP;
         private PlotModel categoriesIncomesPlot;
         private PlotModel categoriesExpensesPlot;
+        private bool calcDepositsIncomes;
 
         public DateTime? FilterUpperDate
         {
@@ -222,7 +223,7 @@ namespace Bruh.VM
             {
                 incomesMode = value;
                 Signal();
-                Signal(nameof(AllIncomes));
+                Signal(nameof(AllIncomesSumm));
                 Signal(nameof(AllIncomesFromDeposits));
                 ChangePlotModels();
             }
@@ -269,7 +270,25 @@ namespace Bruh.VM
             "Текущий год",
             "Текущий квартал"
         ];
-        public decimal AllIncomes => GetSumm(true);
+        public decimal AllIncomesSumm
+        {
+            get
+            {
+                GetRange((byte)Ranges.IndexOf(IncomesMode), out var lowerDate, out var upperDate);
+                return GetSumm(true) + (CalcDepositsIncomes ? IncomeFromDeposits(lowerDate, upperDate) : 0);
+            }
+        }
+        public bool CalcDepositsIncomes
+        {
+            get => calcDepositsIncomes;
+            set
+            {
+                calcDepositsIncomes = value;
+                Signal();
+                Signal(nameof(AllIncomesSumm));
+                ChangePlotModels();
+            }
+        }
         public decimal AllExpenses => GetSumm(false);
         public bool IsSalaryNeededForNDFL
         {
@@ -575,6 +594,8 @@ namespace Bruh.VM
         }
         private void ChangePlotModels()
         {
+            GetCategories(out List<Categor> incomesCats, out List<Categor> expensesCats);
+
             PlotModel incomesPlot = new()
             {
                 EdgeRenderingMode = EdgeRenderingMode.PreferGeometricAccuracy,
@@ -588,7 +609,7 @@ namespace Bruh.VM
 
             FixedPieSeries incomesCategories = new();
             PieSeries expensesCategories = new();
-            GetCategories(out List<Categor> incomesCats, out List<Categor> expensesCats);
+
             for (int i = 0; i < incomesCats.Count; i++)
             {
                 Categor? item = incomesCats[i];
@@ -601,7 +622,7 @@ namespace Bruh.VM
                 var slice = new PieSlice($"{item.Link?.Title}", (double)item.TotalAmount);
                 expensesCategories.Slices.Add(slice);
             }
-            if (AllIncomesFromDeposits > 0)
+            if (CalcDepositsIncomes && AllIncomesFromDeposits > 0)
                 incomesCategories.Slices.Add(new PieSlice($"Вклады", (double)AllIncomesFromDeposits));
 
             incomesCategories.TickDistance = -32;
@@ -649,7 +670,7 @@ namespace Bruh.VM
             ExpensesMode = Ranges[4];
 
             UpdateListsForFilter();
-            CodeOper = 5;
+            CodeOper = 6;
 
             SetOperations = new CommandVM(() => CodeOper = 0, () => true);
             SetIncomes = new CommandVM(() => CodeOper = 1, () => true);

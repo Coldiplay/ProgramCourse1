@@ -8,7 +8,7 @@
         xmlns:model="clr-namespace:Bruh.Model.Models"
         mc:Ignorable="d"
         DataContext="{DynamicResource vm}"
-        Title="EditWindow" Height="450" Width="800"
+        Title="Bruhgalter" Height="450" Width="800"
         WindowStartupLocation="CenterScreen"
         SizeToContent="WidthAndHeight">
     <Window.Resources>
@@ -19,8 +19,6 @@
                 <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBlock Text="Баланс"/>
                 <TextBox Text="{Binding Balance, UpdateSourceTrigger=PropertyChanged}"/>
-                <TextBlock Text="Валюта"/>
-                <ComboBox ItemsSource="{Binding DataContext.Currencies, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" SelectedItem="{Binding Currency, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Title"/>
                 <TextBlock Text="Банк"/>
                 <ComboBox ItemsSource="{Binding DataContext.Banks, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" SelectedItem="{Binding Bank, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Title"/>
             </StackPanel>
@@ -69,11 +67,9 @@
                 <TextBlock Text="Название долга"/>
                 <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" MaxLength="255"/>
                 <TextBlock Text="Сумма долга"/>
-                <TextBox Text="{Binding Summ, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding Summ, UpdateSourceTrigger=PropertyChanged}" MaxLength="25"/>
                 <TextBlock Text="Годовой процент (%)"/>
                 <TextBox Text="{Binding AnnualInterest, UpdateSourceTrigger=PropertyChanged}" MaxLength="8"/>
-                <TextBlock Text="Валюта"/>
-                <ComboBox ItemsSource="{Binding DataContext.Currencies, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" SelectedItem="{Binding Currency, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="GetCurrency"/>
                 <TextBlock Text="Дата взятия долга"/>
                 <DatePicker SelectedDate="{Binding DateOfPick, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBlock Text="Срок"/>
@@ -89,14 +85,13 @@
                 <TextBlock Text="Примерный ежемесячный платёж"/>
                 <TextBlock Text="{Binding GetApproximateMonthlyPayment, UpdateSourceTrigger=PropertyChanged}"/>
             </StackPanel>
-
         </DataTemplate>
         <DataTemplate DataType="{x:Type model:Deposit}">
             <StackPanel>
                 <TextBlock Text="Название вклада"/>
                 <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" MaxLength="255"/>
                 <TextBlock Text="Сумма вклада"/>
-                <TextBox Text="{Binding InitalSumm, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding InitalSumm, UpdateSourceTrigger=PropertyChanged}" MaxLength="25"/>
                 <TextBlock Text="Процент вклада"/>
                 <TextBox Text="{Binding InterestRate, UpdateSourceTrigger=PropertyChanged}" MaxLength="8"/>
                 <CheckBox Content="Капитализация процентов" IsChecked="{Binding Capitalization, UpdateSourceTrigger=PropertyChanged}"/>

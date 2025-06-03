@@ -48,7 +48,7 @@ namespace Bruh.Model.DBs
             debts.ForEach(deb =>
             {
                 Debt debt = (Debt)deb;
-                using (var cmd2 = DbConnection.GetDbConnection().CreateCommand($"SELECT `Cost` FROM `Operations` WHERE `DebtID`={debt.ID} AND `Income`=0;"))
+                using (var cmd2 = DbConnection.GetDbConnection().CreateCommand($"SELECT `Cost` FROM `Operations` WHERE `DebtID`={debt.ID} AND `Income`= 0;"))
                 {
                     DbConnection.GetDbConnection().OpenConnection();
                     ExceptionHandler.Try(() =>
