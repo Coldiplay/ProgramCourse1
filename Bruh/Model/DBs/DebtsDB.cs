@@ -34,7 +34,7 @@ namespace Bruh.Model.DBs
                             debts.Add(new Debt
                             {
                                 ID = dr.GetInt32("ID"),
-                                Title = dr.IsDBNull("Title") ? null : dr.GetString("Title"),
+                                Title = dr.GetString("Title"),
                                 Summ = dr.GetDecimal("Summ"),
                                 AnnualInterest = dr.GetInt16("AnnualInterest"),
                                 DateOfPick = dr.GetDateOnly("DateOfPick").ToDateTime(new TimeOnly()),
@@ -89,7 +89,7 @@ namespace Bruh.Model.DBs
                         else
                         {
                             debt.ID = id;
-                            debt.Title = dr.IsDBNull("Title") ? null : dr.GetString("Title");
+                            debt.Title = dr.GetString("Title");
                             debt.Summ = dr.GetDecimal("Summ");
                             debt.AnnualInterest = dr.GetInt16("AnnualInterest");
                             debt.DateOfPick = dr.GetDateOnly("DateOfPick").ToDateTime(new TimeOnly());

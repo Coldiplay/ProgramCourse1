@@ -94,7 +94,7 @@ namespace Bruh.Model.Models
                         return $"0 ₽";
                     rate += rate / help;
                     approximateMonthlyPayment = Summ * rate;
-                    return $"{Math.Round(approximateMonthlyPayment, MidpointRounding.ToEven)} ₽";
+                    return $"{Math.Round(approximateMonthlyPayment, 2)} ₽";
                 }
                 catch (OverflowException)
                 {

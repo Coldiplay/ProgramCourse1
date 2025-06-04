@@ -195,7 +195,6 @@
                         <ListView.View>
                             <GridView>
                                 <GridViewColumn Header="Название" DisplayMemberBinding="{Binding Title}"/>
-                                <GridViewColumn Header="Сумма вклада" DisplayMemberBinding="{Binding InitalSumm, StringFormat={}{0} ₽}"/>
                                 <GridViewColumn Header="Сумма на данный момент" DisplayMemberBinding="{Binding GetCurrentSumm, StringFormat={}{0} ₽}"/>
                                 <GridViewColumn Header="Ставка" DisplayMemberBinding="{Binding InterestRate, StringFormat={}{0}%}"/>
                                 <GridViewColumn Header="Периодичность выплат" DisplayMemberBinding="{Binding PeriodicityOfPayment.Name}"/>
