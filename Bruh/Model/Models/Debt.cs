@@ -107,7 +107,15 @@ namespace Bruh.Model.Models
         }
         public string GetApproximateFullSumm => decimal.TryParse(GetApproximateMonthlyPayment[..^1], out decimal result) ? $"{result * GetMonths} ₽" : "Ошибка в вычислениях";
         public string GetSumm => $"{Summ} ₽";
-        public string GetPaidSumm => $"{PaidSumm} ₽";
+        public string GetPaidSumm 
+        {
+            get
+            {
+                if(decimal.TryParse(GetApproximateFullSumm[..^1], out decimal res) && PaidSumm == res)
+                    return $"Полностью выплачен";
+                return $"{PaidSumm} ₽";
+            }
+        }
 
         private int GetMonths => ((DateOfReturn.Year - DateOfPick.Year) * 12) + (DateOfReturn.Month - DateOfPick.Month) - (DateOfReturn.Day < DateOfPick.Day ? 1 : 0);
 

@@ -14,8 +14,8 @@ namespace Bruh.VM
         private string durationType = "";
         private byte hours;
         private byte minutes;
-        private bool changeCorrespondingEntries;
-        private Visibility forExpense;
+        private bool changeCorrespondingEntries = true;
+        private Visibility forIncome;
 
         public IModel? Entry
         {
@@ -63,21 +63,27 @@ namespace Bruh.VM
                 Signal();
             }
         }
-        public byte Hours
+        public string Hours
         {
-            get => hours;
+            get => hours < 10 ? $"0{hours}" : hours.ToString();
             set
             {
-                hours = value;
+                if (!byte.TryParse(value, out hours))
+                    hours = 0;
+                if (hours >= 24)
+                    minutes = 0;
                 Signal();
             }
         }
-        public byte Minutes
+        public string Minutes
         {
-            get => minutes;
+            get => minutes < 10 ? $"0{minutes}" : minutes.ToString();
             set
             {
-                minutes = value;
+                if (!byte.TryParse(value, out minutes))
+                    minutes = 0;
+                if (minutes >= 60 && hours == 23)
+                    minutes = 60;
                 Signal();
             }
         }
@@ -94,10 +100,10 @@ namespace Bruh.VM
 
         public Visibility ForIncome
         {
-            get => forExpense;
+            get => forIncome;
             private set
             {
-                forExpense = value;
+                forIncome = value;
                 Signal();
             }
         }
@@ -108,8 +114,23 @@ namespace Bruh.VM
             {
                 if (Entry is Operation operation)
                 {
-                    operation.TransactDate = operation.TransactDate.AddMinutes(Minutes - operation.TransactDate.Minute);
-                    operation.TransactDate = operation.TransactDate.AddHours(Hours - operation.TransactDate.Hour);
+                    operation.TransactDate = operation.TransactDate.AddMinutes(byte.Parse(Minutes) - operation.TransactDate.Minute);
+                    operation.TransactDate = operation.TransactDate.AddHours(byte.Parse(Hours) - operation.TransactDate.Hour);
+
+                    try
+                    {
+                        if (operation.Debt != null && operation.Cost > decimal.Parse(operation.Debt.GetApproximateMonthlyPayment[..^1]))
+                        {
+                            string message = "Сумма операции больше, чем месячный платёж по долгу, вы хотите продолжить?";
+                            if (operation.Cost > decimal.Parse(operation.Debt.GetApproximateFullSumm[..^1]) - operation.Debt.PaidSumm)
+                                message = "Сумма операции больше, чем нужная сумма для покрытия долга, вы точно хотите продолжить?";
+
+                            if (MessageBox.Show(message, "", MessageBoxButton.YesNo) == MessageBoxResult.No)
+                                return;
+                        }
+                    }
+                    catch (Exception)
+                    { }
                 }
 
                 if (Entry?.ID != 0)
@@ -172,8 +193,8 @@ namespace Bruh.VM
 
                 case Operation operation:
                     Debts.Insert(0, new Debt { ID = 0, Title = "Нет" });
-                    Minutes = (byte)operation.TransactDate.Minute;
-                    Hours = (byte)operation.TransactDate.Hour;
+                    Minutes = ((byte)operation.TransactDate.Minute).ToString();
+                    Hours = ((byte)operation.TransactDate.Hour).ToString();
                     ForIncome = operation.Income ? Visibility.Visible : Visibility.Collapsed;
                     if (operation.ID == 0)
                         break;

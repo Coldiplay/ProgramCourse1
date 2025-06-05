@@ -162,6 +162,18 @@ namespace Bruh.Model.DBs
             if (DbConnection.GetDbConnection() == null)
                 return result;
 
+            using (var cmd1 = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID` FROM `Operations` WHERE `DebtID` = {debt.ID}"))
+            {
+                int? id = (int?)cmd1.ExecuteScalar();
+                if (id != null && id > 0) 
+                {
+                    MessageBox.Show("Нельзя удалить долг пока к нему привязаны операции.");
+                    return true;
+                }
+            }
+
+
+
             using (var cmd = DbConnection.GetDbConnection().CreateCommand($"DELETE FROM `Debts` WHERE ID = {debt.ID}"))
             {
                 DbConnection.GetDbConnection().OpenConnection();

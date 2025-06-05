@@ -32,7 +32,7 @@
                 <RadioButton IsChecked="{Binding DataContext.Income, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, UpdateSourceTrigger=PropertyChanged}" Content="Доход"/>
                 <RadioButton Content="Расход" IsChecked="{Binding DataContext.Expense, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
                 <TextBlock Text="Сумма операции"/>
-                <TextBox Text="{Binding Cost, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding Cost, UpdateSourceTrigger=PropertyChanged}" MaxLength="23"/>
                 <TextBlock Text="Дата выполнения операции"/>
                 <DatePicker SelectedDate="{Binding TransactDate, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBlock Text="Время выполнения операции (Часы | Минуты)"/>

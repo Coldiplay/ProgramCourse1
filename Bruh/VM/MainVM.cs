@@ -567,6 +567,21 @@ namespace Bruh.VM
                 {
                     cat.TotalAmount += oper.Cost;
                 }
+
+                if (oper.Income && oper.Debt != null)
+                {
+                    list = expensesCats;
+                    cat = list.FirstOrDefault(c => c.Link?.ID == -1);
+                    if (cat == null)
+                    {
+                        Category category = new() { ID = -1, Title = "Долги" };
+                        list.Add(new Categor { Link = category, TotalAmount = oper.Cost });
+                    }
+                    else
+                        cat.TotalAmount += oper.Cost;
+                }
+
+
             }
         }
         private class Categor 
@@ -637,7 +652,6 @@ namespace Bruh.VM
             expensesCategories.TickLabelDistance = 1;
             expensesCategories.StrokeThickness = 0;
 
-            //incomesCategories.InsideLabelColor = OxyColors.White;
             incomesCategories.TextColor = OxyColors.White;
             expensesCategories.TextColor = OxyColors.White;
             incomesPlot.Series.Add(incomesCategories);

@@ -35,7 +35,7 @@ namespace Bruh.Model.DBs
                             Operation operation = new Operation
                             {
                                 ID = dr.GetInt32("ID"),
-                                Title = dr.GetString("Title"),
+                                Title = dr.IsDBNull("Title") ? null : dr.GetString("Title"),
                                 Cost = dr.GetDecimal("Cost"),
                                 TransactDate = dr.GetDateTime("TransactDate"),
                                 DateOfCreate = dr.GetDateTime("DateOfCreate"),
@@ -79,7 +79,7 @@ namespace Bruh.Model.DBs
                         else
                         {
                             operation.ID = id;
-                            operation.Title = dr.GetString("Title");
+                            operation.Title = dr.IsDBNull("Title") ? null : dr.GetString("Title");
                             operation.Cost = dr.GetDecimal("Cost");
                             operation.TransactDate = dr.GetDateTime("TransactDate");
                             operation.DateOfCreate = dr.GetDateTime("DateOfCreate");

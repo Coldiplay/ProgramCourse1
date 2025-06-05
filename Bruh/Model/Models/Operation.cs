@@ -10,7 +10,7 @@ namespace Bruh.Model.Models
         private DateTime transactDate = DateTime.Today;
 
         public int ID { get; set; }
-        public string Title { get; set; } = string.Empty;
+        public string? Title { get; set; } = string.Empty;
         public decimal Cost { get; set; }
         public DateTime TransactDate
         {
@@ -49,6 +49,6 @@ namespace Bruh.Model.Models
         public string GetCost => $"{Cost} ₽";
         public string IsIncome => Income ? "Доход" : "Расход";
 
-        public bool AllFieldsAreCorrect => !(Category == null || string.IsNullOrWhiteSpace(Title) || Cost <= 0 || Account == null);
+        public bool AllFieldsAreCorrect => !(Category == null || Cost <= 0 || Account == null);
     }
 }

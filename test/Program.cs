@@ -16,7 +16,7 @@
             string eur = el.Where(x => x.Attribute("id").Value == "r01239").Select(x => x.Element("value").Value).FirstOrDefault();
             Console.WriteLine(($"евро: {eur} доллар: {dollar}"));
             */
-            
+            decimal.Parse("fdlkghjkdlf");
         }
 
     }
