@@ -25,6 +25,7 @@ namespace Bruh.Model.DBs
                         });                    
                     }
                 }
+                DbConnection.GetDbConnection().CloseConnection();
                 
             }
             return periodicities;
@@ -49,6 +50,7 @@ namespace Bruh.Model.DBs
                         periodicity.Name = dr.GetString("Name");
                     }
                 }
+                DbConnection.GetDbConnection().CloseConnection();
             }
             return periodicity;
         }

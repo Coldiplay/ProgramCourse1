@@ -164,7 +164,10 @@ namespace Bruh.Model.DBs
 
             using (var cmd1 = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID` FROM `Operations` WHERE `DebtID` = {debt.ID}"))
             {
-                int? id = (int?)cmd1.ExecuteScalar();
+                DbConnection.GetDbConnection().OpenConnection();
+                int? id = 0;
+                ExceptionHandler.Try(() => id = (int?)cmd1.ExecuteScalar());
+                DbConnection.GetDbConnection().CloseConnection();
                 if (id != null && id > 0) 
                 {
                     MessageBox.Show("Нельзя удалить долг пока к нему привязаны операции.");

@@ -58,7 +58,7 @@ namespace Bruh.Model.DBs
                         }
                     }
                 }
-                DbConnection.GetDbConnection().OpenConnection();
+                DbConnection.GetDbConnection().CloseConnection();
             }
             return category;
         }
