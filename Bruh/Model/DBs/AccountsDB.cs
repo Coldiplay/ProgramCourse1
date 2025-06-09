@@ -126,6 +126,19 @@ namespace Bruh.Model.DBs
             if (DbConnection.GetDbConnection() == null)
                 return result;
 
+            bool isEverythingBad = false;
+            using (var cmd1 = DbConnection.GetDbConnection().CreateCommand($"SELECT `ID` FROM `Operations` WHERE `AccountID` = {account.ID}"))
+            {
+                DbConnection.GetDbConnection().OpenConnection();
+                ExceptionHandler.Try(() => isEverythingBad = (int?)cmd1.ExecuteScalar() != null);
+                DbConnection.GetDbConnection().CloseConnection();
+            }
+            if (isEverythingBad)
+            {
+                MessageBox.Show($"Вы не можете удалить этот счёт пока к нему привязаны операции.");
+                return result;
+            }
+
             using (var cmd = DbConnection.GetDbConnection().CreateCommand($"DELETE FROM `Accounts` WHERE ID = {account.ID}"))
             {
                 DbConnection.GetDbConnection().OpenConnection();

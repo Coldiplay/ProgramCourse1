@@ -105,7 +105,13 @@ namespace Bruh.Model.Models
         public string GetCurrentSumm => GetProbableSumm(OpenDate, DateTime.Today, Capitalization);
         public string GetProbSumm => GetProbableSumm(OpenDate, CloseDate, Capitalization);
 
-        public bool AllFieldsAreCorrect => !(Bank == null || CloseDate <= OpenDate || PeriodicityOfPayment == null || string.IsNullOrWhiteSpace(Title) || InitalSumm <= 0 || InterestRate <= 0);
+        public bool AllFieldsAreCorrect => !(
+            Bank == null ||
+            CloseDate <= OpenDate ||
+            PeriodicityOfPayment == null ||
+            string.IsNullOrWhiteSpace(Title) ||
+            InitalSumm <= 0 ||
+            InterestRate <= 0);
 
         internal void ChangeCloseDate(int duration, byte code)
         {

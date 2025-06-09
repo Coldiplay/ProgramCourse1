@@ -90,6 +90,8 @@
             <StackPanel>
                 <TextBlock Text="Название вклада"/>
                 <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" MaxLength="255"/>
+                <TextBlock Text="Банк"/>
+                <ComboBox SelectedItem="{Binding Bank}" ItemsSource="{Binding DataContext.Banks, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" DisplayMemberPath="Title"/>
                 <TextBlock Text="Сумма вклада"/>
                 <TextBox Text="{Binding InitalSumm, UpdateSourceTrigger=PropertyChanged}" MaxLength="25"/>
                 <TextBlock Text="Процент вклада"/>

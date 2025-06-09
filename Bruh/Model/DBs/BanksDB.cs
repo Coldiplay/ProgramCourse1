@@ -111,7 +111,7 @@ namespace Bruh.Model.DBs
                 ExceptionHandler.Try(() => isEverythingBad = (int?)cmd1.ExecuteScalar() != null);
                 DbConnection.GetDbConnection().CloseConnection();                    
             }
-            if (!isEverythingBad)
+            if (isEverythingBad)
             {
                 MessageBox.Show($"Вы не можете удалить этот банк пока к нему привязаны счета. Пожалуйста, отвяжите все счета привязанные к банку '{bank.Title}'");
                 return result;
